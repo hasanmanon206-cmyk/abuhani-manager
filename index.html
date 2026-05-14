@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أبو هاني - مدير</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f2f5; padding: 10px; }
+        .container { max-width: 500px; margin: 0 auto; }
+        .header { background: #1a73e8; color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 10px; }
+        .section { background: white; border-radius: 12px; padding: 15px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .section h3 { margin-bottom: 10px; color: #333; border-bottom: 2px solid #1a73e8; padding-bottom: 5px; }
+        .btn { padding: 10px 15px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: bold; margin: 3px; }
+        .btn-accept { background: #28a745; color: white; }
+        .btn-reject { background: #dc3545; color: white; }
+        .btn-primary { background: #1a73e8; color: white; width: 100%; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        input, select { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 8px; font-family: inherit; }
+        .order-card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 12px; margin-bottom: 10px; }
+        .order-card.new { border-right: 4px solid #ffc107; }
+        .order-card.accepted { border-right: 4px solid #28a745; }
+        .order-card.rejected { border-right: 4px solid #dc3545; }
+        .order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .order-id { font-size: 12px; color: #888; }
+        .order-status { font-size: 12px; padding: 3px 8px; border-radius: 4px; }
+        .status-new { background: #fff3cd; color: #856404; }
+        .status-accepted { background: #d4edda; color: #155724; }
+        .status-rejected { background: #f8d7da; color: #721c24; }
+        .order-items { margin: 8px 0; font-size: 14px; }
+        .order-total { font-weight: bold; color: #1a73e8; }
+        .order-customer { font-size: 13px; color: #555; }
+        .badge { background: #dc3545; color: white; border-radius: 50%; padding: 2px 8px; font-size: 12px; margin-right: 5px; }
+        .hidden { display: none; }
+        .manager-info { background: #d4edda; padding: 10px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+        .stat-box { background: #e8f0fe; padding: 10px; border-radius: 8px; text-align: center; }
+        .stat-box .num { font-size: 22px; font-weight: bold; color: #1a73e8; }
+        .stat-box .label { font-size: 12px; color: #666; }
+        .tab-bar { display: flex; gap: 5px; margin-bottom: 10px; flex-wrap: wrap; }
+        .tab { padding: 8px 15px; border-radius: 8px; background: #ddd; cursor: pointer; font-size: 13px; border: none; }
+        .tab.active { background: #1a73e8; color: white; }
+        .img-preview { max-width: 100%; border-radius: 8px; margin-top: 10px; cursor: pointer; border: 1px solid #ddd; }
+        .modal { display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; }
+        .modal img { max-width: 95%; max-height: 95%; border-radius: 8px; }
+        .modal .close { position: absolute; top: 20px; right: 30px; color: white; font-size: 30px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- شاشة تسجيل الدخول -->
+        <div id="loginScreen" class="section">
+            <h2>🧑‍💼 لوحة تحكم أبو هاني</h2>
+            <p>الرجاء إدخال آيدي المدير</p>
+            <input type="text" id="managerId" placeholder="أدخل آيدي المدير">
+            <button class="btn btn-primary" onclick="managerLogin()" style="margin-top:10px;">دخول</button>
+            <p style="font-size:12px; color:#888; margin-top:10px;">للحصول على آيدي، تواصل مع المدير العام</p>
+        </div>
+
+        <!-- شاشة المدير -->
+        <div id="managerScreen" class="hidden">
+            <div class="manager-info" id="managerInfo"></div>
+            
+            <!-- إحصائيات -->
+            <div class="stats">
+                <div class="stat-box"><div class="num" id="statNew">0</div><div class="label">طلبات جديدة</div></div>
+                <div class="stat-box"><div class="num" id="statAccepted">0</div><div class="label">طلبات مقبولة</div></div>
+                <div class="stat-box"><div class="num" id="statProducts">0</div><div class="label">منتجات</div></div>
+                <div class="stat-box"><div class="num" id="statManagers">0</div><div class="label">مدراء</div></div>
+            </div>
+
+            <!-- شريط التبويبات -->
+            <div class="tab-bar">
+                <button class="tab active" onclick="switchTab('orders')">📋 الطلبات <span id="newBadge" class="badge" style="display:none;">0</span></button>
+                <button class="tab" onclick="switchTab('products')">📦 المنتجات</button>
+                <button class="tab" onclick="switchTab('categories')">📂 الأقسام</button>
+                <button class="tab" onclick="switchTab('managers')">👥 المدراء</button>
+                <button class="tab" onclick="switchTab('shift')">📊 ورديتي</button>
+            </div>
+
+            <!-- قسم الطلبات -->
+            <div id="tabOrders">
+                <div class="section"><h3>📋 الطلبات الجديدة</h3><div id="newOrdersContainer"><p style="color:#888;">لا توجد طلبات جديدة</p></div></div>
+                <div class="section"><h3>✅ الطلبات المقبولة</h3><div id="acceptedOrdersContainer"><p style="color:#888;">لا توجد طلبات مقبولة</p></div></div>
+                <div class="section"><h3>❌ الطلبات المرفوضة</h3><div id="rejectedOrdersContainer"><p style="color:#888;">لا توجد طلبات مرفوضة</p></div></div>
+            </div>
+
+            <!-- قسم المنتجات -->
+            <div id="tabProducts" class="hidden">
+                <div class="section">
+                    <h3>📦 إدارة المنتجات</h3>
+                    <input type="text" id="newProductName" placeholder="اسم المنتج">
+                    <input type="number" id="newProductPrice" placeholder="السعر (ل.س)">
+                    <input type="number" id="newProductStock" placeholder="المخزون">
+                    <select id="newProductCategory"></select>
+                    <button class="btn btn-success" onclick="addProduct()" style="width:100%; margin-top:5px;">➕ إضافة منتج</button>
+                </div>
+                <div class="section"><h3>📋 قائمة المنتجات</h3><div id="productsList"></div></div>
+            </div>
+
+            <!-- قسم الأقسام -->
+            <div id="tabCategories" class="hidden">
+                <div class="section">
+                    <h3>📂 إضافة قسم جديد</h3>
+                    <input type="text" id="newCategoryName" placeholder="اسم القسم">
+                    <button class="btn btn-success" onclick="addCategory()" style="width:100%; margin-top:5px;">➕ إضافة قسم</button>
+                </div>
+                <div class="section"><h3>📋 الأقسام الحالية</h3><div id="categoriesList"></div></div>
+            </div>
+
+            <!-- قسم المدراء -->
+            <div id="tabManagers" class="hidden">
+                <div class="section">
+                    <h3>👥 إضافة مدير جديد</h3>
+                    <input type="text" id="newManagerId" placeholder="آيدي المدير">
+                    <input type="text" id="newManagerName" placeholder="اسم المدير">
+                    <input type="text" id="newManagerPhone" placeholder="رقم الهاتف">
+                    <select id="newManagerRole"><option value="manager">مدير وردية</option><option value="owner">مدير عام</option></select>
+                    <button class="btn btn-success" onclick="addManager()" style="width:100%; margin-top:5px;">➕ إضافة مدير</button>
+                </div>
+                <div class="section"><h3>📋 قائمة المدراء</h3><div id="managersList"></div></div>
+            </div>
+
+            <!-- قسم الوردية -->
+            <div id="tabShift" class="hidden">
+                <div class="section">
+                    <h3>📊 ورديتي الحالية</h3>
+                    <p><strong>وقت البدء:</strong> <span id="shiftStart">-</span></p>
+                    <p><strong>عدد الطلبات:</strong> <span id="shiftOrders">0</span></p>
+                    <p><strong>إجمالي المبيعات:</strong> <span id="shiftTotal">0 ل.س</span></p>
+                    <button class="btn btn-danger" onclick="endShift()" style="width:100%; margin-top:10px;">🚪 إنهاء الوردية</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- مودال عرض الصورة -->
+    <div id="imageModal" class="modal" onclick="closeModal()">
+        <span class="close">&times;</span>
+        <img id="modalImage" src="" alt="الإيصال">
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    
+    <script>
+        const firebaseConfig = {
+            databaseURL: "https://abuhaniapp-default-rtdb.asia-southeast1.firebasedatabase.app/"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        let currentManager = null;
+        let currentShiftId = null;
+        let allOrders = [];
+        let allProducts = [];
+        let allCategories = [];
+        let allManagers = [];
+
+        // ==================== تسجيل الدخول ====================
+        function managerLogin() {
+            const id = document.getElementById('managerId').value.trim();
+            if (!id) { alert('الرجاء إدخال آيدي المدير'); return; }
+            db.ref('managers/' + id).once('value', snap => {
+                if (snap.exists()) {
+                    currentManager = { id, ...snap.val() };
+                    startShift();
+                    document.getElementById('loginScreen').classList.add('hidden');
+                    document.getElementById('managerScreen').classList.remove('hidden');
+                    document.getElementById('managerInfo').innerHTML = `👤 ${currentManager.name} | 🏷️ ${currentManager.role === 'owner' ? 'مدير عام' : 'مدير وردية'} <button class="btn btn-danger" onclick="logout()" style="padding:4px 8px; font-size:12px;">خروج</button>`;
+                    loadAllData();
+                } else {
+                    alert('❌ آيدي غير مصرح به');
+                }
+            });
+        }
+
+        function logout() {
+            if (currentShiftId) endShift();
+            currentManager = null;
+            currentShiftId = null;
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('managerScreen').classList.add('hidden');
+            document.getElementById('managerId').value = '';
+        }
+
+        // ==================== نظام الورديات ====================
+        function startShift() {
+            const shiftRef = db.ref('shifts').push();
+            currentShiftId = shiftRef.key;
+            shiftRef.set({
+                managerId: currentManager.id,
+                managerName: currentManager.name,
+                start: Date.now(),
+                startDate: new Date().toLocaleString('ar-SY'),
+                status: 'active',
+                ordersCount: 0,
+                totalSales: 0
+            });
+            updateShiftDisplay();
+        }
+
+        function endShift() {
+            if (!confirm('هل أنت متأكد من إنهاء الوردية؟')) return;
+            db.ref('shifts/' + currentShiftId).update({
+                status: 'completed',
+                end: Date.now(),
+                endDate: new Date().toLocaleString('ar-SY')
+            });
+            currentShiftId = null;
+            alert('✅ تم إنهاء الوردية');
+            updateShiftDisplay();
+        }
+
+        function updateShiftDisplay() {
+            if (currentShiftId) {
+                db.ref('shifts/' + currentShiftId).once('value', snap => {
+                    if (snap.exists()) {
+                        const shift = snap.val();
+                        document.getElementById('shiftStart').textContent = shift.startDate;
+                        document.getElementById('shiftOrders').textContent = shift.ordersCount || 0;
+                        document.getElementById('shiftTotal').textContent = (shift.totalSales || 0).toLocaleString() + ' ل.س';
+                    }
+                });
+            }
+        }
+
+        // ==================== تحميل البيانات ====================
+        function loadAllData() {
+            // الطلبات
+            db.ref('orders').on('value', snap => {
+                allOrders = [];
+                snap.forEach(o => allOrders.push({ id: o.key, ...o.val() }));
+                displayOrders();
+                updateStats();
+            });
+            // المنتجات
+            db.ref('products').on('value', snap => {
+                allProducts = [];
+                snap.forEach(p => allProducts.push({ id: p.key, ...p.val() }));
+                displayProducts();
+                updateStats();
+                updateCategorySelect();
+            });
+            // الأقسام
+            db.ref('categories').on('value', snap => {
+                allCategories = [];
+                snap.forEach(c => allCategories.push({ id: c.key, ...c.val() }));
+                displayCategories();
+                updateStats();
+                updateCategorySelect();
+            });
+            // المدراء
+            db.ref('managers').on('value', snap => {
+                allManagers = [];
+                snap.forEach(m => allManagers.push({ id: m.key, ...m.val() }));
+                displayManagers();
+                updateStats();
+            });
+        }
+
+        function updateStats() {
+            document.getElementById('statNew').textContent = allOrders.filter(o => o.status === 'new').length;
+            document.getElementById('statAccepted').textContent = allOrders.filter(o => o.status === 'accepted').length;
+            document.getElementById('statProducts').textContent = allProducts.length;
+            document.getElementById('statManagers').textContent = allManagers.length;
+            
+            const newCount = allOrders.filter(o => o.status === 'new').length;
+            const badge = document.getElementById('newBadge');
+            if (newCount > 0) { badge.style.display = 'inline'; badge.textContent = newCount; }
+            else { badge.style.display = 'none'; }
+        }
+
+        // ==================== عرض الطلبات ====================
+        function displayOrders() {
+            const newOrders = allOrders.filter(o => o.status === 'new').reverse();
+            const acceptedOrders = allOrders.filter(o => o.status === 'accepted').reverse();
+            const rejectedOrders = allOrders.filter(o => o.status === 'rejected').reverse();
+
+            document.getElementById('newOrdersContainer').innerHTML = newOrders.length === 0 ? '<p style="color:#888;">لا توجد طلبات جديدة</p>' : newOrders.map(o => orderCard(o)).join('');
+            document.getElementById('acceptedOrdersContainer').innerHTML = acceptedOrders.length === 0 ? '<p style="color:#888;">لا توجد طلبات مقبولة</p>' : acceptedOrders.map(o => orderCard(o)).join('');
+            document.getElementById('rejectedOrdersContainer').innerHTML = rejectedOrders.length === 0 ? '<p style="color:#888;">لا توجد طلبات مرفوضة</p>' : rejectedOrders.map(o => orderCard(o)).join('');
+        }
+
+        function orderCard(order) {
+            const statusClass = order.status === 'new' ? 'new' : order.status === 'accepted' ? 'accepted' : 'rejected';
+            const statusText = order.status === 'new' ? 'جديد' : order.status === 'accepted' ? 'مقبول' : 'مرفوض';
+            const statusLabel = order.status === 'new' ? 'status-new' : order.status === 'accepted' ? 'status-accepted' : 'status-rejected';
+            
+            let itemsHtml = '';
+            if (order.items) {
+                order.items.forEach(item => {
+                    itemsHtml += `<div>• ${item.name} × ${item.qty} = ${(item.total || 0).toLocaleString()} ل.س</div>`;
+                });
+            }
+
+            let buttonsHtml = '';
+            if (order.status === 'new') {
+                buttonsHtml = `
+                    <button class="btn btn-accept" onclick="acceptOrder('${order.id}')">✅ قبول</button>
+                    <button class="btn btn-reject" onclick="rejectOrder('${order.id}')">❌ رفض</button>
+                `;
+            }
+            if (order.processedBy) {
+                buttonsHtml += `<p style="font-size:11px; color:#888;">تمت المعالجة بواسطة: ${order.processedByName || order.processedBy}</p>`;
+            }
+
+            return `
+                <div class="order-card ${statusClass}">
+                    <div class="order-header">
+                        <span class="order-id">🆔 ${order.orderId || order.id}</span>
+                        <span class="order-status ${statusLabel}">${statusText}</span>
+                    </div>
+                    <div class="order-customer">
+                        👤 ${order.customer?.name || 'غير معروف'} | 📞 ${order.customer?.phone || ''}
+                    </div>
+                    <div class="order-items">${itemsHtml}</div>
+                    <div class="order-total">💰 الإجمالي: ${(order.total || 0).toLocaleString()} ل.س</div>
+                    <p style="font-size:11px; color:#888;">📅 ${order.date || ''}</p>
+                    ${order.receiptImageUrl ? `<img src="${order.receiptImageUrl}" class="img-preview" onclick="showImage('${order.receiptImageUrl}')" style="max-height:100px;" alt="الإيصال">` : ''}
+                    <div style="margin-top:8px;">${buttonsHtml}</div>
+                </div>
+            `;
+        }
+
+        function showImage(url) {
+            document.getElementById('modalImage').src = url;
+            document.getElementById('imageModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+
+        // ==================== قبول / رفض الطلب ====================
+        function acceptOrder(orderId) {
+            if (!currentShiftId) { alert('يجب بدء وردية أولاً'); return; }
+            db.ref('orders/' + orderId).update({
+                status: 'accepted',
+                processedBy: currentManager.id,
+                processedByName: currentManager.name,
+                processedAt: Date.now(),
+                shiftId: currentShiftId
+            });
+            // تحديث الوردية
+            const order = allOrders.find(o => o.id === orderId);
+            if (order) {
+                db.ref('shifts/' + currentShiftId).once('value', snap => {
+                    if (snap.exists()) {
+                        const shift = snap.val();
+                        db.ref('shifts/' + currentShiftId).update({
+                            ordersCount: (shift.ordersCount || 0) + 1,
+                            totalSales: (shift.totalSales || 0) + (order.total || 0)
+                        });
+                        updateShiftDisplay();
+                    }
+                });
+                // إنقاص المخزون
+                if (order.items) {
+                    order.items.forEach(item => {
+                        const product = allProducts.find(p => p.id === item.id);
+                        if (product) {
+                            const newStock = (product.stock || 0) - (item.qty || 0);
+                            db.ref('products/' + item.id).update({ stock: Math.max(0, newStock) });
+                        }
+                    });
+                }
+            }
+        }
+
+        function rejectOrder(orderId) {
+            db.ref('orders/' + orderId).update({
+                status: 'rejected',
+                processedBy: currentManager.id,
+                processedByName: currentManager.name,
+                processedAt: Date.now()
+            });
+        }
+
+        // ==================== إدارة المنتجات ====================
+        function updateCategorySelect() {
+            let html = '<option value="">اختر القسم</option>';
+            allCategories.forEach(c => html += `<option value="${c.id}">${c.name}</option>`);
+            document.getElementById('newProductCategory').innerHTML = html;
+        }
+
+        function addProduct() {
+            const name = document.getElementById('newProductName').value.trim();
+            const price = parseInt(document.getElementById('newProductPrice').value);
+            const stock = parseInt(document.getElementById('newProductStock').value);
+            const categoryId = document.getElementById('newProductCategory').value;
+            if (!name || !price || !stock || !categoryId) { alert('الرجاء تعبئة جميع الحقول'); return; }
+            db.ref('products').push({ name, price, stock, categoryId });
+            document.getElementById('newProductName').value = '';
+            document.getElementById('newProductPrice').value = '';
+            document.getElementById('newProductStock').value = '';
+            alert('✅ تم إضافة المنتج');
+        }
+
+        function deleteProduct(id) {
+            if (!confirm('هل أنت متأكد من حذف هذا المنتج؟')) return;
+            db.ref('products/' + id).remove();
+        }
+
+        function displayProducts() {
+            let html = '';
+            if (allProducts.length === 0) {
+                html = '<p style="color:#888;">لا توجد منتجات</p>';
+            } else {
+                allProducts.forEach(p => {
+                    const cat = allCategories.find(c => c.id === p.categoryId);
+                    html += `<div class="order-card"><strong>${p.name}</strong> | السعر: ${(p.price || 0).toLocaleString()} ل.س | المخزون: ${p.stock || 0} | القسم: ${cat?.name || 'غير محدد'} <button class="btn btn-danger" onclick="deleteProduct('${p.id}')" style="padding:4px 8px; font-size:12px;">🗑️ حذف</button></div>`;
+                });
+            }
+            document.getElementById('productsList').innerHTML = html;
+        }
+
+        // ==================== إدارة الأقسام ====================
+        function addCategory() {
+            const name = document.getElementById('newCategoryName').value.trim();
+            if (!name) { alert('الرجاء إدخال اسم القسم'); return; }
+            db.ref('categories').push({ name });
+            document.getElementById('newCategoryName').value = '';
+            alert('✅ تم إضافة القسم');
+        }
+
+        function deleteCategory(id) {
+            if (!confirm('هل أنت متأكد من حذف هذا القسم؟')) return;
+            db.ref('categories/' + id).remove();
+        }
+
+        function displayCategories() {
+            let html = '';
+            if (allCategories.length === 0) {
+                html = '<p style="color:#888;">لا توجد أقسام</p>';
+            } else {
+                allCategories.forEach(c => {
+                    html += `<div class="order-card">📁 ${c.name} <button class="btn btn-danger" onclick="deleteCategory('${c.id}')" style="padding:4px 8px; font-size:12px;">🗑️ حذف</button></div>`;
+                });
+            }
+            document.getElementById('categoriesList').innerHTML = html;
+        }
+
+        // ==================== إدارة المدراء ====================
+        function addManager() {
+            const id = document.getElementById('newManagerId').value.trim();
+            const name = document.getElementById('newManagerName').value.trim();
+            const phone = document.getElementById('newManagerPhone').value.trim();
+            const role = document.getElementById('newManagerRole').value;
+            if (!id || !name) { alert('الرجاء إدخال الآيدي والاسم'); return; }
+            db.ref('managers/' + id).set({ name, phone, role });
+            document.getElementById('newManagerId').value = '';
+            document.getElementById('newManagerName').value = '';
+            document.getElementById('newManagerPhone').value = '';
+            alert('✅ تم إضافة المدير');
+        }
+
+        function deleteManager(id) {
+            if (id === '6057961002') { alert('لا يمكن حذف المدير العام'); return; }
+            if (!confirm('هل أنت متأكد من حذف هذا المدير؟')) return;
+            db.ref('managers/' + id).remove();
+        }
+
+        function displayManagers() {
+            let html = '';
+            if (allManagers.length === 0) {
+                html = '<p style="color:#888;">لا يوجد مدراء</p>';
+            } else {
+                allManagers.forEach(m => {
+                    html += `<div class="order-card">👤 ${m.name} | 🆔 ${m.id} | 🏷️ ${m.role === 'owner' ? 'مدير عام' : 'مدير وردية'} | 📞 ${m.phone || '-'} ${m.id !== '6057961002' ? `<button class="btn btn-danger" onclick="deleteManager('${m.id}')" style="padding:4px 8px; font-size:12px;">🗑️ حذف</button>` : ''}</div>`;
+                });
+            }
+            document.getElementById('managersList').innerHTML = html;
+        }
+
+        // ==================== التبويبات ====================
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            ['tabOrders', 'tabProducts', 'tabCategories', 'tabManagers', 'tabShift'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.remove('hidden');
+            if (tab === 'shift') updateShiftDisplay();
+        }
+    </script>
+</body>
+</html>

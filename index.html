@@ -4,293 +4,160 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>إدارة قهوة البلة - المدير العام</title>
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-database-compat.js"></script>
 
     <style>
-        /* 1. تصميم خلفية قوس قزح المتحركة */
-        :root {
-            --glass: rgba(255, 255, 255, 0.85);
-            --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
-        }
-
+        /* ستايل قوس قزح والواجهة الزجاجية */
         body {
-            margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0; font-family: 'Segoe UI', Tahoma;
             background: linear-gradient(135deg, #ff9a9e, #fad0c4, #a18cd1, #fbc2eb, #8fd3f4);
-            background-size: 400% 400%;
-            animation: rainbowBG 15s ease infinite;
-            height: 100vh;
-            overflow-x: hidden;
-            color: #333;
+            background-size: 400% 400%; animation: rainbow 15s ease infinite;
+            height: 100vh; display: flex; align-items: center; justify-content: center;
+        }
+        @keyframes rainbow { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+
+        .glass-box {
+            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(15px);
+            border-radius: 25px; width: 95%; max-width: 550px; padding: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.3);
+            min-height: 80vh; display: flex; flex-direction: column;
         }
 
-        @keyframes rainbowBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        /* مؤشر حالة الاتصال بالقاعدة */
+        .db-status { font-size: 0.85rem; text-align: center; margin-bottom: 10px; font-weight: bold; padding: 5px; border-radius: 10px; }
+        .online { background: rgba(46, 204, 113, 0.2); color: #27ae60; }
+        .offline { background: rgba(231, 76, 60, 0.2); color: #c0392b; }
+
+        /* ساعة الدوام */
+        .work-clock {
+            background: #2d3436; color: #fdcb6e; padding: 10px; border-radius: 15px;
+            text-align: center; font-family: 'Courier New', Courier, monospace;
+            font-size: 1.5rem; margin-bottom: 15px; border: 2px solid #fdcb6e;
+            box-shadow: inset 0 0 10px rgba(253, 203, 110, 0.3);
         }
 
-        /* 2. تصميم الواجهة الزجاجية */
-        .glass-container {
-            background: var(--glass);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            border-radius: 20px;
-            margin: 15px auto;
-            max-width: 550px;
-            padding: 20px;
-            box-shadow: var(--shadow);
-            min-height: 90vh;
+        /* رسائل الخطأ في تسجيل الدخول */
+        .error-alert {
+            background: #ff7675; color: white; padding: 10px; border-radius: 10px;
+            margin-bottom: 15px; display: none; text-align: center; font-size: 0.9rem;
+            animation: shake 0.4s;
         }
+        @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 75% {transform: translateX(5px);} }
 
-        .header {
-            text-align: center;
-            border-bottom: 2px solid rgba(0,0,0,0.05);
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-
-        .header h1 {
-            font-size: 1.5rem;
-            margin: 0;
-            color: #444;
-        }
-
-        /* 3. الإحصائيات (البطاقات الملونة) */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .stat-card {
-            padding: 15px;
-            border-radius: 15px;
-            color: white;
-            text-align: center;
-            font-weight: bold;
-        }
-
-        .stat-1 { background: linear-gradient(45deg, #ff416c, #ff4b2b); } /* أحمر */
-        .stat-2 { background: linear-gradient(45deg, #f2994a, #f2c94c); } /* برتقالي */
-        .stat-3 { background: linear-gradient(45deg, #2193b0, #6dd5ed); } /* أزرق */
-        .stat-4 { background: linear-gradient(45deg, #8e2de2, #4a00e0); } /* بنفسجي */
-
-        /* 4. شريط التبويبات */
-        .tabs-nav {
-            display: flex;
-            overflow-x: auto;
-            gap: 10px;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-            scrollbar-width: none;
-        }
-
+        /* التبويبات */
+        .tabs-nav { display: flex; overflow-x: auto; gap: 10px; padding-bottom: 10px; margin-bottom: 15px; }
         .tab-btn {
-            background: rgba(255,255,255,0.5);
-            border: none;
-            padding: 10px 15px;
-            border-radius: 12px;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: 0.3s;
+            background: rgba(255,255,255,0.5); border: none; padding: 8px 15px;
+            border-radius: 20px; cursor: pointer; white-space: nowrap; transition: 0.3s;
         }
-
-        .tab-btn.active {
-            background: linear-gradient(45deg, #f093fb, #f5576c);
-            color: white;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        /* 5. شاشة الدخول */
-        #login-screen {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            justify-content: center;
-            height: 70vh;
-        }
+        .tab-btn.active { background: #6c5ce7; color: white; transform: scale(1.05); }
 
         input {
-            padding: 15px;
-            border-radius: 12px;
-            border: 1px solid #ddd;
-            font-size: 1rem;
-            outline: none;
+            width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px;
+            border: 1px solid rgba(0,0,0,0.1); outline: none; background: rgba(255,255,255,0.5);
         }
 
-        .btn-main {
-            background: linear-gradient(45deg, #00b09b, #96c93d);
-            color: white;
-            padding: 15px;
-            border: none;
-            border-radius: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 1.1rem;
+        .login-btn {
+            width: 100%; padding: 15px; border-radius: 12px; border: none;
+            background: linear-gradient(45deg, #00b09b, #96c93d); color: white;
+            font-weight: bold; cursor: pointer; font-size: 1rem;
         }
-
-        .order-item {
-            background: white;
-            margin-bottom: 10px;
-            padding: 15px;
-            border-radius: 12px;
-            border-right: 5px solid #ff9a9e;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(20px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
     </style>
 </head>
 <body>
 
-<div class="glass-container">
-    <div id="login-page">
-        <div class="header">
-            <i class="fas fa-mug-hot fa-3x" style="color: #6d4c41;"></i>
-            <h1>إدارة قهوة البلة</h1>
-            <p>سجل دخولك للمتابعة</p>
-        </div>
-        <div id="login-screen">
-            <input type="text" id="username" placeholder="اسم المستخدم">
-            <input type="password" id="password" placeholder="كلمة المرور">
-            <button class="btn-main" onclick="handleLogin()">دخول <i class="fas fa-sign-in-alt"></i></button>
-        </div>
+<div class="glass-box">
+    <div id="db-status" class="db-status offline">
+        <i class="fas fa-wifi"></i> جاري التحقق من الاتصال...
     </div>
 
-    <div id="admin-page" style="display: none;">
-        <div class="header">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span id="user-info" style="font-weight: bold;"></span>
-                <button onclick="logout()" style="border:none; background:none; color:red;"><i class="fas fa-power-off"></i></button>
-            </div>
-            <h1 id="page-title">لوحة التحكم</h1>
+    <div id="login-screen">
+        <div style="text-align:center; margin-bottom: 20px;">
+            <i class="fas fa-user-shield fa-3x" style="color: #6c5ce7;"></i>
+            <h2>لوحة تحكم أبو هاني</h2>
+        </div>
+        <div id="error-msg" class="error-alert"></div>
+        <input type="text" id="user-name" placeholder="اسم المستخدم">
+        <input type="password" id="user-pass" placeholder="كلمة المرور">
+        <button class="login-btn" onclick="tryLogin()">دخول للمنصة</button>
+    </div>
+
+    <div id="manager-screen" style="display:none;">
+        <div class="work-clock" id="live-timer">00:00:00</div>
+        
+        <div class="tabs-nav">
+            <button class="tab-btn active" onclick="switchTab(this, 'orders')">📋 طلبات</button>
+            <button class="tab-btn" onclick="switchTab(this, 'staff')">👥 موظفين</button>
+            <button class="tab-btn" onclick="switchTab(this, 'suppliers')">🚚 موردين</button>
+            <button class="tab-btn" onclick="switchTab(this, 'charts')">📈 مخططات</button>
+            <button class="tab-btn" onclick="switchTab(this, 'shifts')">⏰ ورديات</button>
+            <button class="tab-btn" onclick="switchTab(this, 'settings')">⚙️ إعدادات</button>
         </div>
 
-        <div class="stats-grid" id="stats-area">
-            <div class="stat-card stat-1"><i class="fas fa-users"></i> <br> <span id="count-emp">0</span> موظفين</div>
-            <div class="stat-card stat-2"><i class="fas fa-truck"></i> <br> <span id="count-sup">0</span> موردين</div>
-            <div class="stat-card stat-3"><i class="fas fa-box"></i> <br> <span id="count-prod">0</span> منتجات</div>
-            <div class="stat-card stat-4"><i class="fas fa-receipt"></i> <br> <span id="count-orders">0</span> طلبات</div>
-        </div>
-
-        <div class="tabs-nav" id="admin-tabs">
-            <button class="tab-btn active" onclick="switchTab('orders')">📋 طلبات</button>
-            <button class="tab-btn" onclick="switchTab('employees')">👥 موظفين</button>
-            <button class="tab-btn" onclick="switchTab('shifts')">📊 ورديات</button>
-            <button class="tab-btn" onclick="switchTab('products')">📦 منتجات</button>
-        </div>
-
-        <div id="tab-content">
-            جاري تحميل البيانات...
+        <div id="display-area" style="flex-grow: 1; overflow-y: auto; background: rgba(255,255,255,0.4); border-radius: 15px; padding: 15px;">
+            مرحباً بك يا أبا هاني، جاري جلب آخر البيانات من Firebase...
         </div>
     </div>
 </div>
 
-<audio id="bell-sound">
-    <source src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" type="audio/mpeg">
-</audio>
-
 <script>
-    // 1. إعدادات Firebase
-    const firebaseConfig = {
-        databaseURL: "https://abuhaniapp-default-rtdb.asia-southeast1.firebasedatabase.app/"
-    };
+    // إعدادات Firebase من مشروعك
+    const firebaseConfig = { databaseURL: "https://abuhaniapp-default-rtdb.asia-southeast1.firebasedatabase.app/" };
     firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+    const database = firebase.database();
 
-    let currentUser = null;
+    // 1. مراقبة حالة الاتصال الحية
+    const connectedRef = database.ref(".info/connected");
+    connectedRef.on("value", (snap) => {
+        const statusDiv = document.getElementById('db-status');
+        if (snap.val() === true) {
+            statusDiv.innerHTML = '<i class="fas fa-check-circle"></i> متصل بقاعدة البيانات';
+            statusDiv.className = "db-status online";
+        } else {
+            statusDiv.innerHTML = '<i class="fas fa-times-circle"></i> انقطع الاتصال بالقاعدة!';
+            statusDiv.className = "db-status offline";
+        }
+    });
 
-    // 2. نظام تسجيل الدخول
-    function handleLogin() {
-        const user = document.getElementById('username').value;
-        const pass = document.getElementById('password').value;
+    // 2. تحديث ساعة الدوام
+    setInterval(() => {
+        const now = new Date();
+        document.getElementById('live-timer').innerText = now.toLocaleTimeString('ar-SY');
+    }, 1000);
 
-        // فحص المدير العام (Admin)
-        if(user === "admin" && pass === "admin123") {
-            showPage('admin', "أبو هاني (مدير)");
+    // 3. منطق تسجيل الدخول والتحذيرات
+    function tryLogin() {
+        const u = document.getElementById('user-name').value;
+        const p = document.getElementById('user-pass').value;
+        const err = document.getElementById('error-msg');
+
+        if (!u || !p) {
+            err.innerText = "أبا هاني، يرجى ملء الحقول المطلوبة!";
+            err.style.display = "block";
             return;
         }
 
-        // فحص الموظفين في القاعدة
-        db.ref('employees').once('value', (snapshot) => {
-            let found = false;
-            snapshot.forEach((child) => {
-                const data = child.val();
-                if(data.username === user && data.password === pass) {
-                    showPage(data.role, data.name);
-                    found = true;
-                }
-            });
-            if(!found) alert("خطأ في بيانات الدخول يا أبا هاني!");
-        });
-    }
-
-    function showPage(role, name) {
-        currentUser = {role, name};
-        document.getElementById('login-page').style.display = 'none';
-        document.getElementById('admin-page').style.display = 'block';
-        document.getElementById('user-info').innerText = name;
-        loadDashboardData();
-        switchTab('orders');
-    }
-
-    // 3. مزامنة البيانات والطلبات
-    function loadDashboardData() {
-        // تحديث الإحصائيات فوراً عند حدوث أي تغيير
-        db.ref('orders').on('value', (snap) => {
-            document.getElementById('count-orders').innerText = snap.numChildren();
-            // تشغيل صوت الجرس عند إضافة طلب جديد
-            if(currentUser) document.getElementById('bell-sound').play();
-        });
-        db.ref('employees').on('value', snap => document.getElementById('count-emp').innerText = snap.numChildren());
-    }
-
-    // 4. تبديل التبويبات
-    function switchTab(tabName) {
-        const content = document.getElementById('tab-content');
-        const btns = document.querySelectorAll('.tab-btn');
-        btns.forEach(b => b.classList.remove('active'));
-        
-        if(tabName === 'orders') {
-            content.innerHTML = "<h3>آخر الطلبات النشطة</h3><div id='list-orders'></div>";
-            listenToOrders();
-        } else if(tabName === 'employees') {
-            content.innerHTML = "<h3>قائمة فريق العمل</h3><p>يمكنك إضافة باريستا أو جرسون من لوحة التحكم.</p>";
+        // تسجيل الدخول الافتراضي للمدير العام
+        if (u === "admin" && p === "admin123") {
+            document.getElementById('login-screen').style.display = "none";
+            document.getElementById('manager-screen').style.display = "block";
+        } else {
+            err.innerText = "خطأ في اسم المستخدم أو كلمة المرور!";
+            err.style.display = "block";
         }
     }
 
-    function listenToOrders() {
-        const listDiv = document.getElementById('list-orders');
-        db.ref('orders').limitToLast(10).on('value', (snapshot) => {
-            listDiv.innerHTML = "";
-            snapshot.forEach((child) => {
-                const val = child.val();
-                const div = document.createElement('div');
-                div.className = 'order-item';
-                div.innerHTML = `
-                    <strong>الزبون: ${val.customerName}</strong><br>
-                    السعر: ${val.total} ليرة <br>
-                    <small>الحالة: ${val.status || 'قيد المعالجة'}</small>
-                `;
-                listDiv.prepend(div);
-            });
-        });
-    }
-
-    function logout() {
-        location.reload();
+    // 4. نظام التبويبات
+    function switchTab(btn, tab) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const area = document.getElementById('display-area');
+        area.innerHTML = "جاري تحميل قسم " + btn.innerText + "...";
+        
+        // هنا يمكن إضافة شروط لتحميل البيانات من Firebase لكل قسم
     }
 </script>
-
 </body>
 </html>

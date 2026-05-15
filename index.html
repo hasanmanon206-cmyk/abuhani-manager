@@ -173,15 +173,6 @@
     let currentCartId=null, invoiceItems=[];
     let activeShiftId=null;
 
-    // ==================== فحص الاتصال ====================
-        setTimeout(()=>{
-            if(statusEl.textContent.includes('جاري')){
-                statusEl.textContent="❌ غير متصل - تأكد من الإنترنت أو إعدادات Firebase";
-                statusEl.className="status-bar status-offline";
-            }
-        },8000);
-    }
-
     // ==================== تسجيل الدخول ====================
     function handleLogin(){
         const u=document.getElementById('username').value.trim();

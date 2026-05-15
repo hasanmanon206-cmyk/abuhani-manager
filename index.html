@@ -174,21 +174,6 @@
     let activeShiftId=null;
 
     // ==================== فحص الاتصال ====================
-    function checkConnection(){
-    const statusEl = document.getElementById('connectionStatus');
-    statusEl.textContent = "⏳ جاري التحقق...";
-    db.ref('managers/6057961002').once('value')
-        .then(() => {
-            statusEl.textContent = "✅ متصل بقاعدة البيانات";
-            statusEl.className = "status-bar status-online";
-        })
-        .catch(error => {
-            // عرض سبب الخطأ بالتفصيل
-            statusEl.textContent = "❌ خطأ: " + (error.message || error.code || "غير معروف");
-            statusEl.className = "status-bar status-offline";
-            console.error("Connection error:", error);
-        });
-}
         setTimeout(()=>{
             if(statusEl.textContent.includes('جاري')){
                 statusEl.textContent="❌ غير متصل - تأكد من الإنترنت أو إعدادات Firebase";

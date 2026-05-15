@@ -5,909 +5,484 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>أبو هاني - الإدارة</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f2f5; padding: 10px; }
-        .container { max-width: 500px; margin: 0 auto; }
-        .section { background: white; border-radius: 12px; padding: 15px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .section h3 { margin-bottom: 10px; color: #333; border-bottom: 2px solid #1a73e8; padding-bottom: 5px; }
-        .btn { padding: 8px 14px; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: bold; margin: 2px; }
-        .btn-primary { background: #1a73e8; color: white; width: 100%; }
-        .btn-success { background: #28a745; color: white; }
-        .btn-danger { background: #dc3545; color: white; }
-        .btn-warning { background: #ffc107; color: black; }
-        .btn-edit { background: #17a2b8; color: white; padding: 4px 10px; font-size: 11px; }
-        input, select, textarea { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 8px; font-family: inherit; }
-        .card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 12px; margin-bottom: 8px; }
-        .card.pending { border-right: 4px solid #ffc107; }
-        .card.accepted { border-right: 4px solid #28a745; }
-        .card.rejected { border-right: 4px solid #dc3545; }
-        .hidden { display: none; }
-        .info { background: #d4edda; padding: 10px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
-        .stat-box { background: #e8f0fe; padding: 10px; border-radius: 8px; text-align: center; }
-        .stat-box .num { font-size: 22px; font-weight: bold; color: #1a73e8; }
-        .stat-box .label { font-size: 11px; color: #666; }
-        .tab-bar { display: flex; gap: 5px; margin-bottom: 10px; flex-wrap: wrap; }
-        .tab { padding: 8px 10px; border-radius: 8px; background: #ddd; cursor: pointer; font-size: 11px; border: none; }
-        .tab.active { background: #1a73e8; color: white; }
-        .img-preview { max-width: 100%; border-radius: 8px; margin-top: 5px; max-height: 80px; cursor: pointer; }
-        .modal { display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; }
-        .modal img { max-width: 95%; max-height: 95%; border-radius: 8px; }
-        .modal .close { position: absolute; top: 20px; right: 30px; color: white; font-size: 30px; cursor: pointer; }
-        .cart-box { background: #f8f9fa; border: 2px dashed #1a73e8; border-radius: 8px; padding: 10px; margin: 5px 0; }
-        .product { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee; }
-        .badge { background: #dc3545; color: white; border-radius: 50%; padding: 2px 7px; font-size: 11px; }
-        .edit-input { width: auto; display: inline; padding: 5px; margin: 2px; border: 1px solid #1a73e8; border-radius: 4px; }
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Segoe UI',Tahoma,sans-serif;background:#f0f2f5;padding:10px}
+        .container{max-width:500px;margin:0 auto}
+        .section{background:white;border-radius:12px;padding:15px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,0.1)}
+        .section h3{margin-bottom:10px;color:#333;border-bottom:2px solid #1a73e8;padding-bottom:5px}
+        .btn{padding:8px 14px;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:bold;margin:2px}
+        .btn-primary{background:#1a73e8;color:white;width:100%}
+        .btn-success{background:#28a745;color:white}
+        .btn-danger{background:#dc3545;color:white}
+        .btn-warning{background:#ffc107;color:black}
+        .btn-edit{background:#17a2b8;color:white;padding:4px 10px;font-size:11px}
+        input,select,textarea{width:100%;padding:10px;margin:5px 0;border:1px solid #ddd;border-radius:8px;font-family:inherit}
+        .card{background:#fff;border:1px solid #ddd;border-radius:8px;padding:12px;margin-bottom:8px}
+        .hidden{display:none}
+        .info{background:#d4edda;padding:10px;border-radius:8px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+        .tab-bar{display:flex;gap:5px;margin-bottom:10px;flex-wrap:wrap}
+        .tab{padding:8px 10px;border-radius:8px;background:#ddd;cursor:pointer;font-size:11px;border:none}
+        .tab.active{background:#1a73e8;color:white}
+        .stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+        .stat-box{background:#e8f0fe;padding:10px;border-radius:8px;text-align:center}
+        .stat-box .num{font-size:22px;font-weight:bold;color:#1a73e8}
+        .stat-box .label{font-size:11px;color:#666}
+        .cart-box{background:#f8f9fa;border:2px dashed #1a73e8;border-radius:8px;padding:10px;margin:5px 0}
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- شاشة تسجيل الدخول -->
         <div id="loginScreen" class="section">
             <h2>🏢 أبو هاني - الإدارة</h2>
             <p>أدخل آيدي الموظف للدخول</p>
             <input type="text" id="loginId" placeholder="أدخل الآيدي">
-            <button class="btn btn-primary" onclick="login()" style="margin-top:10px;">دخول</button>
-            <p style="font-size:11px; color:#888; margin-top:8px;">المدير العام: 6057961002 | للموظفين: استخدم آيدي الموظف</p>
+            <button class="btn btn-primary" onclick="doLogin()" style="margin-top:10px;">دخول</button>
+            <p style="font-size:11px;color:#888;margin-top:8px;">مدير: 6057961002 | محاسب: emp003 | باريستا: emp001 | جرسون: emp002</p>
         </div>
-
-        <!-- الشاشة الرئيسية -->
         <div id="mainScreen" class="hidden">
             <div class="info" id="info"></div>
             <div id="roleContent"></div>
         </div>
     </div>
 
-    <!-- مودال الصور -->
-    <div id="imageModal" class="modal" onclick="this.style.display='none'">
-        <span class="close">&times;</span>
-        <img id="modalImage" src="">
-    </div>
-
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script>
-        firebase.initializeApp({ databaseURL: "https://abuhaniapp-default-rtdb.asia-southeast1.firebasedatabase.app/" });
-        const db = firebase.database();
-        let currentUser = null;
-        let allCategories = {};
-        let allProducts = {};
-        let waiterCarts = [];
-        let currentInvoiceItems = [];
+        firebase.initializeApp({databaseURL:"https://abuhaniapp-default-rtdb.asia-southeast1.firebasedatabase.app/"});
+        const db=firebase.database();
+        let user=null,allCats={},allProds={},cartId=null,invoiceItems=[],currentTab='employees';
 
-        // ==================== تسجيل الدخول ====================
-        function login() {
-            const id = document.getElementById('loginId').value.trim();
-            if (!id) { alert('أدخل الآيدي'); return; }
-            
-            // فحص إذا كان مدير
-            db.ref('managers/' + id).once('value', snap => {
-                if (snap.exists()) {
-                    currentUser = { id, ...snap.val(), type: 'manager' };
-                    document.getElementById('loginScreen').classList.add('hidden');
-                    document.getElementById('mainScreen').classList.remove('hidden');
-                    document.getElementById('info').innerHTML = `👑 ${currentUser.name} | مدير عام <button class="btn btn-danger" onclick="logout()" style="padding:4px 8px; font-size:11px;">خروج</button>`;
-                    loadManagerView();
-                    return;
-                }
-                
-                // فحص إذا كان موظف
-                db.ref('employees/' + id).once('value', snap2 => {
-                    if (snap2.exists()) {
-                        currentUser = { id, ...snap2.val(), type: 'employee' };
-                        document.getElementById('loginScreen').classList.add('hidden');
-                        document.getElementById('mainScreen').classList.remove('hidden');
-                        const roleText = currentUser.role === 'barista' ? 'باريستا' : currentUser.role === 'waiter' ? 'جرسون' : 'محاسب';
-                        document.getElementById('info').innerHTML = `👤 ${currentUser.name} | ${roleText} | 💰 ${currentUser.hourlyRate} ل.س/ساعة <button class="btn btn-danger" onclick="logout()" style="padding:4px 8px; font-size:11px;">خروج</button>`;
-                        loadEmployeeView();
-                    } else {
-                        alert('❌ آيدي غير موجود. تأكد من الآيدي أو تواصل مع المدير.');
+        function doLogin(){
+            const id=document.getElementById('loginId').value.trim();
+            if(!id){alert('أدخل الآيدي');return;}
+            db.ref('managers/'+id).once('value',s=>{
+                if(s.exists()){user={id,...s.val(),type:'manager'};showMain();loadManagerView();return;}
+                db.ref('employees/'+id).once('value',s2=>{
+                    if(s2.exists()){user={id,...s2.val(),type:'employee'};showMain();loadEmployeeView();}
+                    else{alert('آيدي غير موجود');}
+                });
+            });
+        }
+
+        function showMain(){
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainScreen').classList.remove('hidden');
+            const roles={barista:'باريستا',waiter:'جرسون',accountant:'محاسب'};
+            const r=user.role==='owner'?'مدير عام':(roles[user.role]||'موظف');
+            document.getElementById('info').innerHTML=`👤 ${user.name} | ${r} | 💰 ${user.hourlyRate||0} ل.س/ساعة <button class="btn btn-danger" onclick="location.reload()" style="padding:4px 8px;font-size:11px;">خروج</button>`;
+        }
+
+        function loadManagerView(){
+            let h=`<div class="stats"><div class="stat-box"><div class="num" id="statEmp">0</div><div class="label">موظفين</div></div><div class="stat-box"><div class="num" id="statSup">0</div><div class="label">موردين</div></div><div class="stat-box"><div class="num" id="statCust">0</div><div class="label">عملاء</div></div><div class="stat-box"><div class="num" id="statProd">0</div><div class="label">منتجات</div></div></div>
+            <div class="tab-bar">
+                <button class="tab active" onclick="mgrTab('employees',this)">👥 موظفين</button>
+                <button class="tab" onclick="mgrTab('suppliers',this)">🚚 موردين</button>
+                <button class="tab" onclick="mgrTab('customers',this)">👤 عملاء</button>
+                <button class="tab" onclick="mgrTab('products',this)">📦 منتجات</button>
+                <button class="tab" onclick="mgrTab('categories',this)">📂 أقسام</button>
+                <button class="tab" onclick="mgrTab('managers',this)">🔐 مدراء</button>
+                <button class="tab" onclick="mgrTab('requests',this)">📩 طلبات</button>
+            </div><div id="mgrContent"></div>`;
+            document.getElementById('roleContent').innerHTML=h;
+            mgrTab('employees');
+        }
+
+        function mgrTab(tab,btn){
+            if(btn){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');}
+            currentTab=tab;
+            const c=document.getElementById('mgrContent');
+            if(tab==='employees'){c.innerHTML=`<div class="section"><h3>➕ إضافة موظف</h3><input id="empName" placeholder="الاسم"><input id="empPhone" placeholder="الهاتف"><select id="empRole"><option value="barista">باريستا (5000 ل.س)</option><option value="waiter">جرسون (4000 ل.س)</option><option value="accountant">محاسب (6000 ل.س)</option></select><button class="btn btn-success" onclick="addEmp()" style="width:100%;">➕ إضافة</button></div><div class="section"><h3>📋 الموظفين</h3><div id="empList"></div></div>`;loadEmps();}
+            else if(tab==='suppliers'){c.innerHTML=`<div class="section"><h3>➕ إضافة مورد</h3><input id="supName" placeholder="اسم المورد"><input id="supPhone" placeholder="الهاتف"><button class="btn btn-success" onclick="addSup()" style="width:100%;">➕ إضافة</button></div><div class="section"><h3>📋 الموردين</h3><div id="supList"></div></div>`;loadSups();}
+            else if(tab==='customers'){c.innerHTML=`<div class="section"><h3>➕ إضافة عميل</h3><input id="custName" placeholder="اسم العميل"><input id="custPhone" placeholder="الهاتف"><button class="btn btn-success" onclick="addCust()" style="width:100%;">➕ إضافة</button></div><div class="section"><h3>📋 العملاء</h3><div id="custList"></div></div>`;loadCusts();}
+            else if(tab==='products'){c.innerHTML=`<div class="section"><h3>➕ إضافة منتج</h3><input id="prodName" placeholder="اسم المنتج"><input id="prodPrice" placeholder="السعر"><input id="prodStock" placeholder="المخزون"><select id="prodCat"><option value="">اختر القسم</option></select><button class="btn btn-success" onclick="addProd()" style="width:100%;">➕ إضافة</button></div><div class="section"><h3>📋 المنتجات</h3><div id="prodList"></div></div>`;loadProdCat();loadProds();}
+            else if(tab==='categories'){c.innerHTML=`<div class="section"><h3>➕ إضافة قسم</h3><input id="catName" placeholder="اسم القسم"><button class="btn btn-success" onclick="addCat()" style="width:100%;">➕ إضافة</button></div><div class="section"><h3>📋 الأقسام</h3><div id="catList"></div></div>`;loadCats();}
+            else if(tab==='managers'){c.innerHTML=`<div class="section"><h3>➕ إضافة مدير</h3><input id="mgrId" placeholder="آيدي"><input id="mgrName" placeholder="الاسم"><input id="mgrPhone" placeholder="هاتف"><button class="btn btn-success" onclick="addMgr()" style="width:100%;">➕ إضافة</button></div><div class="section"><h3>📋 المدراء</h3><div id="mgrList"></div></div>`;loadMgrs();}
+            else if(tab==='requests'){c.innerHTML=`<div class="section"><h3>📩 طلبات تغيير الدور</h3><div id="reqList"></div></div>`;loadReqs();}
+            loadStats();
+        }
+
+        function loadStats(){
+            db.ref('employees').once('value',s=>{const el=document.getElementById('statEmp');if(el)el.textContent=s.numChildren();});
+            db.ref('suppliers').once('value',s=>{const el=document.getElementById('statSup');if(el)el.textContent=s.numChildren();});
+            db.ref('customers').once('value',s=>{const el=document.getElementById('statCust');if(el)el.textContent=s.numChildren();});
+            db.ref('products').once('value',s=>{const el=document.getElementById('statProd');if(el)el.textContent=s.numChildren();});
+        }
+
+        function addEmp(){
+            const n=document.getElementById('empName').value.trim(),p=document.getElementById('empPhone').value.trim(),r=document.getElementById('empRole').value;
+            const rates={barista:5000,waiter:4000,accountant:6000};
+            if(!n){alert('أدخل الاسم');return;}
+            db.ref('employees').push({name:n,phone:p,role:r,hourlyRate:rates[r],status:'active'});
+            document.getElementById('empName').value='';document.getElementById('empPhone').value='';
+            loadEmps();loadStats();
+        }
+
+        function loadEmps(){
+            db.ref('employees').on('value',s=>{
+                let h='';
+                s.forEach(e=>{
+                    const emp=e.val();const roles={barista:'باريستا',waiter:'جرسون',accountant:'محاسب'};
+                    h+=`<div class="card">👤 ${emp.name} | ${roles[emp.role]} | 💰 ${emp.hourlyRate} ل.س/ساعة | 📞 ${emp.phone||'-'} <button class="btn btn-edit" onclick="editEmp('${e.key}')">✏️</button> <button class="btn btn-danger" onclick="if(confirm('حذف؟'))db.ref('employees/${e.key}').remove()" style="padding:4px 8px;font-size:10px;">🗑️</button></div>`;
+                });
+                document.getElementById('empList').innerHTML=h||'<p style="color:#888;">لا يوجد</p>';
+            });
+        }
+
+        function editEmp(id){
+            db.ref('employees/'+id).once('value',s=>{
+                if(!s.exists())return;
+                const e=s.val();
+                const nn=prompt('الاسم:',e.name);if(!nn)return;
+                const np=prompt('الهاتف:',e.phone||'');
+                const nr=prompt('الدور (barista/waiter/accountant):',e.role);
+                const rates={barista:5000,waiter:4000,accountant:6000};
+                db.ref('employees/'+id).update({name:nn,phone:np||'',role:nr,hourlyRate:rates[nr]||e.hourlyRate});
+            });
+        }
+
+        function addSup(){
+            const n=document.getElementById('supName').value.trim(),p=document.getElementById('supPhone').value.trim();
+            if(!n){alert('أدخل الاسم');return;}
+            db.ref('suppliers').push({name:n,phone:p,balance:0});
+            document.getElementById('supName').value='';document.getElementById('supPhone').value='';
+        }
+
+        function loadSups(){
+            db.ref('suppliers').on('value',s=>{
+                let h='';
+                s.forEach(x=>{h+=`<div class="card">🚚 ${x.val().name} | 📞 ${x.val().phone||'-'} <button class="btn btn-edit" onclick="editSup('${x.key}')">✏️</button> <button class="btn btn-danger" onclick="if(confirm('حذف؟'))db.ref('suppliers/${x.key}').remove()" style="padding:4px 8px;font-size:10px;">🗑️</button></div>`;});
+                document.getElementById('supList').innerHTML=h||'<p style="color:#888;">لا يوجد</p>';
+            });
+        }
+
+        function editSup(id){
+            db.ref('suppliers/'+id).once('value',s=>{
+                if(!s.exists())return;
+                const x=s.val();
+                const nn=prompt('الاسم:',x.name);if(!nn)return;
+                const np=prompt('الهاتف:',x.phone||'');
+                db.ref('suppliers/'+id).update({name:nn,phone:np||''});
+            });
+        }
+
+        function addCust(){
+            const n=document.getElementById('custName').value.trim(),p=document.getElementById('custPhone').value.trim();
+            if(!n){alert('أدخل الاسم');return;}
+            db.ref('customers').push({name:n,phone:p,totalPurchases:0,debt:0});
+            document.getElementById('custName').value='';document.getElementById('custPhone').value='';
+        }
+
+        function loadCusts(){
+            db.ref('customers').on('value',s=>{
+                let h='';
+                s.forEach(x=>{h+=`<div class="card">👤 ${x.val().name} | 📞 ${x.val().phone||'-'} <button class="btn btn-edit" onclick="editCust('${x.key}')">✏️</button> <button class="btn btn-danger" onclick="if(confirm('حذف؟'))db.ref('customers/${x.key}').remove()" style="padding:4px 8px;font-size:10px;">🗑️</button></div>`;});
+                document.getElementById('custList').innerHTML=h||'<p style="color:#888;">لا يوجد</p>';
+            });
+        }
+
+        function editCust(id){
+            db.ref('customers/'+id).once('value',s=>{
+                if(!s.exists())return;
+                const x=s.val();
+                const nn=prompt('الاسم:',x.name);if(!nn)return;
+                const np=prompt('الهاتف:',x.phone||'');
+                db.ref('customers/'+id).update({name:nn,phone:np||''});
+            });
+        }
+
+        function loadProdCat(){
+            db.ref('categories').on('value',s=>{
+                let h='<option value="">اختر القسم</option>';
+                s.forEach(c=>{allCats[c.key]={id:c.key,...c.val()};h+=`<option value="${c.key}">${c.val().name}</option>`;});
+                const el=document.getElementById('prodCat');if(el)el.innerHTML=h;
+            });
+        }
+
+        function addProd(){
+            const n=document.getElementById('prodName').value.trim(),pr=parseInt(document.getElementById('prodPrice').value),st=parseInt(document.getElementById('prodStock').value),ci=document.getElementById('prodCat').value;
+            if(!n||!pr||!st||!ci){alert('املأ كل الحقول');return;}
+            db.ref('products').push({name:n,price:pr,stock:st,categoryId:ci});
+            document.getElementById('prodName').value='';document.getElementById('prodPrice').value='';document.getElementById('prodStock').value='';
+        }
+
+        function loadProds(){
+            db.ref('products').on('value',s=>{
+                allProds={};let h='';
+                s.forEach(p=>{allProds[p.key]={id:p.key,...p.val()};h+=`<div class="card">📦 ${p.val().name} | 💰 ${p.val().price} ل.س | 📦 ${p.val().stock} <button class="btn btn-edit" onclick="editProd('${p.key}')">✏️</button> <button class="btn btn-danger" onclick="if(confirm('حذف؟'))db.ref('products/${p.key}').remove()" style="padding:4px 8px;font-size:10px;">🗑️</button></div>`;});
+                const el=document.getElementById('prodList');if(el)el.innerHTML=h||'<p style="color:#888;">لا يوجد</p>';
+            });
+        }
+
+        function editProd(id){
+            db.ref('products/'+id).once('value',s=>{
+                if(!s.exists())return;
+                const p=s.val();
+                const nn=prompt('الاسم:',p.name);if(!nn)return;
+                const np=parseInt(prompt('السعر:',p.price));
+                const ns=parseInt(prompt('المخزون:',p.stock));
+                db.ref('products/'+id).update({name:nn,price:np,stock:ns});
+            });
+        }
+
+        function addCat(){
+            const n=document.getElementById('catName').value.trim();
+            if(!n){alert('أدخل الاسم');return;}
+            db.ref('categories').push({name:n});
+            document.getElementById('catName').value='';
+        }
+
+        function loadCats(){
+            db.ref('categories').on('value',s=>{
+                allCats={};let h='';
+                s.forEach(c=>{allCats[c.key]={id:c.key,...c.val()};h+=`<div class="card">📂 ${c.val().name} <button class="btn btn-edit" onclick="editCat('${c.key}')">✏️</button> <button class="btn btn-danger" onclick="if(confirm('حذف؟'))db.ref('categories/${c.key}').remove()" style="padding:4px 8px;font-size:10px;">🗑️</button></div>`;});
+                const el=document.getElementById('catList');if(el)el.innerHTML=h||'<p style="color:#888;">لا يوجد</p>';
+            });
+        }
+
+        function editCat(id){
+            db.ref('categories/'+id).once('value',s=>{
+                if(!s.exists())return;
+                const nn=prompt('الاسم:',s.val().name);if(!nn)return;
+                db.ref('categories/'+id).update({name:nn});
+            });
+        }
+
+        function addMgr(){
+            const id=document.getElementById('mgrId').value.trim(),n=document.getElementById('mgrName').value.trim(),p=document.getElementById('mgrPhone').value.trim();
+            if(!id||!n){alert('أدخل الآيدي والاسم');return;}
+            db.ref('managers/'+id).set({name:n,phone:p,role:'manager'});
+            document.getElementById('mgrId').value='';document.getElementById('mgrName').value='';document.getElementById('mgrPhone').value='';
+        }
+
+        function loadMgrs(){
+            db.ref('managers').on('value',s=>{
+                let h='';
+                s.forEach(m=>{h+=`<div class="card">🔐 ${m.val().name} | 🆔 ${m.key} ${m.key!=='6057961002'?`<button class="btn btn-edit" onclick="editMgr('${m.key}')">✏️</button> <button class="btn btn-danger" onclick="if(confirm('حذف؟'))db.ref('managers/${m.key}').remove()" style="padding:4px 8px;font-size:10px;">🗑️</button>`:'<span style="color:#888;">(رئيسي)</span>'}</div>`;});
+                document.getElementById('mgrList').innerHTML=h||'<p style="color:#888;">لا يوجد</p>';
+            });
+        }
+
+        function editMgr(id){
+            db.ref('managers/'+id).once('value',s=>{
+                if(!s.exists())return;
+                const m=s.val();
+                const nn=prompt('الاسم:',m.name);if(!nn)return;
+                const np=prompt('الهاتف:',m.phone||'');
+                db.ref('managers/'+id).update({name:nn,phone:np||''});
+            });
+        }
+
+        function loadReqs(){
+            db.ref('roleRequests').on('value',s=>{
+                let h='';
+                s.forEach(r=>{
+                    if(r.val().status==='pending'){
+                        h+=`<div class="card">👤 ${r.val().employeeName} | ${r.val().currentRole} → ${r.val().requestedRole} <button class="btn btn-success" onclick="approveReq('${r.key}')">✅ قبول</button> <button class="btn btn-danger" onclick="rejectReq('${r.key}')">❌ رفض</button></div>`;
                     }
                 });
+                document.getElementById('reqList').innerHTML=h||'<p style="color:#888;">لا توجد طلبات</p>';
             });
         }
 
-        function logout() { location.reload(); }
-
-        // ==================== تحميل عرض المدير ====================
-        function loadManagerView() {
-            if (currentUser.type !== 'manager') return;
-            let html = `
-                <div class="stats">
-                    <div class="stat-box"><div class="num" id="statEmp">0</div><div class="label">موظفين</div></div>
-                    <div class="stat-box"><div class="num" id="statSup">0</div><div class="label">موردين</div></div>
-                    <div class="stat-box"><div class="num" id="statCust">0</div><div class="label">عملاء</div></div>
-                    <div class="stat-box"><div class="num" id="statProd">0</div><div class="label">منتجات</div></div>
-                </div>
-                <div class="tab-bar">
-                    <button class="tab active" onclick="switchMgrTab('employees', this)">👥 موظفين</button>
-                    <button class="tab" onclick="switchMgrTab('suppliers', this)">🚚 موردين</button>
-                    <button class="tab" onclick="switchMgrTab('customers', this)">👤 عملاء</button>
-                    <button class="tab" onclick="switchMgrTab('products', this)">📦 منتجات</button>
-                    <button class="tab" onclick="switchMgrTab('categories', this)">📂 أقسام</button>
-                    <button class="tab" onclick="switchMgrTab('managers', this)">🔐 مدراء</button>
-                    <button class="tab" onclick="switchMgrTab('requests', this)">📩 طلبات</button>
-                    <button class="tab" onclick="switchMgrTab('reports', this)">📊 تقارير</button>
-                </div>
-                <div id="mgrTabContent"></div>
-            `;
-            document.getElementById('roleContent').innerHTML = html;
-            loadMgrStats();
-            switchMgrTab('employees', document.querySelector('.tab.active'));
-        }
-
-        function loadMgrStats() {
-            db.ref('employees').once('value', s => document.getElementById('statEmp').textContent = s.numChildren());
-            db.ref('suppliers').once('value', s => document.getElementById('statSup').textContent = s.numChildren());
-            db.ref('customers').once('value', s => document.getElementById('statCust').textContent = s.numChildren());
-            db.ref('products').once('value', s => document.getElementById('statProd').textContent = s.numChildren());
-        }
-
-        function switchMgrTab(tab, btn) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            btn.classList.add('active');
-            const content = document.getElementById('mgrTabContent');
-            
-            const tabs = {
-                'employees': mgrEmployeesTab,
-                'suppliers': mgrSuppliersTab,
-                'customers': mgrCustomersTab,
-                'products': mgrProductsTab,
-                'categories': mgrCategoriesTab,
-                'managers': mgrManagersTab,
-                'requests': mgrRequestsTab,
-                'reports': mgrReportsTab
-            };
-            
-            if (tabs[tab]) content.innerHTML = tabs[tab]();
-            loadMgrTabData(tab);
-        }
-
-        function loadMgrTabData(tab) {
-            if (tab === 'employees') loadEmployees();
-            if (tab === 'suppliers') loadSuppliers();
-            if (tab === 'customers') loadCustomers();
-            if (tab === 'products') { loadProducts(); updateCategorySelect(); }
-            if (tab === 'categories') loadCategories();
-            if (tab === 'managers') loadManagers();
-            if (tab === 'requests') loadRoleRequests();
-            if (tab === 'reports') { loadShiftsReport(); loadSalariesReport(); }
-        }
-
-        // تبويبات المدير - HTML
-        function mgrEmployeesTab() {
-            return `
-                <div class="section"><h3>➕ إضافة موظف</h3>
-                    <input id="empName" placeholder="الاسم"><input id="empPhone" placeholder="الهاتف">
-                    <select id="empRole"><option value="barista">باريستا (5000 ل.س/ساعة)</option><option value="waiter">جرسون (4000 ل.س/ساعة)</option><option value="accountant">محاسب (6000 ل.س/ساعة)</option></select>
-                    <button class="btn btn-success" onclick="addEmployee()" style="width:100%;">➕ إضافة</button>
-                </div>
-                <div class="section"><h3>📋 الموظفين</h3><div id="employeesList"></div></div>
-            `;
-        }
-
-        function mgrSuppliersTab() {
-            return `
-                <div class="section"><h3>➕ إضافة مورد</h3>
-                    <input id="supName" placeholder="اسم المورد"><input id="supPhone" placeholder="الهاتف">
-                    <button class="btn btn-success" onclick="addSupplier()" style="width:100%;">➕ إضافة</button>
-                </div>
-                <div class="section"><h3>📋 الموردين</h3><div id="suppliersList"></div></div>
-            `;
-        }
-
-        function mgrCustomersTab() {
-            return `
-                <div class="section"><h3>➕ إضافة عميل</h3>
-                    <input id="custName" placeholder="اسم العميل"><input id="custPhone" placeholder="الهاتف">
-                    <button class="btn btn-success" onclick="addCustomer()" style="width:100%;">➕ إضافة</button>
-                </div>
-                <div class="section"><h3>📋 العملاء</h3><div id="customersList"></div></div>
-            `;
-        }
-
-        function mgrProductsTab() {
-            return `
-                <div class="section"><h3>➕ إضافة منتج</h3>
-                    <input id="prodName" placeholder="اسم المنتج"><input id="prodPrice" placeholder="السعر"><input id="prodStock" placeholder="المخزون">
-                    <select id="prodCategory"><option value="">اختر القسم</option></select>
-                    <button class="btn btn-success" onclick="addProduct()" style="width:100%;">➕ إضافة</button>
-                </div>
-                <div class="section"><h3>📋 المنتجات</h3><div id="productsList"></div></div>
-            `;
-        }
-
-        function mgrCategoriesTab() {
-            return `
-                <div class="section"><h3>➕ إضافة قسم</h3>
-                    <input id="catName" placeholder="اسم القسم">
-                    <button class="btn btn-success" onclick="addCategory()" style="width:100%;">➕ إضافة</button>
-                </div>
-                <div class="section"><h3>📋 الأقسام</h3><div id="categoriesList"></div></div>
-            `;
-        }
-
-        function mgrManagersTab() {
-            return `
-                <div class="section"><h3>➕ إضافة مدير</h3>
-                    <input id="mgrId" placeholder="آيدي المدير"><input id="mgrName" placeholder="الاسم"><input id="mgrPhone" placeholder="هاتف">
-                    <button class="btn btn-success" onclick="addManager()" style="width:100%;">➕ إضافة</button>
-                </div>
-                <div class="section"><h3>📋 المدراء</h3><div id="managersList"></div></div>
-            `;
-        }
-
-        function mgrRequestsTab() {
-            return `
-                <div class="section"><h3>📩 طلبات تغيير الدور</h3><div id="roleRequests"></div></div>
-            `;
-        }
-
-        function mgrReportsTab() {
-            return `
-                <div class="section"><h3>📊 تقرير الورديات</h3><div id="shiftsReport"></div></div>
-                <div class="section"><h3>💰 تقرير الأجور</h3><div id="salariesReport"></div></div>
-            `;
-        }
-
-        // ==================== CRUD - موظفين ====================
-        function addEmployee() {
-            const name = document.getElementById('empName').value.trim();
-            const phone = document.getElementById('empPhone').value.trim();
-            const role = document.getElementById('empRole').value;
-            const rates = { barista: 5000, waiter: 4000, accountant: 6000 };
-            if (!name) { alert('أدخل الاسم'); return; }
-            db.ref('employees').push({ name, phone, role, hourlyRate: rates[role], status: 'active', currentShift: null });
-            document.getElementById('empName').value = ''; document.getElementById('empPhone').value = '';
-            loadEmployees(); loadMgrStats();
-        }
-
-        function loadEmployees() {
-            db.ref('employees').on('value', snap => {
-                let html = '';
-                snap.forEach(e => {
-                    const emp = e.val();
-                    const roleText = emp.role === 'barista' ? 'باريستا' : emp.role === 'waiter' ? 'جرسون' : 'محاسب';
-                    html += `<div class="card">👤 ${emp.name} | 🏷️ ${roleText} | 💰 ${emp.hourlyRate} ل.س/ساعة | 📞 ${emp.phone || '-'} 
-                        <button class="btn btn-edit" onclick="editEmployee('${e.key}', '${emp.name}', '${emp.phone || ''}', '${emp.role}')">✏️</button>
-                        <button class="btn btn-danger" onclick="deleteEmployee('${e.key}')" style="padding:4px 8px; font-size:10px;">🗑️</button></div>`;
-                });
-                document.getElementById('employeesList').innerHTML = html || '<p style="color:#888;">لا يوجد موظفين</p>';
+        function approveReq(id){
+            db.ref('roleRequests/'+id).once('value',s=>{
+                if(!s.exists())return;
+                const r=s.val();
+                const rates={barista:5000,waiter:4000,accountant:6000};
+                db.ref('employees/'+r.employeeId).update({role:r.requestedRole,hourlyRate:rates[r.requestedRole]});
+                db.ref('roleRequests/'+id).update({status:'approved'});
             });
         }
 
-        function editEmployee(id, name, phone, role) {
-            const newName = prompt('الاسم الجديد:', name);
-            if (!newName) return;
-            const newPhone = prompt('الهاتف الجديد:', phone);
-            const roles = { barista: 'باريستا', waiter: 'جرسون', accountant: 'محاسب' };
-            const newRole = prompt('الدور (barista/waiter/accountant):', role);
-            const rates = { barista: 5000, waiter: 4000, accountant: 6000 };
-            db.ref('employees/' + id).update({
-                name: newName,
-                phone: newPhone || '',
-                role: newRole,
-                hourlyRate: rates[newRole] || rates[role]
-            });
+        function rejectReq(id){db.ref('roleRequests/'+id).update({status:'rejected'});}
+
+        function loadEmployeeView(){
+            if(user.role==='accountant')loadAccView();
+            else if(user.role==='barista')loadBarView();
+            else if(user.role==='waiter')loadWaitView();
         }
 
-        function deleteEmployee(id) { if (confirm('حذف الموظف؟')) db.ref('employees/' + id).remove(); }
-
-        // ==================== CRUD - موردين ====================
-        function addSupplier() {
-            const name = document.getElementById('supName').value.trim();
-            const phone = document.getElementById('supPhone').value.trim();
-            if (!name) { alert('أدخل الاسم'); return; }
-            db.ref('suppliers').push({ name, phone, balance: 0 });
-            document.getElementById('supName').value = ''; document.getElementById('supPhone').value = '';
+        function loadAccView(){
+            let h=`<div class="tab-bar"><button class="tab active" onclick="accTab('orders',this)">📋 طلبات</button><button class="tab" onclick="accTab('purchases',this)">📦 فواتير</button></div><div id="accContent"></div><div class="section"><button class="btn btn-warning" onclick="reqRole()" style="width:100%;">🔄 طلب تغيير الدور</button></div>`;
+            document.getElementById('roleContent').innerHTML=h;
+            accTab('orders');
         }
 
-        function loadSuppliers() {
-            db.ref('suppliers').on('value', snap => {
-                let html = '';
-                snap.forEach(s => {
-                    html += `<div class="card">🚚 ${s.val().name} | 📞 ${s.val().phone || '-'} 
-                        <button class="btn btn-edit" onclick="editSupplier('${s.key}', '${s.val().name}', '${s.val().phone || ''}')">✏️</button>
-                        <button class="btn btn-danger" onclick="deleteSupplier('${s.key}')" style="padding:4px 8px; font-size:10px;">🗑️</button></div>`;
-                });
-                document.getElementById('suppliersList').innerHTML = html || '<p style="color:#888;">لا يوجد موردين</p>';
-            });
+        function accTab(tab,btn){
+            if(btn){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');}
+            const c=document.getElementById('accContent');
+            if(tab==='orders'){c.innerHTML=`<div class="section"><h3>📋 طلبات الجرسونات</h3><div id="wOrders"></div></div>`;loadWOrders();}
+            else if(tab==='purchases'){c.innerHTML=`<div class="section"><h3>📦 فاتورة شراء</h3><select id="supSel"><option value="">اختر المورد</option></select><input id="invItem" placeholder="الصنف"><input id="invQty" placeholder="الكمية"><input id="invPrice" placeholder="سعر الشراء"><button class="btn btn-warning" onclick="addInvItem()">➕ إضافة</button><div id="invItems"></div><button class="btn btn-success" onclick="saveInv()" style="width:100%;margin-top:10px;">💾 حفظ</button></div><div class="section"><h3>📋 فواتير اليوم</h3><div id="invList"></div></div>`;loadSupsForInv();loadInvs();}
         }
 
-        function editSupplier(id, name, phone) {
-            const newName = prompt('الاسم الجديد:', name);
-            if (!newName) return;
-            const newPhone = prompt('الهاتف الجديد:', phone);
-            db.ref('suppliers/' + id).update({ name: newName, phone: newPhone || '' });
-        }
-
-        function deleteSupplier(id) { if (confirm('حذف المورد؟')) db.ref('suppliers/' + id).remove(); }
-
-        // ==================== CRUD - عملاء ====================
-        function addCustomer() {
-            const name = document.getElementById('custName').value.trim();
-            const phone = document.getElementById('custPhone').value.trim();
-            if (!name) { alert('أدخل الاسم'); return; }
-            db.ref('customers').push({ name, phone, totalPurchases: 0, debt: 0 });
-            document.getElementById('custName').value = ''; document.getElementById('custPhone').value = '';
-        }
-
-        function loadCustomers() {
-            db.ref('customers').on('value', snap => {
-                let html = '';
-                snap.forEach(c => {
-                    html += `<div class="card">👤 ${c.val().name} | 📞 ${c.val().phone || '-'} 
-                        <button class="btn btn-edit" onclick="editCustomer('${c.key}', '${c.val().name}', '${c.val().phone || ''}')">✏️</button>
-                        <button class="btn btn-danger" onclick="deleteCustomer('${c.key}')" style="padding:4px 8px; font-size:10px;">🗑️</button></div>`;
-                });
-                document.getElementById('customersList').innerHTML = html || '<p style="color:#888;">لا يوجد عملاء</p>';
-            });
-        }
-
-        function editCustomer(id, name, phone) {
-            const newName = prompt('الاسم الجديد:', name);
-            if (!newName) return;
-            const newPhone = prompt('الهاتف الجديد:', phone);
-            db.ref('customers/' + id).update({ name: newName, phone: newPhone || '' });
-        }
-
-        function deleteCustomer(id) { if (confirm('حذف العميل؟')) db.ref('customers/' + id).remove(); }
-
-        // ==================== CRUD - منتجات ====================
-        function updateCategorySelect() {
-            db.ref('categories').on('value', snap => {
-                let html = '<option value="">اختر القسم</option>';
-                snap.forEach(c => { html += `<option value="${c.key}">${c.val().name}</option>`; });
-                const sel = document.getElementById('prodCategory');
-                if (sel) sel.innerHTML = html;
-            });
-        }
-
-        function addProduct() {
-            const name = document.getElementById('prodName').value.trim();
-            const price = parseInt(document.getElementById('prodPrice').value);
-            const stock = parseInt(document.getElementById('prodStock').value);
-            const categoryId = document.getElementById('prodCategory').value;
-            if (!name || !price || !stock || !categoryId) { alert('املأ كل الحقول'); return; }
-            db.ref('products').push({ name, price, stock, categoryId });
-            document.getElementById('prodName').value = ''; document.getElementById('prodPrice').value = ''; document.getElementById('prodStock').value = '';
-        }
-
-        function loadProducts() {
-            db.ref('products').on('value', snap => {
-                allProducts = {};
-                let html = '';
-                snap.forEach(p => {
-                    allProducts[p.key] = { id: p.key, ...p.val() };
-                    html += `<div class="card">📦 ${p.val().name} | 💰 ${p.val().price} ل.س | 📦 ${p.val().stock} 
-                        <button class="btn btn-edit" onclick="editProduct('${p.key}', '${p.val().name}', ${p.val().price}, ${p.val().stock}, '${p.val().categoryId}')">✏️</button>
-                        <button class="btn btn-danger" onclick="deleteProduct('${p.key}')" style="padding:4px 8px; font-size:10px;">🗑️</button></div>`;
-                });
-                const el = document.getElementById('productsList');
-                if (el) el.innerHTML = html || '<p style="color:#888;">لا توجد منتجات</p>';
-            });
-        }
-
-        function editProduct(id, name, price, stock, catId) {
-            const newName = prompt('اسم المنتج:', name);
-            if (!newName) return;
-            const newPrice = parseInt(prompt('السعر:', price));
-            const newStock = parseInt(prompt('المخزون:', stock));
-            db.ref('products/' + id).update({ name: newName, price: newPrice, stock: newStock });
-        }
-
-        function deleteProduct(id) { if (confirm('حذف المنتج؟')) db.ref('products/' + id).remove(); }
-
-        // ==================== CRUD - أقسام ====================
-        function addCategory() {
-            const name = document.getElementById('catName').value.trim();
-            if (!name) { alert('أدخل اسم القسم'); return; }
-            db.ref('categories').push({ name });
-            document.getElementById('catName').value = '';
-        }
-
-        function loadCategories() {
-            db.ref('categories').on('value', snap => {
-                allCategories = {};
-                let html = '';
-                snap.forEach(c => {
-                    allCategories[c.key] = { id: c.key, ...c.val() };
-                    html += `<div class="card">📂 ${c.val().name} 
-                        <button class="btn btn-edit" onclick="editCategory('${c.key}', '${c.val().name}')">✏️</button>
-                        <button class="btn btn-danger" onclick="deleteCategory('${c.key}')" style="padding:4px 8px; font-size:10px;">🗑️</button></div>`;
-                });
-                const el = document.getElementById('categoriesList');
-                if (el) el.innerHTML = html || '<p style="color:#888;">لا توجد أقسام</p>';
-            });
-        }
-
-        function editCategory(id, name) {
-            const newName = prompt('اسم القسم:', name);
-            if (!newName) return;
-            db.ref('categories/' + id).update({ name: newName });
-        }
-
-        function deleteCategory(id) { if (confirm('حذف القسم؟ قد يؤثر على المنتجات.')) db.ref('categories/' + id).remove(); }
-
-        // ==================== CRUD - مدراء ====================
-        function addManager() {
-            const id = document.getElementById('mgrId').value.trim();
-            const name = document.getElementById('mgrName').value.trim();
-            const phone = document.getElementById('mgrPhone').value.trim();
-            if (!id || !name) { alert('أدخل الآيدي والاسم'); return; }
-            db.ref('managers/' + id).set({ name, phone, role: 'manager' });
-            document.getElementById('mgrId').value = ''; document.getElementById('mgrName').value = ''; document.getElementById('mgrPhone').value = '';
-        }
-
-        function loadManagers() {
-            db.ref('managers').on('value', snap => {
-                let html = '';
-                snap.forEach(m => {
-                    html += `<div class="card">🔐 ${m.val().name} | 🆔 ${m.key} | 📞 ${m.val().phone || '-'} 
-                        ${m.key !== '6057961002' ? `<button class="btn btn-edit" onclick="editManager('${m.key}', '${m.val().name}', '${m.val().phone || ''}')">✏️</button>
-                        <button class="btn btn-danger" onclick="deleteManager('${m.key}')" style="padding:4px 8px; font-size:10px;">🗑️</button>` : '<span style="color:#888;">(رئيسي)</span>'}</div>`;
-                });
-                document.getElementById('managersList').innerHTML = html || '<p style="color:#888;">لا يوجد مدراء</p>';
-            });
-        }
-
-        function editManager(id, name, phone) {
-            const newName = prompt('الاسم:', name);
-            if (!newName) return;
-            const newPhone = prompt('الهاتف:', phone);
-            db.ref('managers/' + id).update({ name: newName, phone: newPhone || '' });
-        }
-
-        function deleteManager(id) {
-            if (id === '6057961002') { alert('لا يمكن حذف المدير العام'); return; }
-            if (confirm('حذف المدير؟')) db.ref('managers/' + id).remove();
-        }
-
-        // ==================== طلبات تغيير الدور ====================
-        function loadRoleRequests() {
-            db.ref('roleRequests').on('value', snap => {
-                let html = '';
-                snap.forEach(req => {
-                    const r = req.val();
-                    if (r.status === 'pending') {
-                        html += `<div class="card pending">👤 ${r.employeeName} | ${r.currentRole} → ${r.requestedRole} 
-                            <button class="btn btn-success" onclick="approveRoleRequest('${req.key}')">✅ قبول</button>
-                            <button class="btn btn-danger" onclick="rejectRoleRequest('${req.key}')">❌ رفض</button></div>`;
+        function loadWOrders(){
+            db.ref('waiterCarts').on('value',s=>{
+                let h='';
+                s.forEach(cart=>{
+                    const c=cart.val();
+                    if(c.status==='submitted'&&c.coldItems&&c.coldItems.length>0){
+                        h+=`<div class="card">🛒 ${c.waiterName||'?'} | سلة ${c.cartNumber} | 💰 ${c.coldTotal||0} ل.س <button class="btn btn-success" onclick="confirmPay('${cart.key}')" style="padding:4px 8px;font-size:11px;">✅ استلام</button></div>`;
                     }
                 });
-                document.getElementById('roleRequests').innerHTML = html || '<p style="color:#888;">لا توجد طلبات معلقة</p>';
+                document.getElementById('wOrders').innerHTML=h||'<p style="color:#888;">لا توجد طلبات</p>';
             });
         }
 
-        function approveRoleRequest(reqId) {
-            db.ref('roleRequests/' + reqId).once('value', snap => {
-                if (snap.exists()) {
-                    const req = snap.val();
-                    const rates = { barista: 5000, waiter: 4000, accountant: 6000 };
-                    db.ref('employees/' + req.employeeId).update({
-                        role: req.requestedRole,
-                        hourlyRate: rates[req.requestedRole]
-                    });
-                    db.ref('roleRequests/' + reqId).update({ status: 'approved' });
-                }
+        function confirmPay(id){if(confirm('تأكيد الاستلام؟'))db.ref('waiterCarts/'+id).update({status:'paid',accountantId:user.id,paidAt:Date.now()});}
+
+        function loadSupsForInv(){
+            db.ref('suppliers').on('value',s=>{
+                let h='<option value="">اختر المورد</option>';
+                s.forEach(x=>{h+=`<option value="${x.key}">${x.val().name}</option>`;});
+                const el=document.getElementById('supSel');if(el)el.innerHTML=h;
             });
         }
 
-        function rejectRoleRequest(reqId) {
-            db.ref('roleRequests/' + reqId).update({ status: 'rejected' });
+        function addInvItem(){
+            const item=document.getElementById('invItem').value.trim(),qty=parseInt(document.getElementById('invQty').value),price=parseInt(document.getElementById('invPrice').value);
+            if(!item||!qty||!price){alert('أدخل البيانات');return;}
+            invoiceItems.push({item,qty,price,total:qty*price});
+            document.getElementById('invItem').value='';document.getElementById('invQty').value='';document.getElementById('invPrice').value='';
+            document.getElementById('invItems').innerHTML=invoiceItems.map((i,idx)=>`<div>📦 ${i.item} × ${i.qty} = ${i.total} ل.س <button class="btn btn-danger" onclick="invoiceItems.splice(${idx},1);addInvItem()" style="padding:2px 6px;font-size:10px;">❌</button></div>`).join('');
         }
 
-        // ==================== تقارير ====================
-        function loadShiftsReport() {
-            db.ref('shifts').once('value', snap => {
-                let html = '';
-                snap.forEach(s => {
-                    html += `<div class="card">👤 ${s.val().employeeName || '?'} | ⏱️ ${s.val().totalHours || '?'} ساعة | 💰 ${s.val().totalEarnings || 0} ل.س | 📊 ${s.val().status}</div>`;
-                });
-                document.getElementById('shiftsReport').innerHTML = html || '<p>لا توجد ورديات</p>';
+        function saveInv(){
+            const supId=document.getElementById('supSel').value;
+            if(!supId||invoiceItems.length===0){alert('اختر المورد وأضف أصناف');return;}
+            const total=invoiceItems.reduce((s,i)=>s+i.total,0);
+            db.ref('purchaseInvoices').push({supplierId:supId,items:[...invoiceItems],total,accountantId:user.id,accountantName:user.name,date:Date.now(),dateStr:new Date().toLocaleString('ar-SY')});
+            invoiceItems=[];document.getElementById('invItems').innerHTML='';alert('✅ تم الحفظ');loadInvs();
+        }
+
+        function loadInvs(){
+            db.ref('purchaseInvoices').on('value',s=>{
+                let h='';
+                s.forEach(inv=>{h+=`<div class="card">📦 ${inv.val().dateStr} | 💰 ${inv.val().total} ل.س | 👤 ${inv.val().accountantName||'?'} <button class="btn btn-danger" onclick="if(confirm('حذف؟'))db.ref('purchaseInvoices/${inv.key}').remove()" style="padding:2px 6px;font-size:10px;">🗑️</button></div>`;});
+                document.getElementById('invList').innerHTML=h||'<p style="color:#888;">لا توجد فواتير</p>';
             });
         }
 
-        function loadSalariesReport() {
-            db.ref('employees').once('value', snap => {
-                let html = '';
-                snap.forEach(e => {
-                    html += `<div class="card">👤 ${e.val().name} | 💰 ${e.val().hourlyRate} ل.س/ساعة</div>`;
-                });
-                document.getElementById('salariesReport').innerHTML = html || '<p>لا يوجد موظفين</p>';
-            });
+        function loadBarView(){
+            let h=`<div class="section"><h3>☕ طلبات ساخنة جديدة</h3><div id="hotNew"></div></div><div class="section"><h3>⏳ جاري التجهيز</h3><div id="hotPrep"></div></div><div class="section"><h3>✅ جاهزة</h3><div id="hotReady"></div></div><div class="section"><button class="btn btn-warning" onclick="reqRole()" style="width:100%;">🔄 طلب تغيير الدور</button></div>`;
+            document.getElementById('roleContent').innerHTML=h;
+            loadBarOrders();
         }
 
-        // ==================== عرض الموظف (حسب الدور) ====================
-        function loadEmployeeView() {
-            if (currentUser.type !== 'employee') return;
-            
-            if (currentUser.role === 'accountant') loadAccountantView();
-            else if (currentUser.role === 'barista') loadBaristaView();
-            else if (currentUser.role === 'waiter') loadWaiterView();
-        }
-
-        // ==================== شاشة المحاسب ====================
-        function loadAccountantView() {
-            let html = `
-                <div class="tab-bar">
-                    <button class="tab active" onclick="switchAccTab('orders', this)">📋 طلبات</button>
-                    <button class="tab" onclick="switchAccTab('payments', this)">💵 استلام</button>
-                    <button class="tab" onclick="switchAccTab('purchases', this)">📦 فواتير</button>
-                    <button class="tab" onclick="switchAccTab('report', this)">📊 تقرير</button>
-                </div>
-                <div id="accTabContent"></div>
-                <div class="section" style="margin-top:10px;">
-                    <button class="btn btn-warning" onclick="requestRoleChange()" style="width:100%;">🔄 طلب تغيير الدور</button>
-                </div>
-            `;
-            document.getElementById('roleContent').innerHTML = html;
-            switchAccTab('orders', document.querySelector('.tab.active'));
-        }
-
-        function switchAccTab(tab, btn) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            btn.classList.add('active');
-            const content = document.getElementById('accTabContent');
-            
-            if (tab === 'orders') {
-                content.innerHTML = `<div class="section"><h3>📋 طلبات الجرسونات</h3><div id="waiterOrders"></div></div>`;
-                loadWaiterOrdersForAccountant();
-            } else if (tab === 'payments') {
-                content.innerHTML = `<div class="section"><h3>💵 استلام رصيد</h3><select id="waiterSelect"><option value="">اختر الجرسون</option></select><input id="paymentAmount" placeholder="المبلغ"><button class="btn btn-success" onclick="receivePayment()" style="width:100%;">✅ استلام</button></div><div class="section"><h3>📋 السجل</h3><div id="paymentsLog"></div></div>`;
-                loadWaitersForPayment();
-                loadPaymentsLog();
-            } else if (tab === 'purchases') {
-                content.innerHTML = `<div class="section"><h3>📦 فاتورة شراء</h3><select id="supplierSelect"><option value="">اختر المورد</option></select><input id="invoiceItem" placeholder="الصنف"><input id="invoiceQty" placeholder="الكمية"><input id="invoicePrice" placeholder="سعر الشراء"><button class="btn btn-warning" onclick="addInvoiceItem()">➕ إضافة</button><div id="invoiceItems"></div><button class="btn btn-success" onclick="saveInvoice()" style="width:100%; margin-top:10px;">💾 حفظ</button></div><div class="section"><h3>📋 فواتير اليوم</h3><div id="invoicesList"></div></div>`;
-                loadSuppliersForInvoice();
-                loadInvoices();
-            } else if (tab === 'report') {
-                content.innerHTML = `<div class="section"><h3>📊 تقرير اليوم</h3><div id="dailyReport"></div></div>`;
-                loadDailyReport();
-            }
-        }
-
-        function loadWaiterOrdersForAccountant() {
-            db.ref('waiterCarts').on('value', snap => {
-                let html = '';
-                snap.forEach(cart => {
-                    const c = cart.val();
-                    if (c.status === 'submitted' && c.coldItems && c.coldItems.length > 0) {
-                        html += `<div class="card pending">🛒 ${c.waiterName || '?'} | سلة ${c.cartNumber} | 💰 ${c.coldTotal || 0} ل.س <button class="btn btn-success" onclick="confirmPayment('${cart.key}')" style="padding:4px 8px; font-size:11px;">✅ استلام</button></div>`;
+        function loadBarOrders(){
+            db.ref('waiterCarts').on('value',s=>{
+                let nw='',pr='',rd='';
+                s.forEach(cart=>{
+                    const c=cart.val();
+                    if(c.hotItems&&c.hotItems.length>0){
+                        const card=`<div class="card">🛒 ${c.waiterName||'?'} | سلة ${c.cartNumber} | 🔥 ${c.hotItems.map(i=>i.name).join(', ')}<br>${c.hotStatus==='submitted'||!c.hotStatus?`<button class="btn btn-success" onclick="startPrep('${cart.key}')" style="padding:4px 8px;font-size:11px;">▶️ بدء</button>`:c.hotStatus==='preparing'?`<button class="btn btn-success" onclick="markReady('${cart.key}')" style="padding:4px 8px;font-size:11px;">✅ جاهز</button>`:'<span style="color:green;">✅ جاهز</span>'}</div>`;
+                        if(c.hotStatus==='submitted'||!c.hotStatus)nw+=card;
+                        else if(c.hotStatus==='preparing')pr+=card;
+                        else if(c.hotStatus==='ready')rd+=card;
                     }
                 });
-                document.getElementById('waiterOrders').innerHTML = html || '<p style="color:#888;">لا توجد طلبات</p>';
+                document.getElementById('hotNew').innerHTML=nw||'<p style="color:#888;">لا يوجد</p>';
+                document.getElementById('hotPrep').innerHTML=pr||'<p style="color:#888;">لا يوجد</p>';
+                document.getElementById('hotReady').innerHTML=rd||'<p style="color:#888;">لا يوجد</p>';
             });
         }
 
-        function confirmPayment(cartId) {
-            if (confirm('تأكيد استلام الرصيد؟')) {
-                db.ref('waiterCarts/' + cartId).update({ status: 'paid', accountantId: currentUser.id, paidAt: Date.now() });
-            }
-        }
+        function startPrep(id){db.ref('waiterCarts/'+id).update({hotStatus:'preparing',baristaId:user.id,baristaName:user.name});}
+        function markReady(id){db.ref('waiterCarts/'+id).update({hotStatus:'ready'});}
 
-        function loadWaitersForPayment() {
-            db.ref('employees').on('value', snap => {
-                let html = '<option value="">اختر الجرسون</option>';
-                snap.forEach(e => { if (e.val().role === 'waiter') html += `<option value="${e.key}">${e.val().name}</option>`; });
-                document.getElementById('waiterSelect').innerHTML = html;
-            });
-        }
-
-        function receivePayment() {
-            const waiterId = document.getElementById('waiterSelect').value;
-            const amount = parseInt(document.getElementById('paymentAmount').value);
-            if (!waiterId || !amount) { alert('اختر الجرسون وأدخل المبلغ'); return; }
-            db.ref('payments').push({ waiterId, amount, accountantId: currentUser.id, date: Date.now() });
-            document.getElementById('paymentAmount').value = '';
-            alert('✅ تم استلام الرصيد');
-            loadPaymentsLog();
-        }
-
-        function loadPaymentsLog() {
-            db.ref('payments').on('value', snap => {
-                let html = '';
-                snap.forEach(p => { html += `<div class="card">💵 ${p.val().amount} ل.س | 🕐 ${new Date(p.val().date).toLocaleString('ar-SY')}</div>`; });
-                document.getElementById('paymentsLog').innerHTML = html || '<p style="color:#888;">لا يوجد سجل</p>';
-            });
-        }
-
-        function loadSuppliersForInvoice() {
-            db.ref('suppliers').on('value', snap => {
-                let html = '<option value="">اختر المورد</option>';
-                snap.forEach(s => { html += `<option value="${s.key}">${s.val().name}</option>`; });
-                document.getElementById('supplierSelect').innerHTML = html;
-            });
-        }
-
-        function addInvoiceItem() {
-            const item = document.getElementById('invoiceItem').value.trim();
-            const qty = parseInt(document.getElementById('invoiceQty').value);
-            const price = parseInt(document.getElementById('invoicePrice').value);
-            if (!item || !qty || !price) { alert('أدخل الصنف والكمية والسعر'); return; }
-            currentInvoiceItems.push({ item, qty, price, total: qty * price });
-            document.getElementById('invoiceItem').value = ''; document.getElementById('invoiceQty').value = ''; document.getElementById('invoicePrice').value = '';
-            document.getElementById('invoiceItems').innerHTML = currentInvoiceItems.map((i, idx) => `<div>📦 ${i.item} × ${i.qty} = ${i.total} ل.س <button class="btn btn-danger" onclick="removeInvoiceItem(${idx})" style="padding:2px 6px; font-size:10px;">❌</button></div>`).join('');
-        }
-
-        function removeInvoiceItem(idx) { currentInvoiceItems.splice(idx, 1); document.getElementById('invoiceItems').innerHTML = currentInvoiceItems.map((i, idx) => `<div>📦 ${i.item} × ${i.qty} = ${i.total} ل.س <button class="btn btn-danger" onclick="removeInvoiceItem(${idx})" style="padding:2px 6px; font-size:10px;">❌</button></div>`).join(''); }
-
-        function saveInvoice() {
-            const supplierId = document.getElementById('supplierSelect').value;
-            if (!supplierId || currentInvoiceItems.length === 0) { alert('اختر المورد وأضف أصناف'); return; }
-            const total = currentInvoiceItems.reduce((s, i) => s + i.total, 0);
-            db.ref('purchaseInvoices').push({ supplierId, items: [...currentInvoiceItems], total, accountantId: currentUser.id, accountantName: currentUser.name, date: Date.now(), dateStr: new Date().toLocaleString('ar-SY') });
-            currentInvoiceItems = [];
-            document.getElementById('invoiceItems').innerHTML = '';
-            alert('✅ تم حفظ الفاتورة');
-            loadInvoices();
-        }
-
-        function loadInvoices() {
-            db.ref('purchaseInvoices').on('value', snap => {
-                let html = '';
-                snap.forEach(inv => {
-                    html += `<div class="card">📦 ${inv.val().dateStr} | 💰 ${inv.val().total} ل.س | 👤 ${inv.val().accountantName || '?'} 
-                        <button class="btn btn-danger" onclick="deleteInvoice('${inv.key}')" style="padding:2px 6px; font-size:10px;">🗑️</button></div>`;
-                });
-                document.getElementById('invoicesList').innerHTML = html || '<p style="color:#888;">لا توجد فواتير</p>';
-            });
-        }
-
-        function deleteInvoice(id) { if (confirm('حذف الفاتورة؟')) db.ref('purchaseInvoices/' + id).remove(); }
-
-        function loadDailyReport() {
-            const today = new Date().toLocaleDateString('ar-SY');
-            let html = `<p>📅 تاريخ: ${today}</p>`;
-            db.ref('purchaseInvoices').once('value', snap => {
-                let total = 0;
-                snap.forEach(inv => { total += inv.val().total || 0; });
-                html += `<p>📦 مشتريات اليوم: ${total.toLocaleString()} ل.س</p>`;
-                document.getElementById('dailyReport').innerHTML = html;
-            });
-        }
-
-        // ==================== شاشة الباريستا ====================
-        function loadBaristaView() {
-            let html = `
-                <div class="section"><h3>☕ طلبات المشروبات الساخنة</h3><div id="hotOrders"></div></div>
-                <div class="section"><h3>⏳ جاري التجهيز</h3><div id="preparingOrders"></div></div>
-                <div class="section"><h3>✅ جاهزة</h3><div id="readyOrders"></div></div>
-                <div class="section">
-                    <button class="btn btn-warning" onclick="requestRoleChange()" style="width:100%;">🔄 طلب تغيير الدور</button>
-                </div>
-            `;
-            document.getElementById('roleContent').innerHTML = html;
-            loadBaristaOrders();
-        }
-
-        function loadBaristaOrders() {
-            db.ref('waiterCarts').on('value', snap => {
-                let newHtml = '', preparingHtml = '', readyHtml = '';
-                snap.forEach(cart => {
-                    const c = cart.val();
-                    if (c.hotItems && c.hotItems.length > 0) {
-                        const card = `<div class="card ${c.hotStatus === 'preparing' ? 'accepted' : c.hotStatus === 'ready' ? '' : 'pending'}">
-                            🛒 ${c.waiterName || '?'} | سلة ${c.cartNumber} | 🔥 ${c.hotItems.map(i => i.name).join(', ')}
-                            ${c.hotStatus === 'submitted' ? `<button class="btn btn-success" onclick="startPreparing('${cart.key}')" style="padding:4px 8px; font-size:11px;">▶️ بدء التجهيز</button>` : ''}
-                            ${c.hotStatus === 'preparing' ? `<button class="btn btn-success" onclick="markReady('${cart.key}')" style="padding:4px 8px; font-size:11px;">✅ جاهز</button>` : ''}
-                            ${c.hotStatus === 'ready' ? `<span style="color:green;">✅ جاهز</span>` : ''}
-                        </div>`;
-                        if (c.hotStatus === 'submitted' || !c.hotStatus) newHtml += card;
-                        else if (c.hotStatus === 'preparing') preparingHtml += card;
-                        else if (c.hotStatus === 'ready') readyHtml += card;
-                    }
-                });
-                document.getElementById('hotOrders').innerHTML = newHtml || '<p style="color:#888;">لا توجد طلبات جديدة</p>';
-                document.getElementById('preparingOrders').innerHTML = preparingHtml || '<p style="color:#888;">لا يوجد</p>';
-                document.getElementById('readyOrders').innerHTML = readyHtml || '<p style="color:#888;">لا يوجد</p>';
-            });
-        }
-
-        function startPreparing(cartId) {
-            db.ref('waiterCarts/' + cartId).update({ hotStatus: 'preparing', baristaId: currentUser.id, baristaName: currentUser.name });
-        }
-
-        function markReady(cartId) {
-            db.ref('waiterCarts/' + cartId).update({ hotStatus: 'ready' });
-        }
-
-        // ==================== شاشة الجرسون ====================
-        function loadWaiterView() {
-            // تحميل المنتجات والأقسام
-            db.ref('categories').once('value', snap => { allCategories = {}; snap.forEach(c => allCategories[c.key] = { id: c.key, ...c.val() }; });
-            db.ref('products').once('value', snap => { allProducts = {}; snap.forEach(p => allProducts[p.key] = { id: p.key, ...p.val() }; });
-            
-            let html = `
-                <div class="section"><h3>🛒 سلاتي</h3><div id="myCarts"></div>
-                <button class="btn btn-primary" onclick="createNewCart()" style="width:100%; margin-top:10px;">➕ سلة جديدة</button></div>
-                <div class="section hidden" id="cartDetail"><h3 id="cartDetailTitle">سلة #1</h3>
-                    <div id="cartItems"></div>
-                    <div id="cartHotItems"></div>
-                    <div id="cartColdItems"></div>
-                </div>
-                <div class="section hidden" id="addProductSection">
-                    <h3>📂 الأقسام</h3><div id="waiterCategories"></div>
-                    <div class="hidden" id="waiterProductsSection"><h3>📦 المنتجات</h3><button class="btn btn-warning" onclick="showWaiterCategories()">⬅ رجوع</button><div id="waiterProducts"></div></div>
-                </div>
-                <div class="section">
-                    <button class="btn btn-warning" onclick="requestRoleChange()" style="width:100%;">🔄 طلب تغيير الدور</button>
-                </div>
-            `;
-            document.getElementById('roleContent').innerHTML = html;
+        function loadWaitView(){
+            db.ref('categories').once('value',s=>{allCats={};s.forEach(c=>allCats[c.key]={id:c.key,...c.val()};});
+            db.ref('products').once('value',s=>{allProds={};s.forEach(p=>allProds[p.key]={id:p.key,...p.val()};});
+            let h=`<div class="section"><h3>🛒 سلاتي</h3><div id="myCarts"></div><button class="btn btn-primary" onclick="newCart()" style="width:100%;margin-top:10px;">➕ سلة جديدة</button></div><div class="section hidden" id="cartDetail"><h3 id="cartTitle">سلة</h3><div id="cartContent"></div></div><div class="section hidden" id="prodSection"><h3>📂 الأقسام</h3><div id="wCats"></div><div class="hidden" id="wProdsSec"><h3>📦 المنتجات</h3><button class="btn btn-warning" onclick="showWCats()">⬅ رجوع</button><div id="wProds"></div></div></div><div class="section"><button class="btn btn-warning" onclick="reqRole()" style="width:100%;">🔄 طلب تغيير الدور</button></div>`;
+            document.getElementById('roleContent').innerHTML=h;
             loadMyCarts();
         }
 
-        function createNewCart() {
-            const cartNumber = Date.now().toString().slice(-4);
-            db.ref('waiterCarts').push({
-                waiterId: currentUser.id,
-                waiterName: currentUser.name,
-                cartNumber: cartNumber,
-                items: [],
-                hotItems: [],
-                coldItems: [],
-                hotTotal: 0,
-                coldTotal: 0,
-                hotStatus: null,
-                coldStatus: null,
-                status: 'active',
-                createdAt: Date.now()
-            });
-        }
+        function newCart(){db.ref('waiterCarts').push({waiterId:user.id,waiterName:user.name,cartNumber:Date.now().toString().slice(-4),items:[],hotItems:[],coldItems:[],hotTotal:0,coldTotal:0,hotStatus:null,coldStatus:null,status:'active',createdAt:Date.now()});}
 
-        function loadMyCarts() {
-            db.ref('waiterCarts').orderByChild('waiterId').equalTo(currentUser.id).on('value', snap => {
-                let html = '';
-                snap.forEach(cart => {
-                    const c = cart.val();
-                    if (c.status !== 'paid' && c.status !== 'cancelled') {
-                        html += `<div class="card">🛒 سلة #${c.cartNumber} | 🔥 ${c.hotItems?.length || 0} ساخن | 🧊 ${c.coldItems?.length || 0} بارد | 💰 ${(c.hotTotal || 0) + (c.coldTotal || 0)} ل.س
-                            <button class="btn btn-primary" onclick="openCart('${cart.key}')" style="padding:4px 8px; font-size:11px;">📂 فتح</button>
-                            <button class="btn btn-danger" onclick="cancelCart('${cart.key}')" style="padding:4px 8px; font-size:11px;">🗑️</button></div>`;
+        function loadMyCarts(){
+            db.ref('waiterCarts').orderByChild('waiterId').equalTo(user.id).on('value',s=>{
+                let h='';
+                s.forEach(cart=>{
+                    const c=cart.val();
+                    if(c.status!=='paid'&&c.status!=='cancelled'){
+                        h+=`<div class="card">🛒 سلة #${c.cartNumber} | 🔥 ${c.hotItems?.length||0} | 🧊 ${c.coldItems?.length||0} | 💰 ${(c.hotTotal||0)+(c.coldTotal||0)} ل.س <button class="btn btn-primary" onclick="openCart('${cart.key}')" style="padding:4px 8px;font-size:11px;">📂</button> <button class="btn btn-danger" onclick="if(confirm('حذف؟'))db.ref('waiterCarts/${cart.key}').update({status:'cancelled'})" style="padding:4px 8px;font-size:11px;">🗑️</button></div>`;
                     }
                 });
-                document.getElementById('myCarts').innerHTML = html || '<p style="color:#888;">لا توجد سلات نشطة. اضغط "سلة جديدة".</p>';
+                document.getElementById('myCarts').innerHTML=h||'<p style="color:#888;">لا توجد سلات</p>';
             });
         }
 
-        let currentCartId = null;
-
-        function openCart(cartId) {
-            currentCartId = cartId;
-            document.getElementById('addProductSection').classList.remove('hidden');
+        function openCart(id){
+            cartId=id;
             document.getElementById('cartDetail').classList.remove('hidden');
-            
-            db.ref('waiterCarts/' + cartId).once('value', snap => {
-                if (snap.exists()) {
-                    const c = snap.val();
-                    document.getElementById('cartDetailTitle').textContent = `🛒 سلة #${c.cartNumber}`;
-                    
-                    let itemsHtml = '<h4>📋 كل المنتجات:</h4>';
-                    if (c.items && c.items.length > 0) {
-                        c.items.forEach(i => { itemsHtml += `<div>• ${i.name} × ${i.qty} = ${i.total} ل.س</div>`; });
-                    }
-                    
-                    let hotHtml = '<h4>🔥 مشروبات ساخنة:</h4>';
-                    if (c.hotItems && c.hotItems.length > 0) {
-                        c.hotItems.forEach(i => { hotHtml += `<div>• ${i.name} × ${i.qty} = ${i.total} ل.س</div>`; });
-                        hotHtml += `<p><strong>الإجمالي: ${c.hotTotal || 0} ل.س</strong></p>`;
-                        if (!c.hotStatus || c.hotStatus === 'submitted') {
-                            hotHtml += `<button class="btn btn-warning" onclick="sendHotToBarista('${cartId}')">☕ إرسال للباريستا</button>`;
-                        } else {
-                            hotHtml += `<p>الحالة: ${c.hotStatus === 'preparing' ? '⏳ جاري التجهيز' : '✅ جاهز'}</p>`;
-                        }
-                    }
-                    
-                    let coldHtml = '<h4>🧊 باقي المنتجات:</h4>';
-                    if (c.coldItems && c.coldItems.length > 0) {
-                        c.coldItems.forEach(i => { coldHtml += `<div>• ${i.name} × ${i.qty} = ${i.total} ل.س</div>`; });
-                        coldHtml += `<p><strong>الإجمالي: ${c.coldTotal || 0} ل.س</strong></p>`;
-                        coldHtml += `<button class="btn btn-success" onclick="sendColdToAccountant('${cartId}')">💵 إرسال للمحاسب</button>`;
-                    }
-                    
-                    document.getElementById('cartItems').innerHTML = itemsHtml;
-                    document.getElementById('cartHotItems').innerHTML = hotHtml;
-                    document.getElementById('cartColdItems').innerHTML = coldHtml;
-                }
+            document.getElementById('prodSection').classList.remove('hidden');
+            db.ref('waiterCarts/'+id).once('value',s=>{
+                if(!s.exists())return;
+                const c=s.val();
+                document.getElementById('cartTitle').textContent=`🛒 سلة #${c.cartNumber}`;
+                let h='<h4>📋 كل المنتجات:</h4>';
+                if(c.items) c.items.forEach(i=>{h+=`<div>• ${i.name} × ${i.qty} = ${i.total} ل.س</div>`;});
+                h+='<h4>🔥 ساخن:</h4>';
+                if(c.hotItems&&c.hotItems.length>0){
+                    c.hotItems.forEach(i=>{h+=`<div>• ${i.name} × ${i.qty} = ${i.total} ل.س</div>`;});
+                    h+=`<p><strong>الإجمالي: ${c.hotTotal||0} ل.س</strong></p>`;
+                    h+=c.hotStatus==='ready'?'<p style="color:green;">✅ جاهز</p>':c.hotStatus==='preparing'?'<p>⏳ جاري التجهيز</p>':`<button class="btn btn-warning" onclick="sendHot('${id}')">☕ إرسال للباريستا</button>`;
+                }else{h+='<p style="color:#888;">لا يوجد</p>';}
+                h+='<h4>🧊 بارد:</h4>';
+                if(c.coldItems&&c.coldItems.length>0){
+                    c.coldItems.forEach(i=>{h+=`<div>• ${i.name} × ${i.qty} = ${i.total} ل.س</div>`;});
+                    h+=`<p><strong>الإجمالي: ${c.coldTotal||0} ل.س</strong></p>`;
+                    h+=`<button class="btn btn-success" onclick="sendCold('${id}')">💵 إرسال للمحاسب</button>`;
+                }else{h+='<p style="color:#888;">لا يوجد</p>';}
+                document.getElementById('cartContent').innerHTML=h;
             });
-            
-            showWaiterCategories();
+            showWCats();
         }
 
-        function showWaiterCategories() {
-            document.getElementById('waiterProductsSection').classList.add('hidden');
-            document.getElementById('waiterCategories').classList.remove('hidden');
-            const cats = Object.values(allCategories);
-            let html = '';
-            cats.forEach(c => { html += `<div class="card" onclick="showWaiterProducts('${c.id}', '${c.name}')" style="cursor:pointer;">📁 ${c.name} ➤</div>`; });
-            document.getElementById('waiterCategories').innerHTML = html || '<p>لا توجد أقسام</p>';
+        function showWCats(){
+            document.getElementById('wProdsSec').classList.add('hidden');
+            document.getElementById('wCats').classList.remove('hidden');
+            let h='';
+            Object.values(allCats).forEach(c=>{h+=`<div class="card" onclick="showWProds('${c.id}','${c.name}')" style="cursor:pointer;">📁 ${c.name} ➤</div>`;});
+            document.getElementById('wCats').innerHTML=h||'<p>لا توجد أقسام</p>';
         }
 
-        function showWaiterProducts(catId, catName) {
-            document.getElementById('waiterCategories').classList.add('hidden');
-            document.getElementById('waiterProductsSection').classList.remove('hidden');
-            document.getElementById('waiterProductsSection').querySelector('h3').textContent = `📦 ${catName}`;
-            const products = Object.values(allProducts).filter(p => String(p.categoryId) === String(catId));
-            let html = '';
-            products.forEach(p => {
-                html += `<div class="product"><span>${p.name} | 💰 ${p.price} ل.س | 📦 ${p.stock}</span><button class="btn btn-success" onclick="addToWaiterCart('${p.id}', '${p.name}', ${p.price}, '${p.categoryId}')" style="padding:4px 8px; font-size:11px;">➕</button></div>`;
-            });
-            document.getElementById('waiterProducts').innerHTML = html || '<p>لا توجد منتجات</p>';
+        function showWProds(catId,catName){
+            document.getElementById('wCats').classList.add('hidden');
+            document.getElementById('wProdsSec').classList.remove('hidden');
+            document.getElementById('wProdsSec').querySelector('h3').textContent=`📦 ${catName}`;
+            const prods=Object.values(allProds).filter(p=>String(p.categoryId)===String(catId));
+            let h='';
+            prods.forEach(p=>{h+=`<div class="card">${p.name} | 💰 ${p.price} ل.س | 📦 ${p.stock} <button class="btn btn-success" onclick="addToCart('${p.id}','${p.name}',${p.price},'${p.categoryId}')" style="padding:4px 8px;font-size:11px;">➕</button></div>`;});
+            document.getElementById('wProds').innerHTML=h||'<p>لا توجد منتجات</p>';
         }
 
-        function addToWaiterCart(prodId, name, price, catId) {
-            if (!currentCartId) { alert('افتح سلة أولاً'); return; }
-            const isHot = String(catId) === 'cat1'; // cat1 = مشروبات ساخنة
-            
-            db.ref('waiterCarts/' + currentCartId).once('value', snap => {
-                if (snap.exists()) {
-                    const cart = snap.val();
-                    const items = cart.items || [];
-                    const existing = items.find(i => i.id === prodId);
-                    
-                    if (existing) {
-                        existing.qty += 1;
-                        existing.total = existing.qty * price;
-                    } else {
-                        items.push({ id: prodId, name, price, qty: 1, total: price });
-                    }
-                    
-                    const hotItems = items.filter(i => String(allProducts[i.id]?.categoryId) === 'cat1');
-                    const coldItems = items.filter(i => String(allProducts[i.id]?.categoryId) !== 'cat1');
-                    const hotTotal = hotItems.reduce((s, i) => s + i.total, 0);
-                    const coldTotal = coldItems.reduce((s, i) => s + i.total, 0);
-                    
-                    db.ref('waiterCarts/' + currentCartId).update({ items, hotItems, coldItems, hotTotal, coldTotal });
-                    openCart(currentCartId);
-                }
+        function addToCart(pid,name,price,catId){
+            if(!cartId){alert('افتح سلة أولاً');return;}
+            const isHot=String(catId)==='cat1';
+            db.ref('waiterCarts/'+cartId).once('value',s=>{
+                if(!s.exists())return;
+                const c=s.val();
+                const items=c.items||[];
+                const ex=items.find(i=>i.id===pid);
+                if(ex){ex.qty+=1;ex.total=ex.qty*price;}else{items.push({id:pid,name,price,qty:1,total:price});}
+                const hot=items.filter(i=>String(allProds[i.id]?.categoryId)==='cat1');
+                const cold=items.filter(i=>String(allProds[i.id]?.categoryId)!=='cat1');
+                db.ref('waiterCarts/'+cartId).update({items,hotItems:hot,coldItems:cold,hotTotal:hot.reduce((s,i)=>s+i.total,0),coldTotal:cold.reduce((s,i)=>s+i.total,0)});
+                openCart(cartId);
             });
         }
 
-        function sendHotToBarista(cartId) {
-            if (confirm('إرسال المشروبات الساخنة للباريستا؟')) {
-                db.ref('waiterCarts/' + cartId).update({ hotStatus: 'submitted' });
-                alert('✅ تم إرسال الطلب للباريستا');
-            }
-        }
+        function sendHot(id){if(confirm('إرسال للباريستا؟'))db.ref('waiterCarts/'+id).update({hotStatus:'submitted'});}
+        function sendCold(id){if(confirm('إرسال للمحاسب؟'))db.ref('waiterCarts/'+id).update({coldStatus:'submitted',status:'submitted'});}
 
-        function sendColdToAccountant(cartId) {
-            if (confirm('إرسال باقي الطلبات للمحاسب؟')) {
-                db.ref('waiterCarts/' + cartId).update({ coldStatus: 'submitted', status: 'submitted' });
-                alert('✅ تم إرسال الطلب للمحاسب - الرجاء تسليم الرصيد');
-            }
-        }
-
-        function cancelCart(cartId) {
-            if (confirm('حذف هذه السلة؟')) {
-                db.ref('waiterCarts/' + cartId).update({ status: 'cancelled' });
-            }
-        }
-
-        // ==================== طلب تغيير الدور ====================
-        function requestRoleChange() {
-            const roles = { barista: 'باريستا', waiter: 'جرسون', accountant: 'محاسب' };
-            const currentRole = currentUser.role;
-            const options = Object.entries(roles).filter(([k]) => k !== currentRole).map(([k, v]) => `${k} (${v})`).join(', ');
-            const newRole = prompt(`دورك الحالي: ${roles[currentRole]}\n\nاختر الدور الجديد:\n${options}\n\nاكتب اسم الدور بالإنجليزي:`);
-            if (!newRole || !['barista', 'waiter', 'accountant'].includes(newRole)) { alert('دور غير صالح'); return; }
-            if (newRole === currentRole) { alert('هذا دورك الحالي'); return; }
-            
-            db.ref('roleRequests').push({
-                employeeId: currentUser.id,
-                employeeName: currentUser.name,
-                currentRole: currentRole,
-                requestedRole: newRole,
-                status: 'pending',
-                date: Date.now()
-            });
-            alert('✅ تم إرسال طلب تغيير الدور للمدير العام');
-        }
-
-        // ==================== دوال مساعدة ====================
-        function showImage(url) {
-            document.getElementById('modalImage').src = url;
-            document.getElementById('imageModal').style.display = 'flex';
+        function reqRole(){
+            const roles={barista:'باريستا',waiter:'جرسون',accountant:'محاسب'};
+            const opts=Object.entries(roles).filter(([k])=>k!==user.role).map(([k,v])=>`${k} (${v})`).join(', ');
+            const nr=prompt(`دورك: ${roles[user.role]}\nاختر:\n${opts}\nاكتب بالإنجليزي:`);
+            if(!nr||!['barista','waiter','accountant'].includes(nr)){alert('دور غير صالح');return;}
+            db.ref('roleRequests').push({employeeId:user.id,employeeName:user.name,currentRole:user.role,requestedRole:nr,status:'pending',date:Date.now()});
+            alert('✅ تم إرسال الطلب');
         }
     </script>
 </body>

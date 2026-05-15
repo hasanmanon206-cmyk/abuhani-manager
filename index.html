@@ -3,216 +3,482 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>أبو هاني | الإدارة</title>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<title>إدارة البلة | أبو هاني</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 <style>
+
 :root{
---brown:#4e342e;
---beige:#f5e6ca;
---gold:#d4a017;
---green:#16a34a;
---red:#dc2626;
---blue:#2563eb;
---glass:rgba(255,255,255,.18);
---radius:18px;
+--bg1:#00c6ff;
+--bg2:#0072ff;
+--bg3:#7f5af0;
+--glass:rgba(255,255,255,0.15);
+--glass2:rgba(255,255,255,0.10);
+--white:#fff;
+--shadow:0 8px 25px rgba(0,0,0,.15);
+--radius:24px;
 }
 
 *{
 margin:0;
 padding:0;
 box-sizing:border-box;
+font-family:"Segoe UI",sans-serif;
+-webkit-tap-highlight-color:transparent;
 }
 
 body{
-font-family:Tahoma,sans-serif;
-background:linear-gradient(-45deg,#ff006e,#8338ec,#3a86ff,#06d6a0,#ffbe0b,#fb5607);
+background:linear-gradient(135deg,var(--bg1),var(--bg2),var(--bg3));
 background-size:400% 400%;
-animation:rainbowBG 15s ease infinite;
+animation:bgMove 12s ease infinite;
 min-height:100vh;
-padding:15px;
 color:#fff;
-overflow-x:hidden;
+padding-bottom:100px;
 }
 
-@keyframes rainbowBG{
-0%{background-position:0% 50%;}
-50%{background-position:100% 50%;}
-100%{background-position:0% 50%;}
+@keyframes bgMove{
+0%{background-position:0% 50%}
+50%{background-position:100% 50%}
+100%{background-position:0% 50%}
 }
 
-.container{
-max-width:1200px;
-margin:auto;
+.hidden{
+display:none!important;
+}
+
+.topbar{
+padding:18px;
+display:flex;
+align-items:center;
+justify-content:space-between;
+}
+
+.topbar h1{
+font-size:34px;
+font-weight:bold;
+}
+
+.menu-btn{
+width:65px;
+height:65px;
+border-radius:50%;
+border:none;
+font-size:30px;
+color:white;
+background:linear-gradient(135deg,#ff00cc,#3333ff);
+box-shadow:var(--shadow);
 }
 
 .glass{
 background:var(--glass);
-backdrop-filter:blur(10px);
-border:1px solid rgba(255,255,255,.2);
-border-radius:var(--radius);
-padding:20px;
-margin-bottom:20px;
-box-shadow:0 8px 30px rgba(0,0,0,.2);
+backdrop-filter:blur(14px);
+border:1px solid rgba(255,255,255,.15);
+border-radius:30px;
+box-shadow:var(--shadow);
 }
 
-h1,h2,h3{
-margin-bottom:15px;
+.user-box{
+margin:0 15px 20px;
+padding:18px;
+display:flex;
+justify-content:space-between;
+align-items:center;
 }
 
-input,select,textarea{
-width:100%;
-padding:12px;
-border:none;
-border-radius:12px;
-margin:8px 0;
+.user-info h2{
+font-size:22px;
+margin-bottom:5px;
+}
+
+.live-clock{
 font-size:15px;
+opacity:.9;
 }
 
-button{
+.logout-btn{
+background:#ff4757;
 border:none;
 padding:12px 18px;
-border-radius:12px;
-cursor:pointer;
+border-radius:16px;
+color:white;
 font-weight:bold;
-transition:.2s;
-}
-
-button:hover{
-transform:translateY(-2px);
-}
-
-.btn-primary{
-background:var(--gold);
-color:#fff;
-}
-
-.btn-danger{
-background:var(--red);
-color:#fff;
-}
-
-.btn-success{
-background:var(--green);
-color:#fff;
-}
-
-.btn-blue{
-background:var(--blue);
-color:#fff;
 }
 
 .grid{
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+grid-template-columns:1fr 1fr;
 gap:15px;
+padding:0 15px;
+margin-bottom:25px;
 }
 
-.card{
-background:rgba(255,255,255,.12);
-padding:15px;
-border-radius:15px;
+.card-btn{
+background:white;
+color:#222;
+padding:22px 10px;
+border-radius:24px;
+text-align:center;
+font-size:20px;
+font-weight:bold;
+border:none;
+box-shadow:0 6px 15px rgba(0,0,0,.15);
 }
 
-.hidden{
-display:none;
-}
-
-.item{
-background:rgba(255,255,255,.12);
-padding:12px;
-border-radius:12px;
+.card-btn i{
+display:block;
+font-size:28px;
 margin-bottom:10px;
+}
+
+.section{
+margin:15px;
+padding:20px;
+}
+
+.section-title{
+font-size:32px;
+margin-bottom:20px;
+font-weight:bold;
+}
+
+.orders-container{
+display:flex;
+flex-direction:column;
+gap:14px;
+}
+
+.order-card{
+background:rgba(255,255,255,.12);
+padding:18px;
+border-radius:22px;
+border:1px solid rgba(255,255,255,.15);
+}
+
+.order-top{
 display:flex;
 justify-content:space-between;
-align-items:center;
-gap:10px;
-flex-wrap:wrap;
+margin-bottom:12px;
 }
 
-.tabs{
+.customer-name{
+font-size:22px;
+font-weight:bold;
+}
+
+.status{
+padding:6px 14px;
+border-radius:30px;
+font-size:14px;
+font-weight:bold;
+}
+
+.status-new{
+background:#ff9800;
+}
+
+.status-processing{
+background:#2196f3;
+}
+
+.status-completed{
+background:#4caf50;
+}
+
+.order-products{
+margin-top:10px;
+line-height:2;
+font-size:16px;
+}
+
+.order-total{
+margin-top:10px;
+font-size:20px;
+font-weight:bold;
+color:#ffe082;
+}
+
+.order-actions{
 display:flex;
-flex-wrap:wrap;
 gap:10px;
+margin-top:15px;
+}
+
+.action-btn{
+flex:1;
+padding:12px;
+border:none;
+border-radius:14px;
+font-weight:bold;
+color:white;
+}
+
+.accept{
+background:#2ecc71;
+}
+
+.prepare{
+background:#3498db;
+}
+
+.finish{
+background:#9b59b6;
+}
+
+.reject{
+background:#e74c3c;
+}
+
+.side-menu{
+position:fixed;
+top:0;
+right:-320px;
+width:300px;
+height:100%;
+background:#ffffff;
+color:#222;
+z-index:9999;
+transition:.3s;
+padding:20px;
+overflow:auto;
+}
+
+.side-menu.active{
+right:0;
+}
+
+.side-menu h3{
 margin-bottom:20px;
+font-size:25px;
 }
 
-.tab{
-background:#fff;
-color:#333;
+.side-menu button{
+width:100%;
+padding:16px;
+margin-bottom:12px;
+border:none;
+border-radius:16px;
+font-size:18px;
+font-weight:bold;
+background:#f1f3f6;
 }
 
-.active-tab{
-background:var(--gold);
-color:#fff;
+.overlay{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.4);
+display:none;
+z-index:999;
+}
+
+.overlay.active{
+display:block;
 }
 
 .footer{
 text-align:center;
-margin-top:30px;
-opacity:.8;
-font-size:14px;
+padding:25px 15px;
+font-size:18px;
+opacity:.95;
+line-height:1.8;
 }
+
+.login-screen{
+padding:20px;
+display:flex;
+align-items:center;
+justify-content:center;
+min-height:100vh;
+}
+
+.login-box{
+width:100%;
+max-width:420px;
+padding:30px;
+text-align:center;
+}
+
+.login-box h1{
+margin-bottom:25px;
+font-size:40px;
+}
+
+.login-box input{
+width:100%;
+padding:18px;
+margin-bottom:15px;
+border:none;
+border-radius:18px;
+font-size:18px;
+outline:none;
+}
+
+.login-btn{
+width:100%;
+padding:18px;
+border:none;
+border-radius:18px;
+font-size:20px;
+font-weight:bold;
+background:linear-gradient(135deg,#00dbde,#fc00ff);
+color:white;
+}
+
+.remember{
+display:flex;
+align-items:center;
+gap:10px;
+margin-bottom:20px;
+font-size:16px;
+}
+
+.empty{
+text-align:center;
+padding:30px;
+font-size:18px;
+opacity:.9;
+}
+
+.badge{
+background:red;
+color:white;
+padding:3px 9px;
+border-radius:50px;
+font-size:12px;
+margin-right:5px;
+}
+
 </style>
 </head>
+
 <body>
 
-<div class="container">
+<!-- شاشة تسجيل الدخول -->
 
-<div id="loginScreen" class="glass">
-<h1>☕ نظام أبو هاني</h1>
+<div id="loginScreen" class="login-screen">
+
+<div class="login-box glass">
+
+<h1>☕ إدارة البلة</h1>
 
 <input type="text" id="username" placeholder="اسم المستخدم">
+
 <input type="password" id="password" placeholder="كلمة المرور">
 
-<select id="roleSelect" class="hidden">
-<option value="">اختر الدور</option>
-<option value="barista">☕ باريستا</option>
-<option value="waiter">🛒 جرسون</option>
-<option value="accountant">💰 محاسب</option>
-</select>
-
-<button class="btn-primary" onclick="login()">🚀 دخول</button>
-<button class="btn-success hidden" id="confirmRoleBtn" onclick="confirmRole()">✅ تأكيد الدور</button>
-
-<p id="loginMsg"></p>
+<div class="remember">
+<input type="checkbox" id="rememberMe">
+<label for="rememberMe">تذكر الجلسة</label>
 </div>
 
-<div id="dashboard" class="hidden">
+<button class="login-btn" onclick="login()">
+🚀 دخول
+</button>
 
-<button id="mobileMenuBtn" onclick="toggleMobileMenu()" style="position:fixed;top:15px;left:15px;z-index:999;background:linear-gradient(45deg,#ff006e,#8338ec,#3a86ff);color:white;width:55px;height:55px;border-radius:50%;font-size:22px;box-shadow:0 8px 20px rgba(0,0,0,.3)">
+</div>
+
+</div>
+
+<!-- التطبيق -->
+
+<div id="app" class="hidden">
+
+<div class="topbar">
+
+<h1>إدارة البلة</h1>
+
+<button class="menu-btn" onclick="toggleMenu()">
 ☰
 </button>
 
-<div id="mobileSidebar" class="hidden" style="position:fixed;top:0;right:0;width:280px;height:100vh;background:rgba(0,0,0,.45);backdrop-filter:blur(20px);padding:20px;z-index:998;overflow:auto;border-left:1px solid rgba(255,255,255,.2)">
-<h2 style="margin-bottom:20px">📱 القائمة</h2>
-<div id="mobileTabsContainer"></div>
 </div>
 
-<div class="glass">
-<div style="display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap">
-<div>
-<h2 id="welcomeName"></h2>
-<p id="welcomeRole"></p>
-</div>
-<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-<div class="card" style="padding:10px 15px;min-width:120px;text-align:center">
-🕒 <span id="liveClock">00:00:00</span>
-</div>
-<div class="card" style="padding:10px 15px;min-width:180px;text-align:center">
-⏱️ مدة الوردية: <span id="shiftDuration">0 دقيقة</span>
-</div>
-<button class="btn-danger" onclick="logout()">🚪 تسجيل خروج وإنهاء الوردية</button>
-</div>
-</div>
+<div class="user-box glass">
+
+<div class="user-info">
+
+<h2 id="welcomeName">أهلاً</h2>
+
+<div class="live-clock" id="clock">
+00:00
 </div>
 
-<div id="stats" class="grid"></div>
+</div>
 
-<div class="tabs" id="tabs"></div>
+<button class="logout-btn" onclick="logout()">
+🚪 خروج
+</button>
 
-<div class="glass" id="content"></div>
+</div>
+
+<div class="grid">
+
+<button class="card-btn">
+👥
+الموظفين
+</button>
+
+<button class="card-btn">
+📦
+المنتجات
+</button>
+
+<button class="card-btn">
+🚚
+الموردين
+</button>
+
+<button class="card-btn">
+📂
+الأقسام
+</button>
+
+<button class="card-btn">
+💰
+الأدوار والأجور
+</button>
+
+<button class="card-btn">
+🧾
+الفواتير
+</button>
+
+<button class="card-btn">
+👤
+العملاء
+</button>
+
+<button class="card-btn">
+⏱️
+الورديات
+</button>
+
+<button class="card-btn">
+⚙️
+الإعدادات
+</button>
+
+<button class="card-btn">
+📊
+التقارير
+</button>
+
+</div>
+
+<div class="section glass">
+
+<div class="section-title">
+🧾 الطلبات
+<span class="badge" id="ordersCount">0</span>
+</div>
+
+<div id="ordersContainer" class="orders-container">
+
+<div class="empty">
+لا توجد طلبات حالياً
+</div>
+
+</div>
 
 </div>
 
@@ -222,716 +488,447 @@ font-size:14px;
 
 </div>
 
+<!-- القائمة -->
+
+<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
+<div class="side-menu" id="sideMenu">
+
+<h3>📋 القائمة</h3>
+
+<button>👥 الموظفين</button>
+<button>📦 المنتجات</button>
+<button>🚚 الموردين</button>
+<button>📂 الأقسام</button>
+<button>💰 الأدوار والأجور</button>
+<button>🧾 الفواتير</button>
+<button>📊 التقارير</button>
+<button>⚙️ الإعدادات</button>
+
+<button onclick="logout()" style="background:#ff4757;color:white;">
+🚪 تسجيل خروج
+</button>
+
+</div>
+
+<!-- Firebase -->
+
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
 <script>
 
-const firebaseConfig={
+const firebaseConfig = {
 databaseURL:"https://abuhaniapp-default-rtdb.asia-southeast1.firebasedatabase.app/"
 };
 
 firebase.initializeApp(firebaseConfig);
 
-const db=firebase.database();
-
-let currentUser=null;
-let shiftStartTime=null;
-let shiftTimer=null;
-
-let ROLE_RATES={
-barista:5000,
-waiter:4000,
-accountant:6000
-};
-
-const ROLE_MAP={
-owner:{label:'مدير عام',icon:'👑'},
-barista:{label:'باريستا',icon:'☕'},
-waiter:{label:'جرسون',icon:'🛒'},
-accountant:{label:'محاسب',icon:'💰'}
-};
+const db = firebase.database();
 
 function $(id){
 return document.getElementById(id);
 }
 
-function initSystem(){
+let currentUser = null;
 
-const adminRef=db.ref('managers/6057961002');
+function toggleMenu(){
 
-adminRef.once('value').then(snapshot=>{
+$('sideMenu').classList.toggle('active');
 
-if(!snapshot.exists()){
-
-adminRef.set({
-name:'أبو هاني',
-phone:'0932293515',
-role:'owner',
-username:'admin',
-password:'admin321'
-});
+$('overlay').classList.toggle('active');
 
 }
 
-});
+function startClock(){
 
-const pricingRef=db.ref('rolePricing');
+setInterval(()=>{
 
-pricingRef.once('value').then(snapshot=>{
+const now = new Date();
 
-if(!snapshot.exists()){
+$('clock').innerText =
+now.toLocaleTimeString('ar-SY');
 
-pricingRef.set({
-barista:{hourlyRate:5000},
-waiter:{hourlyRate:4000},
-accountant:{hourlyRate:6000}
-});
-
-}else{
-
-const data=snapshot.val();
-
-ROLE_RATES={
-barista:data.barista?.hourlyRate||5000,
-waiter:data.waiter?.hourlyRate||4000,
-accountant:data.accountant?.hourlyRate||6000
-};
+},1000);
 
 }
 
-});
+function saveSession(user){
+
+localStorage.setItem(
+"abuhani_session",
+JSON.stringify(user)
+);
 
 }
 
-initSystem();
+function loadSession(){
+
+const session =
+localStorage.getItem("abuhani_session");
+
+if(session){
+
+currentUser = JSON.parse(session);
+
+showApp();
+
+}
+
+}
+
+function clearSession(){
+
+localStorage.removeItem("abuhani_session");
+
+}
 
 function login(){
 
-const username=$('username').value.trim();
-const password=$('password').value.trim();
+const username =
+$('username').value.trim();
 
-if(!username||!password){
-$('loginMsg').innerText='⚠️ أدخل بيانات الدخول';
+const password =
+$('password').value.trim();
+
+if(!username || !password){
+
+alert("أدخل البيانات");
+
 return;
+
 }
 
-// مدير
-if(username==='admin'&&password==='admin321'){
+db.ref("managers").once("value")
 
-currentUser={
-name:'أبو هاني',
-role:'owner'
-};
+.then(snapshot=>{
 
-openDashboard();
-return;
-}
-
-// موظفين
-
-db.ref('employees').once('value').then(snapshot=>{
-
-let found=null;
+let found = false;
 
 snapshot.forEach(item=>{
 
-const data=item.val();
+const data = item.val();
 
-if(data.username===username&&data.password===password){
-found={id:item.key,...data};
+if(
+data.username === username &&
+data.password === password
+){
+
+found = true;
+
+currentUser = {
+id:item.key,
+...data
+};
+
+if($('rememberMe').checked){
+
+saveSession(currentUser);
+
+}
+
+showApp();
+
 }
 
 });
 
-if(found){
+if(!found){
 
-currentUser=found;
+db.ref("employees").once("value")
 
-$('roleSelect').classList.remove('hidden');
-$('confirmRoleBtn').classList.remove('hidden');
+.then(snap=>{
 
-$('loginMsg').innerText='✅ اختر دورك';
+let empFound = false;
 
-}else{
-$('loginMsg').innerText='❌ بيانات غير صحيحة';
-}
+snap.forEach(emp=>{
 
-});
+const d = emp.val();
 
-}
+if(
+d.username === username &&
+d.password === password
+){
 
-function confirmRole(){
+empFound = true;
 
-const role=$('roleSelect').value;
+currentUser = {
+id:emp.key,
+...d
+};
 
-if(!role){
-alert('اختر الدور');
-return;
-}
+if($('rememberMe').checked){
 
-currentUser.role=role;
-
-openDashboard();
+saveSession(currentUser);
 
 }
-
-function openDashboard(){
-
-$('loginScreen').classList.add('hidden');
-$('dashboard').classList.remove('hidden');
-
-$('welcomeName').innerText=currentUser.name;
-
-$('welcomeRole').innerText=
-ROLE_MAP[currentUser.role]?.label||'مدير';
 
 startShift();
+
+showApp();
+
+}
+
+});
+
+if(!empFound){
+
+alert("بيانات الدخول غير صحيحة");
+
+}
+
+});
+
+}
+
+});
+
+}
+
+function showApp(){
+
+$('loginScreen').classList.add('hidden');
+
+$('app').classList.remove('hidden');
+
+$('welcomeName').innerText =
+`👋 ${currentUser.name}`;
+
 startClock();
 
-if(currentUser.role==='owner'){
-renderOwner();
-}else{
-renderEmployee();
-}
+listenOrders();
 
 }
 
 function logout(){
-if(currentUser && currentUser.role!=='owner'){
-const endTime=Date.now();
-const hours=((endTime-shiftStartTime)/1000/60/60).toFixed(2);
-const salary=Math.round(hours*(ROLE_RATES[currentUser.role]||0));
-const shiftData={
-employee:currentUser.name,
-role:currentUser.role,
-start:shiftStartTime,
-end:endTime,
-hours:hours,
-salary:salary
-};
 
-db.ref('shifts').push(shiftData).then(()=>{
-alert(`✅ انتهت الوردية
-⏱️ عدد الساعات: ${hours}
-💰 الأجر: ${salary} ل.س`);
-location.reload();
-});
-}else{
-location.reload();
-}
+if(currentUser){
+
+endShift();
 }
 
-function startClock(){
-function updateClock(){
-const now=new Date();
-$('liveClock').innerText=now.toLocaleTimeString('ar-EG');
-}
-updateClock();
-setInterval(updateClock,1000);
+clearSession();
+
+location.reload();
+
 }
 
 function startShift(){
-shiftStartTime=Date.now();
-if(shiftTimer) clearInterval(shiftTimer);
-shiftTimer=setInterval(()=>{
-const diff=Date.now()-shiftStartTime;
-const mins=Math.floor(diff/1000/60);
-const hrs=Math.floor(mins/60);
-$('shiftDuration').innerText=`${hrs} ساعة و ${mins%60} دقيقة`;
-},1000);
-}
 
-function renderOwner(){
+const startTime = Date.now();
 
-loadStats();
+const shift = {
 
-const tabsHTML=`
-<button class="tab active-tab" onclick="employeesTab()">👥 الموظفين</button>
-<button class="tab" onclick="productsTab()">📦 المنتجات</button>
-<button class="tab" onclick="categoriesTab()">📂 الأقسام</button>
-<button class="tab" onclick="suppliersTab()">🚚 الموردين</button>
-<button class="tab" onclick="ordersTab()">🧾 الطلبات</button>
-<button class="tab" onclick="pricingTab()">💰 الأدوار والأجور</button>
-<button class="tab" onclick="customersTab()">👤 العملاء</button>
-<button class="tab" onclick="invoicesTab()">🧾 الفواتير</button>
-<button class="tab" onclick="reportsTab()">📊 التقارير</button>
-<button class="tab" onclick="shiftsTab()">⏱️ الورديات</button>
-<button class="tab" onclick="settingsTab()">⚙️ الإعدادات</button>
-`;
+employeeId:currentUser.id,
+employeeName:currentUser.name,
+role:currentUser.role || "موظف",
+hourlyRate:currentUser.hourlyRate || 0,
+startTime:startTime,
+status:"active"
 
-$('tabs').innerHTML=tabsHTML;
-$('mobileTabsContainer').innerHTML=tabsHTML;
-
-employeesTab();
-
-}
-
-function renderEmployee(){
-
-$('stats').innerHTML='';
-$('tabs').innerHTML='';
-
-if(currentUser.role==='barista'){
-baristaTab();
-}
-
-if(currentUser.role==='waiter'){
-waiterTab();
-}
-
-if(currentUser.role==='accountant'){
-accountantTab();
-}
-
-}
-
-function loadStats(){
-
-Promise.all([
-db.ref('employees').once('value'),
-db.ref('products').once('value'),
-db.ref('orders').once('value'),
-db.ref('suppliers').once('value')
-]).then(res=>{
-
-$('stats').innerHTML=`
-<div class="card"><h2>${res[0].numChildren()}</h2><p>👥 موظفين</p></div>
-<div class="card"><h2>${res[1].numChildren()}</h2><p>📦 منتجات</p></div>
-<div class="card"><h2>${res[2].numChildren()}</h2><p>🧾 طلبات</p></div>
-<div class="card"><h2>${res[3].numChildren()}</h2><p>🚚 موردين</p></div>
-`;
-
-});
-
-}
-
-function employeesTab(){
-
-$('content').innerHTML=`
-<h2>👥 الموظفين</h2>
-
-<input id="empName" placeholder="اسم الموظف">
-<input id="empUser" placeholder="اسم المستخدم">
-<input id="empPass" placeholder="كلمة المرور">
-<input id="empPhone" placeholder="الهاتف">
-
-<button class="btn-primary" onclick="addEmployee()">➕ إضافة موظف</button>
-
-<hr style="margin:20px 0">
-
-<div id="employeesList"></div>
-`;
-
-loadEmployees();
-
-}
-
-function addEmployee(){
-
-const data={
-name:$('empName').value,
-username:$('empUser').value,
-password:$('empPass').value,
-phone:$('empPhone').value
 };
 
-if(!data.name||!data.username||!data.password){
-alert('املأ الحقول');
-return;
-}
-
-
-db.ref('employees').push(data).then(()=>{
-alert('✅ تمت الإضافة');
-employeesTab();
-});
+db.ref("activeShifts/"+currentUser.id)
+.set(shift);
 
 }
 
-function loadEmployees(){
+function endShift(){
 
-const list=$('employeesList');
+db.ref("activeShifts/"+currentUser.id)
+.once("value")
+.then(snapshot=>{
 
+if(snapshot.exists()){
 
-db.ref('employees').on('value',snapshot=>{
+const shift = snapshot.val();
 
-let html='';
+const endTime = Date.now();
 
-snapshot.forEach(item=>{
+const hours =
+(endTime - shift.startTime)
+/
+1000
+/
+60
+/
+60;
 
-const data=item.val();
+const salary =
+Math.round(hours * shift.hourlyRate);
 
-html+=`
-<div class="item">
-<div>
-<b>${data.name}</b><br>
-${data.username}
-</div>
-<button class="btn-danger" onclick="deleteEmployee('${item.key}')">🗑️ حذف</button>
-</div>
-`;
+const completedShift = {
 
-});
+...shift,
+endTime:endTime,
+workedHours:hours.toFixed(2),
+salary:salary,
+status:"completed"
 
-list.innerHTML=html||'<p>لا يوجد موظفين</p>';
-
-});
-
-}
-
-function deleteEmployee(id){
-
-if(confirm('حذف الموظف؟')){
-db.ref('employees/'+id).remove();
-}
-
-}
-
-function productsTab(){
-
-$('content').innerHTML=`
-<h2>📦 المنتجات</h2>
-
-<input id="prodName" placeholder="اسم المنتج">
-<input id="prodPrice" type="number" placeholder="السعر">
-
-<button class="btn-primary" onclick="addProduct()">➕ إضافة منتج</button>
-
-<hr style="margin:20px 0">
-
-<div id="productsList"></div>
-`;
-
-loadProducts();
-
-}
-
-function addProduct(){
-
-const name=$('prodName').value;
-const price=$('prodPrice').value;
-
-if(!name||!price){
-alert('أدخل البيانات');
-return;
-}
-
-
-db.ref('products').push({
-name,
-price,
-createdAt:Date.now()
-});
-
-$('prodName').value='';
-$('prodPrice').value='';
-
-}
-
-function loadProducts(){
-
-const list=$('productsList');
-
-
-db.ref('products').on('value',snapshot=>{
-
-let html='';
-
-snapshot.forEach(item=>{
-
-const data=item.val();
-
-html+=`
-<div class="item">
-<div>
-<b>${data.name}</b><br>
-💰 ${data.price} ل.س
-</div>
-<button class="btn-danger" onclick="deleteProduct('${item.key}')">🗑️ حذف</button>
-</div>
-`;
-
-});
-
-list.innerHTML=html||'<p>لا يوجد منتجات</p>';
-
-});
-
-}
-
-function deleteProduct(id){
-
-if(confirm('حذف المنتج؟')){
-db.ref('products/'+id).remove();
-}
-
-}
-
-function pricingTab(){
-$('content').innerHTML=`
-<h2>💰 تسعير الأدوار</h2>
-<label>☕ أجر الباريستا / ساعة</label>
-<input type="number" id="baristaRate" value="${ROLE_RATES.barista}">
-<label>🛒 أجر الجرسون / ساعة</label>
-<input type="number" id="waiterRate" value="${ROLE_RATES.waiter}">
-<label>💰 أجر المحاسب / ساعة</label>
-<input type="number" id="accountantRate" value="${ROLE_RATES.accountant}">
-<button class="btn-success" onclick="saveRolePricing()">💾 حفظ التسعير</button>
-`;
-}
-
-function saveRolePricing(){
-ROLE_RATES={
-barista:parseInt($('baristaRate').value)||5000,
-waiter:parseInt($('waiterRate').value)||4000,
-accountant:parseInt($('accountantRate').value)||6000
 };
 
-db.ref('rolePricing').set({
-barista:{hourlyRate:ROLE_RATES.barista},
-waiter:{hourlyRate:ROLE_RATES.waiter},
-accountant:{hourlyRate:ROLE_RATES.accountant}
-}).then(()=>{
-alert('✅ تم حفظ أجور الأدوار');
+db.ref("completedShifts")
+.push(completedShift);
+
+db.ref("activeShifts/"+currentUser.id)
+.remove();
+
+}
+
 });
-}
-
-function categoriesTab(){
-
-$('content').innerHTML=`
-<h2>📂 الأقسام</h2>
-
-<input id="catName" placeholder="اسم القسم">
-
-<button class="btn-primary" onclick="addCategory()">➕ إضافة قسم</button>
-
-<hr style="margin:20px 0">
-
-<div id="catList"></div>
-`;
-
-loadCategories();
 
 }
 
-function addCategory(){
+function listenOrders(){
 
-const name=$('catName').value;
+db.ref("orders")
+.on("value",snapshot=>{
 
-if(!name)return;
+let html = "";
 
+let count = 0;
 
-db.ref('categories').push({name});
+if(snapshot.exists()){
 
-$('catName').value='';
-
-}
-
-function loadCategories(){
-
-
-db.ref('categories').on('value',snapshot=>{
-
-let html='';
+const orders = [];
 
 snapshot.forEach(item=>{
 
-html+=`
-<div class="item">
-<div>${item.val().name}</div>
-<button class="btn-danger" onclick="deleteCategory('${item.key}')">🗑️</button>
-</div>
-`;
+orders.unshift({
+id:item.key,
+...item.val()
+});
 
 });
 
-$('catList').innerHTML=html||'<p>لا يوجد أقسام</p>';
+count = orders.length;
 
-});
+orders.forEach(order=>{
 
-}
+let productsHTML = "";
 
-function deleteCategory(id){
+if(order.items){
 
-if(confirm('حذف القسم؟')){
-db.ref('categories/'+id).remove();
-}
+order.items.forEach(p=>{
 
-}
-
-function suppliersTab(){
-
-$('content').innerHTML=`
-<h2>🚚 الموردين</h2>
-
-<input id="supName" placeholder="اسم المورد">
-<input id="supPhone" placeholder="الهاتف">
-
-<button class="btn-primary" onclick="addSupplier()">➕ إضافة</button>
-
-<hr style="margin:20px 0">
-
-<div id="suppliersList"></div>
-`;
-
-loadSuppliers();
-
-}
-
-function addSupplier(){
-
-const name=$('supName').value;
-const phone=$('supPhone').value;
-
-if(!name)return;
-
-
-db.ref('suppliers').push({
-name,
-phone
-});
-
-$('supName').value='';
-$('supPhone').value='';
-
-}
-
-function loadSuppliers(){
-
-
-db.ref('suppliers').on('value',snapshot=>{
-
-let html='';
-
-snapshot.forEach(item=>{
-
-const data=item.val();
-
-html+=`
-<div class="item">
+productsHTML += `
 <div>
-<b>${data.name}</b><br>
-📞 ${data.phone||'-'}
-</div>
-<button class="btn-danger" onclick="deleteSupplier('${item.key}')">🗑️</button>
+• ${p.name}
+× ${p.qty}
+= ${(p.total || 0).toLocaleString()} ل.س
 </div>
 `;
 
 });
 
-$('suppliersList').innerHTML=html||'<p>لا يوجد موردين</p>';
+}
 
-});
+let statusClass = "status-new";
+
+if(order.status === "processing"){
+
+statusClass = "status-processing";
 
 }
 
-function deleteSupplier(id){
+if(order.status === "completed"){
 
-if(confirm('حذف المورد؟')){
-db.ref('suppliers/'+id).remove();
-}
+statusClass = "status-completed";
 
 }
 
-function ordersTab(){
+html += `
 
-$('content').innerHTML=`
-<h2>🧾 الطلبات</h2>
-<div id="ordersList"></div>
-`;
+<div class="order-card">
 
+<div class="order-top">
 
-db.ref('orders').on('value',snapshot=>{
-
-let html='';
-
-snapshot.forEach(item=>{
-
-const data=item.val();
-
-html+=`
-<div class="item">
 <div>
-<b>${data.customerName||'زبون'}</b><br>
-الحالة: ${data.status||'new'}
+
+<div class="customer-name">
+${order.customer?.name || "زبون"}
 </div>
+
+<div>
+📞 ${order.customer?.phone || "-"}
 </div>
+
+</div>
+
+<div class="status ${statusClass}">
+${order.status || "new"}
+</div>
+
+</div>
+
+<div class="order-products">
+${productsHTML}
+</div>
+
+<div class="order-total">
+💰 الإجمالي:
+${(order.total || 0).toLocaleString()}
+ل.س
+</div>
+
+<div style="margin-top:10px;">
+🕒 ${order.date || ""}
+</div>
+
+<div class="order-actions">
+
+<button class="action-btn accept"
+onclick="changeOrderStatus('${order.id}','accepted')">
+✅ قبول
+</button>
+
+<button class="action-btn prepare"
+onclick="changeOrderStatus('${order.id}','processing')">
+👨‍🍳 تحضير
+</button>
+
+<button class="action-btn finish"
+onclick="changeOrderStatus('${order.id}','completed')">
+📦 إنهاء
+</button>
+
+</div>
+
+</div>
+
 `;
 
 });
 
-$('ordersList').innerHTML=html||'<p>لا يوجد طلبات</p>';
+}else{
+
+html = `
+<div class="empty">
+لا توجد طلبات حالياً
+</div>
+`;
+
+}
+
+$('ordersContainer').innerHTML = html;
+
+$('ordersCount').innerText = count;
 
 });
 
 }
 
-function baristaTab(){
+function changeOrderStatus(orderId,status){
 
-$('content').innerHTML=`
-<h2>☕ شاشة الباريستا</h2>
-<p>طلبات المشروبات الساخنة ستظهر هنا</p>
-`;
-
-}
-
-function waiterTab(){
-
-$('content').innerHTML=`
-<h2>🛒 شاشة الجرسون</h2>
-<p>إدارة السلات والطلبات</p>
-`;
+db.ref("orders/"+orderId)
+.update({
+status:status
+});
 
 }
 
-function toggleMobileMenu(){
-$('mobileSidebar').classList.toggle('hidden');
-}
-
-function customersTab(){
-$('content').innerHTML=`
-<h2>👤 العملاء</h2>
-<p>إدارة العملاء ونقاطهم وبياناتهم</p>
-`;
-}
-
-function invoicesTab(){
-$('content').innerHTML=`
-<h2>🧾 الفواتير</h2>
-<p>إدارة الفواتير والمبيعات اليومية</p>
-`;
-}
-
-function reportsTab(){
-$('content').innerHTML=`
-<h2>📊 التقارير</h2>
-<p>تقارير الأرباح والمبيعات والموظفين</p>
-`;
-}
-
-function shiftsTab(){
-$('content').innerHTML=`
-<h2>⏱️ الورديات</h2>
-<p>عرض جميع الورديات والأجور المحسوبة</p>
-`;
-}
-
-function settingsTab(){
-$('content').innerHTML=`
-<h2>⚙️ الإعدادات</h2>
-<p>إعدادات النظام العامة</p>
-`;
-}
-
-function accountantTab(){
-
-$('content').innerHTML=`
-<h2>💰 شاشة المحاسب</h2>
-<p>الفواتير والدفعات</p>
-`;
-
-}
+loadSession();
 
 </script>
 

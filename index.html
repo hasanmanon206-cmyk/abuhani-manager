@@ -181,6 +181,15 @@ font-size:14px;
 
 <div id="dashboard" class="hidden">
 
+<button id="mobileMenuBtn" onclick="toggleMobileMenu()" style="position:fixed;top:15px;left:15px;z-index:999;background:linear-gradient(45deg,#ff006e,#8338ec,#3a86ff);color:white;width:55px;height:55px;border-radius:50%;font-size:22px;box-shadow:0 8px 20px rgba(0,0,0,.3)">
+☰
+</button>
+
+<div id="mobileSidebar" class="hidden" style="position:fixed;top:0;right:0;width:280px;height:100vh;background:rgba(0,0,0,.45);backdrop-filter:blur(20px);padding:20px;z-index:998;overflow:auto;border-left:1px solid rgba(255,255,255,.2)">
+<h2 style="margin-bottom:20px">📱 القائمة</h2>
+<div id="mobileTabsContainer"></div>
+</div>
+
 <div class="glass">
 <div style="display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap">
 <div>
@@ -437,14 +446,22 @@ function renderOwner(){
 
 loadStats();
 
-$('tabs').innerHTML=`
+const tabsHTML=`
 <button class="tab active-tab" onclick="employeesTab()">👥 الموظفين</button>
 <button class="tab" onclick="productsTab()">📦 المنتجات</button>
 <button class="tab" onclick="categoriesTab()">📂 الأقسام</button>
 <button class="tab" onclick="suppliersTab()">🚚 الموردين</button>
 <button class="tab" onclick="ordersTab()">🧾 الطلبات</button>
-<button class="tab" onclick="pricingTab()">💰 الأجور</button>
+<button class="tab" onclick="pricingTab()">💰 الأدوار والأجور</button>
+<button class="tab" onclick="customersTab()">👤 العملاء</button>
+<button class="tab" onclick="invoicesTab()">🧾 الفواتير</button>
+<button class="tab" onclick="reportsTab()">📊 التقارير</button>
+<button class="tab" onclick="shiftsTab()">⏱️ الورديات</button>
+<button class="tab" onclick="settingsTab()">⚙️ الإعدادات</button>
 `;
+
+$('tabs').innerHTML=tabsHTML;
+$('mobileTabsContainer').innerHTML=tabsHTML;
 
 employeesTab();
 
@@ -866,6 +883,45 @@ $('content').innerHTML=`
 <p>إدارة السلات والطلبات</p>
 `;
 
+}
+
+function toggleMobileMenu(){
+$('mobileSidebar').classList.toggle('hidden');
+}
+
+function customersTab(){
+$('content').innerHTML=`
+<h2>👤 العملاء</h2>
+<p>إدارة العملاء ونقاطهم وبياناتهم</p>
+`;
+}
+
+function invoicesTab(){
+$('content').innerHTML=`
+<h2>🧾 الفواتير</h2>
+<p>إدارة الفواتير والمبيعات اليومية</p>
+`;
+}
+
+function reportsTab(){
+$('content').innerHTML=`
+<h2>📊 التقارير</h2>
+<p>تقارير الأرباح والمبيعات والموظفين</p>
+`;
+}
+
+function shiftsTab(){
+$('content').innerHTML=`
+<h2>⏱️ الورديات</h2>
+<p>عرض جميع الورديات والأجور المحسوبة</p>
+`;
+}
+
+function settingsTab(){
+$('content').innerHTML=`
+<h2>⚙️ الإعدادات</h2>
+<p>إعدادات النظام العامة</p>
+`;
 }
 
 function accountantTab(){

@@ -8,9 +8,9 @@
     <style>
         :root{--bg-start:#ff9a9e;--bg-mid1:#fad0c4;--bg-mid2:#a18cd1;--bg-mid3:#fbc2eb;--bg-end:#8fd3f4;--card-bg:rgba(255,255,255,0.85);--blur:blur(10px);--radius:20px;--radius-sm:12px;--shadow:0 8px 20px rgba(0,0,0,0.1);--blue:#1a73e8;--red:#ff4757;--green:#2ed573;--orange:#ffa502;--purple:#6c5ce7}
         *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:'Segoe UI',Tahoma,sans-serif;background:linear-gradient(135deg,var(--bg-start) 0%,var(--bg-mid1) 25%,var(--bg-mid2) 50%,var(--bg-mid3) 75%,var(--bg-end) 100%);background-size:400% 400%;animation:gradientBG 15s ease infinite;min-height:100vh;padding:20px 10px}
+        body{font-family:'Segoe UI',Tahoma,sans-serif;background:linear-gradient(135deg,var(--bg-start) 0%,var(--bg-mid1) 25%,var(--bg-mid2) 50%,var(--bg-mid3) 75%,var(--bg-end) 100%);background-size:400% 400%;animation:gradientBG 15s ease infinite;min-height:100vh;padding:20px 10px;display:flex;flex-direction:column;min-height:100vh}
         @keyframes gradientBG{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-        .container{max-width:550px;margin:0 auto}
+        .container{max-width:550px;margin:0 auto;flex:1}
         .login-box{background:var(--card-bg);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-radius:var(--radius);padding:30px 20px;box-shadow:var(--shadow);text-align:center;margin-top:50px}
         .login-box h2{font-size:28px;margin-bottom:20px;background:linear-gradient(to right,#ff6b6b,#feca57,#48dbfb,#ff9ff3);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
         .login-box input,.login-box select{width:100%;padding:12px 15px;margin:10px 0;border:2px solid #e0e0e0;border-radius:var(--radius-sm);font-size:16px;outline:none;transition:0.3s}
@@ -48,6 +48,9 @@
         .hidden{display:none!important}
         .message{padding:10px;border-radius:10px;margin-top:10px;text-align:center;font-weight:bold}
         .message-success{background:#d4edda;color:#155724}.message-error{background:#f8d7da;color:#721c24}.message-info{background:#d1ecf1;color:#0c5460}
+        /* تذييل المطور */
+        .footer{text-align:center;padding:15px 10px;color:rgba(255,255,255,0.8);font-size:12px;margin-top:20px;background:rgba(0,0,0,0.1);border-radius:15px;backdrop-filter:blur(5px)}
+        .footer strong{color:white;font-size:13px}
     </style>
 </head>
 <body>
@@ -67,6 +70,9 @@
         <button class="btn-login" id="btnLogin" onclick="handleLogin()">🚀 دخول</button>
         <button class="btn-login hidden" id="btnConfirmRole" onclick="confirmRole()">🎯 تأكيد الدور والدخول</button>
         <div id="loginMessage"></div>
+        <div class="footer">
+            <strong>© عالم الإلكترونيات</strong> | تم التطوير بواسطة <strong>أبو هاني</strong>
+        </div>
     </div>
 
     <!-- داشبورد -->
@@ -80,6 +86,9 @@
         <div id="mainContent" class="content-card"></div>
         <div id="shiftSection"></div>
         <div id="roleRequestSection"></div>
+        <div class="footer">
+            <strong>© عالم الإلكترونيات</strong> | تم التطوير بواسطة <strong>أبو هاني</strong> | جميع الأنظمة (ويندوز، لينكس، أندرويد)
+        </div>
     </div>
 </div>
 
@@ -107,13 +116,13 @@ function loadRoleRates(){
 }
 db.ref('rolePricing').on('value',snap=>{ snap.forEach(r=>{ ROLE_RATES[r.key]=r.val().hourlyRate; }); });
 
-// ==================== الإعداد الأولي (تم الإصلاح) ====================
+// ==================== الإعداد الأولي ====================
 function setupInitialData(){
     const msg=$('loginMessage');
+    if(!msg) return;
     msg.className='message message-info';
     msg.textContent='⏳ جاري التحقق من الإعدادات...';
     
-    // التأكد من وجود حساب المدير العام
     db.ref('managers/6057961002').once('value').then(snap=>{
         if(!snap.exists()||!snap.val().username){
             msg.textContent='⚙️ جاري إنشاء حساب المدير العام...';
@@ -123,7 +132,6 @@ function setupInitialData(){
         }
         return Promise.resolve();
     }).then(()=>{
-        // التأكد من وجود rolePricing
         return db.ref('rolePricing').once('value');
     }).then(snap2=>{
         if(!snap2.exists()){
@@ -137,11 +145,11 @@ function setupInitialData(){
         msg.textContent='✅ المنصة جاهزة للعمل';
     }).catch(err=>{
         msg.className='message message-error';
-        msg.textContent='❌ خطأ في الاتصال: '+err.message;
+        msg.textContent='❌ خطأ: '+err.message;
     });
 }
 
-// ==================== تسجيل الدخول (تم إصلاح الوعود) ====================
+// ==================== تسجيل الدخول ====================
 function handleLogin(){
     const u=$('loginUsername').value.trim();
     const p=$('loginPassword').value.trim();
@@ -161,7 +169,6 @@ function handleLogin(){
     
     let found=false;
     
-    // التحقق من المدراء
     db.ref('managers').once('value').then(snap=>{
         snap.forEach(m=>{
             const d=m.val();
@@ -174,10 +181,9 @@ function handleLogin(){
             showDashboard();
             return Promise.resolve();
         }
-        // إذا لم يوجد مدير، نتحقق من الموظفين
         return db.ref('employees').once('value');
     }).then(snap2=>{
-        if(found) return; // وجدناه كمدير، لا داعي للمتابعة
+        if(found) return;
         if(snap2){
             snap2.forEach(e=>{
                 const d=e.val();
@@ -195,7 +201,7 @@ function handleLogin(){
         }
     }).catch(err=>{
         msg.className='message message-error';
-        msg.textContent='❌ خطأ في الاتصال: '+err.message;
+        msg.textContent='❌ خطأ: '+err.message;
     }).finally(()=>{
         btn.disabled=false;
         btn.textContent='🚀 دخول';
@@ -215,10 +221,7 @@ function showRoleSelection(){
 
 function confirmRole(){
     const role=$('loginRole').value;
-    if(!role){
-        alert('اختر دوراً');
-        return;
-    }
+    if(!role){ alert('اختر دوراً'); return; }
     currentUser.currentRole=role;
     currentUser.hourlyRate=ROLE_RATES[role]||5000;
     
@@ -246,9 +249,7 @@ function showDashboard(){
     renderManagerView();
 }
 
-function doLogout(){
-    location.reload();
-}
+function doLogout(){ location.reload(); }
 
 // ==================== مدير عام ====================
 function renderManagerView(){
@@ -259,16 +260,16 @@ function renderManagerView(){
         <div class="stat-card"><div class="num" id="statCust">0</div><div class="label">👤 عملاء</div></div>
         <div class="stat-card"><div class="num" id="statProd">0</div><div class="label">📦 منتجات</div></div>`);
     setHTML('tabsContainer',`
-        <button class="tab-btn active" onclick="switchMgrTab('employees')">👥 موظفين</button>
-        <button class="tab-btn" onclick="switchMgrTab('suppliers')">🚚 موردين</button>
-        <button class="tab-btn" onclick="switchMgrTab('customers')">👤 عملاء</button>
-        <button class="tab-btn" onclick="switchMgrTab('products')">📦 منتجات</button>
-        <button class="tab-btn" onclick="switchMgrTab('categories')">📂 أقسام</button>
-        <button class="tab-btn" onclick="switchMgrTab('managers')">🔐 مدراء</button>
-        <button class="tab-btn" onclick="switchMgrTab('pricing')">💵 تسعير الأدوار</button>
-        <button class="tab-btn" onclick="switchMgrTab('requests')">📩 طلبات</button>
-        <button class="tab-btn" onclick="switchMgrTab('shifts')">📊 ورديات</button>`);
-    switchMgrTab('employees');
+        <button class="tab-btn active" onclick="switchMgrTab('employees',event)">👥 موظفين</button>
+        <button class="tab-btn" onclick="switchMgrTab('suppliers',event)">🚚 موردين</button>
+        <button class="tab-btn" onclick="switchMgrTab('customers',event)">👤 عملاء</button>
+        <button class="tab-btn" onclick="switchMgrTab('products',event)">📦 منتجات</button>
+        <button class="tab-btn" onclick="switchMgrTab('categories',event)">📂 أقسام</button>
+        <button class="tab-btn" onclick="switchMgrTab('managers',event)">🔐 مدراء</button>
+        <button class="tab-btn" onclick="switchMgrTab('pricing',event)">💵 تسعير الأدوار</button>
+        <button class="tab-btn" onclick="switchMgrTab('requests',event)">📩 طلبات</button>
+        <button class="tab-btn" onclick="switchMgrTab('shifts',event)">📊 ورديات</button>`);
+    switchMgrTab('employees',{target:document.querySelector('.tab-btn')});
 }
 
 function updateStats(){
@@ -278,9 +279,12 @@ function updateStats(){
     db.ref('products').once('value',s=>{ const el=$('statProd'); if(el)el.textContent=s.numChildren(); });
 }
 
-function switchMgrTab(tab){
-    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-    event.target.classList.add('active');
+// ==================== switchMgrTab مع تمرير event ====================
+function switchMgrTab(tab,evt){
+    if(evt&&evt.target){
+        document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+        evt.target.classList.add('active');
+    }
     setHTML('mainContent','');
     if(tab==='employees') loadEmployeesTab();
     else if(tab==='suppliers') loadSuppliersTab();
@@ -315,19 +319,15 @@ function savePricing(){
     const waiter=parseInt($('priceWaiter').value)||4000;
     const accountant=parseInt($('priceAccountant').value)||6000;
     db.ref('rolePricing').set({
-        barista:{hourlyRate:barista},
-        waiter:{hourlyRate:waiter},
-        accountant:{hourlyRate:accountant}
+        barista:{hourlyRate:barista},waiter:{hourlyRate:waiter},accountant:{hourlyRate:accountant}
     }).then(()=>{
         alert('✅ تم حفظ التسعير بنجاح');
-        ROLE_RATES.barista=barista;
-        ROLE_RATES.waiter=waiter;
-        ROLE_RATES.accountant=accountant;
+        ROLE_RATES.barista=barista; ROLE_RATES.waiter=waiter; ROLE_RATES.accountant=accountant;
         loadPricingTab();
     });
 }
 
-// === باقي التبويبات ===
+// === تبويب الموظفين ===
 function loadEmployeesTab(){
     setHTML('mainContent',`<h3>➕ إضافة موظف</h3>
         <input id="empUsername" placeholder="اسم المستخدم"><input id="empPassword" placeholder="كلمة المرور"><input id="empName" placeholder="الاسم الكامل"><input id="empPhone" placeholder="الهاتف">
@@ -336,149 +336,56 @@ function loadEmployeesTab(){
         <hr><h3>📋 الموظفين</h3><div id="empList"></div>`);
     loadEmployeesList();
 }
-
 function addEmployee(){
     const u=$('empUsername').value.trim(),p=$('empPassword').value.trim(),n=$('empName').value.trim(),ph=$('empPhone').value.trim();
     if(!u||!p||!n){alert('اسم المستخدم وكلمة المرور والاسم مطلوبة');return;}
     db.ref('employees').push({username:u,password:p,name:n,phone:ph,status:'active'});
-    alert('✅ تمت إضافة الموظف');
-    loadEmployeesTab();
+    alert('✅ تمت الإضافة'); loadEmployeesTab();
 }
-
 function loadEmployeesList(){
-    db.ref('employees').on('value',s=>{
-        let h='';
-        s.forEach(e=>{
-            const d=e.val();
-            h+=`<div class="list-item"><span>👤 ${d.name} (${d.username}) | 📞 ${d.phone||'-'}</span>
-            <div><button class="btn-sm btn-edit" onclick="editEmp('${e.key}')">✏️</button>
-            <button class="btn-sm btn-delete" onclick="if(confirm('حذف؟'))db.ref('employees/${e.key}').remove()">🗑️</button></div></div>`;
-        });
-        setHTML('empList',h||'<p style="color:#888;">لا يوجد موظفين</p>');
-    });
-}
+    db.ref('employees').on('value',s=>{let h='';s.forEach(e=>{const d=e.val();h+=`<div class="list-item"><span>👤 ${d.name} (${d.username}) | 📞 ${d.phone||'-'}</span><div><button class="btn-sm btn-edit" onclick="editEmp('${e.key}')">✏️</button><button class="btn-sm btn-delete" onclick="if(confirm('حذف؟'))db.ref('employees/${e.key}').remove()">🗑️</button></div></div>`;});setHTML('empList',h||'<p style="color:#888;">لا يوجد موظفين</p>';});}
+function editEmp(id){db.ref('employees/'+id).once('value',s=>{if(!s.exists())return;const d=s.val();const u=prompt('اسم المستخدم',d.username);if(u===null)return;const p=prompt('كلمة المرور',d.password);if(p===null)return;const n=prompt('الاسم',d.name);if(n===null)return;const ph=prompt('الهاتف',d.phone||'');db.ref('employees/'+id).update({username:u,password:p,name:n,phone:ph||''});});}
 
-function editEmp(id){
-    db.ref('employees/'+id).once('value',s=>{
-        if(!s.exists())return;
-        const d=s.val();
-        const u=prompt('اسم المستخدم',d.username);if(u===null)return;
-        const p=prompt('كلمة المرور',d.password);if(p===null)return;
-        const n=prompt('الاسم',d.name);if(n===null)return;
-        const ph=prompt('الهاتف',d.phone||'');
-        db.ref('employees/'+id).update({username:u,password:p,name:n,phone:ph||''});
-    });
-}
-
-function loadSuppliersTab(){
-    setHTML('mainContent',`<h3>➕ إضافة مورد</h3><input id="supName" placeholder="اسم المورد"><input id="supPhone" placeholder="الهاتف"><button class="btn-primary" onclick="addSupplier()">➕ إضافة</button><hr><h3>📋 الموردين</h3><div id="supList"></div>`);
-    db.ref('suppliers').on('value',s=>{let h='';s.forEach(x=>h+=`<div class="list-item"><span>🚚 ${x.val().name}</span><button class="btn-sm btn-delete" onclick="if(confirm('حذف؟'))db.ref('suppliers/${x.key}').remove()">🗑️</button></div>`);setHTML('supList',h||'<p>لا يوجد</p>');});
-}
-function addSupplier(){ const n=$('supName').value.trim(); if(!n)return; db.ref('suppliers').push({name:n,phone:$('supPhone').value.trim(),balance:0}); $('supName').value='';$('supPhone').value=''; }
-
-function loadCustomersTab(){
-    setHTML('mainContent',`<h3>➕ إضافة عميل</h3><input id="custName" placeholder="اسم العميل"><input id="custPhone" placeholder="الهاتف"><button class="btn-primary" onclick="addCustomer()">➕ إضافة</button><hr><h3>📋 العملاء</h3><div id="custList"></div>`);
-    db.ref('customers').on('value',s=>{let h='';s.forEach(x=>h+=`<div class="list-item"><span>👤 ${x.val().name}</span><button class="btn-sm btn-delete" onclick="if(confirm('حذف؟'))db.ref('customers/${x.key}').remove()">🗑️</button></div>`);setHTML('custList',h||'<p>لا يوجد</p>');});
-}
-function addCustomer(){ const n=$('custName').value.trim(); if(!n)return; db.ref('customers').push({name:n,phone:$('custPhone').value.trim(),totalPurchases:0,debt:0}); $('custName').value='';$('custPhone').value=''; }
-
-function loadProductsTab(){
-    setHTML('mainContent',`<h3>➕ إضافة منتج</h3><input id="prodName" placeholder="الاسم"><input id="prodPrice" placeholder="السعر"><input id="prodStock" placeholder="المخزون"><select id="prodCat"><option value="">اختر القسم</option></select><button class="btn-primary" onclick="addProduct()">➕ إضافة</button><hr><h3>📋 المنتجات</h3><div id="prodList"></div>`);
-    loadCatSelect(); loadProductsList();
-}
-function loadCatSelect(){ db.ref('categories').on('value',s=>{let h='<option value="">اختر القسم</option>';s.forEach(c=>{allCategories[c.key]={id:c.key,...c.val()};h+=`<option value="${c.key}">${c.val().name}</option>`;});const el=$('prodCat');if(el)el.innerHTML=h;}); }
-function addProduct(){ const n=$('prodName').value.trim(),pr=parseInt($('prodPrice').value),st=parseInt($('prodStock').value),cat=$('prodCat').value; if(!n||!pr||!st||!cat){alert('املأ الحقول');return;} db.ref('products').push({name:n,price:pr,stock:st,categoryId:cat}); $('prodName').value='';$('prodPrice').value='';$('prodStock').value=''; }
-function loadProductsList(){ db.ref('products').on('value',s=>{allProducts={};let h='';s.forEach(p=>{allProducts[p.key]={id:p.key,...p.val()};h+=`<div class="list-item"><span>📦 ${p.val().name} | 💰 ${p.val().price} ل.س</span><button class="btn-sm btn-delete" onclick="if(confirm('حذف؟'))db.ref('products/${p.key}').remove()">🗑️</button></div>`;});setHTML('prodList',h||'<p>لا يوجد</p>');}); }
-
-function loadCategoriesTab(){
-    setHTML('mainContent',`<h3>➕ إضافة قسم</h3><input id="catName" placeholder="اسم القسم"><button class="btn-primary" onclick="addCategory()">➕ إضافة</button><hr><h3>📋 الأقسام</h3><div id="catList"></div>`);
-    db.ref('categories').on('value',s=>{allCategories={};let h='';s.forEach(c=>{allCategories[c.key]={id:c.key,...c.val()};h+=`<div class="list-item"><span>📂 ${c.val().name}</span><button class="btn-sm btn-delete" onclick="if(confirm('حذف؟'))db.ref('categories/${c.key}').remove()">🗑️</button></div>`;});setHTML('catList',h||'<p>لا يوجد</p>');});
-}
-function addCategory(){ const n=$('catName').value.trim(); if(!n)return; db.ref('categories').push({name:n}); $('catName').value=''; }
-
-function loadManagersTab(){
-    setHTML('mainContent',`<h3>➕ إضافة مدير</h3><input id="mgrUsername" placeholder="اسم المستخدم"><input id="mgrPassword" placeholder="كلمة المرور"><input id="mgrName" placeholder="الاسم"><input id="mgrPhone" placeholder="الهاتف"><button class="btn-primary" onclick="addManager()">➕ إضافة</button><hr><h3>📋 المدراء</h3><div id="mgrList"></div>`);
-    db.ref('managers').on('value',s=>{let h='';s.forEach(m=>{if(m.key==='6057961002')return;h+=`<div class="list-item"><span>🔐 ${m.val().name}</span><button class="btn-sm btn-delete" onclick="if(confirm('حذف؟'))db.ref('managers/${m.key}').remove()">🗑️</button></div>`;});setHTML('mgrList',h||'<p>لا يوجد</p>');});
-}
-function addManager(){ const u=$('mgrUsername').value.trim(),p=$('mgrPassword').value.trim(),n=$('mgrName').value.trim(),ph=$('mgrPhone').value.trim(); if(!u||!p||!n)return; db.ref('managers').push({username:u,password:p,name:n,phone:ph,role:'manager'}); $('mgrUsername').value='';$('mgrPassword').value='';$('mgrName').value='';$('mgrPhone').value=''; }
-
-function loadRequestsTab(){
-    setHTML('mainContent',`<h3>📩 طلبات تغيير الدور</h3><div id="reqList"></div>`);
-    db.ref('roleRequests').on('value',s=>{let h='';s.forEach(r=>{if(r.val().status==='pending')h+=`<div class="list-item"><span>👤 ${r.val().employeeName} | ${ROLE_MAP[r.val().currentRole]?.label||r.val().currentRole} → ${ROLE_MAP[r.val().requestedRole]?.label||r.val().requestedRole}</span><div><button class="btn-sm btn-success" onclick="approveReq('${r.key}')">✅</button><button class="btn-sm btn-delete" onclick="rejectReq('${r.key}')">❌</button></div></div>`;});setHTML('reqList',h||'<p>لا طلبات</p>');});
-}
-function approveReq(id){ db.ref('roleRequests/'+id).once('value',s=>{if(!s.exists())return;db.ref('roleRequests/'+id).update({status:'approved'});}); }
-function rejectReq(id){ db.ref('roleRequests/'+id).update({status:'rejected'}); }
-
-function loadShiftsTab(){
-    setHTML('mainContent',`<h3>📊 جميع الورديات</h3><div id="allShifts"></div><hr><h3>💰 إجمالي الأجور المستحقة</h3><div id="totalSalaries" style="font-size:20px;font-weight:bold;color:var(--purple);"></div>`);
-    db.ref('shifts').once('value',s=>{let h='',total=0;s.forEach(sh=>{const d=sh.val();const badge=d.status==='active'?'<span class="shift-badge shift-active">نشطة</span>':'<span class="shift-badge shift-completed">مكتملة</span>';const earn=d.totalEarnings||0;if(d.status==='completed')total+=earn;h+=`<div class="list-item"><span>👤 ${d.employeeName} | ${d.startDate||''} - ${d.endDate||'...'} | ⏱️ ${d.totalHours||0} س | 💰 ${formatMoney(earn)} ل.س</span>${badge}</div>`;});setHTML('allShifts',h||'<p>لا ورديات</p>');$('totalSalaries').textContent=formatMoney(total)+' ل.س';});
-}
+// === باقي التبويبات (نفس الكود السابق مع setHTML الآمن) ===
+function loadSuppliersTab(){setHTML('mainContent',`<h3>➕ إضافة مورد</h3><input id="supName" placeholder="اسم المورد"><input id="supPhone" placeholder="الهاتف"><button class="btn-primary" onclick="addSupplier()">➕ إضافة</button><hr><h3>📋 الموردين</h3><div id="supList"></div>`);db.ref('suppliers').on('value',s=>{let h='';s.forEach(x=>h+=`<div class="list-item"><span>🚚 ${x.val().name}</span><button class="btn-sm btn-delete" onclick="if(confirm('حذف؟'))db.ref('suppliers/${x.key}').remove()">🗑️</button></div>`);setHTML('supList',h||'<p>لا يوجد</p>';});}
+function addSupplier(){const n=$('supName').value.trim();if(!n)return;db.ref('suppliers').push({name:n,phone:$('supPhone').value.trim(),balance:0});$('supName').value='';$('supPhone').value='';}
+function loadCustomersTab(){setHTML('mainContent',`<h3>➕ إضافة عميل</h3><input id="custName" placeholder="اسم العميل"><input id="custPhone" placeholder="الهاتف"><button class="btn-primary" onclick="addCustomer()">➕ إضافة</button><hr><h3>📋 العملاء</h3><div id="custList"></div>`);db.ref('customers').on('value',s=>{let h='';s.forEach(x=>h+=`<div class="list-item"><span>👤 ${x.val().name}</span><button class="btn-sm btn-delete" onclick="if(confirm('حذف؟'))db.ref('customers/${x.key}').remove()">🗑️</button></div>`);setHTML('custList',h||'<p>لا يوجد</p>';});}
+function addCustomer(){const n=$('custName').value.trim();if(!n)return;db.ref('customers').push({name:n,phone:$('custPhone').value.trim(),totalPurchases:0,debt:0});$('custName').value='';$('custPhone').value='';}
+function loadProductsTab(){setHTML('mainContent',`<h3>➕ إضافة منتج</h3><input id="prodName" placeholder="الاسم"><input id="prodPrice" placeholder="السعر"><input id="prodStock" placeholder="المخزون"><select id="prodCat"><option value="">اختر القسم</option></select><button class="btn-primary" onclick="addProduct()">➕ إضافة</button><hr><h3>📋 المنتجات</h3><div id="prodList"></div>`);loadCatSelect();loadProductsList();}
+function loadCatSelect(){db.ref('categories').on('value',s=>{let h='<option value="">اختر القسم</option>';s.forEach(c=>{allCategories[c.key]={id:c.key,...c.val()};h+=`<option value="${c.key}">${c.val().name}</option>`;});const el=$('prodCat');if(el)el.innerHTML=h;});}
+function addProduct(){const n=$('prodName').value.trim(),pr=parseInt($('prodPrice').value),st=parseInt($('prodStock').value),cat=$('prodCat').value;if(!n||!pr||!st||!cat){alert('املأ الحقول');return;}db.ref('products').push({name:n,price:pr,stock:st,categoryId:cat});$('prodName').value='';$('prodPrice').value='';$('prodStock').value='';}
+function loadProductsList(){db.ref('products').on('value',s=>{allProducts={};let h='';s.forEach(p=>{allProducts[p.key]={id:p.key,...p.val()};h+=`<div class="list-item"><span>📦 ${p.val().name} | 💰 ${p.val().price} ل.س</span><button class="btn-sm btn-delete" onclick="if(confirm('حذف؟'))db.ref('products/${p.key}').remove()">🗑️</button></div>`;});setHTML('prodList',h||'<p>لا يوجد</p>';});}
+function loadCategoriesTab(){setHTML('mainContent',`<h3>➕ إضافة قسم</h3><input id="catName" placeholder="اسم القسم"><button class="btn-primary" onclick="addCategory()">➕ إضافة</button><hr><h3>📋 الأقسام</h3><div id="catList"></div>`);db.ref('categories').on('value',s=>{allCategories={};let h='';s.forEach(c=>{allCategories[c.key]={id:c.key,...c.val()};h+=`<div class="list-item"><span>📂 ${c.val().name}</span><button class="btn-sm btn-delete" onclick="if(confirm('حذف؟'))db.ref('categories/${c.key}').remove()">🗑️</button></div>`;});setHTML('catList',h||'<p>لا يوجد</p>';});}
+function addCategory(){const n=$('catName').value.trim();if(!n)return;db.ref('categories').push({name:n});$('catName').value='';}
+function loadManagersTab(){setHTML('mainContent',`<h3>➕ إضافة مدير</h3><input id="mgrUsername" placeholder="اسم المستخدم"><input id="mgrPassword" placeholder="كلمة المرور"><input id="mgrName" placeholder="الاسم"><input id="mgrPhone" placeholder="الهاتف"><button class="btn-primary" onclick="addManager()">➕ إضافة</button><hr><h3>📋 المدراء</h3><div id="mgrList"></div>`);db.ref('managers').on('value',s=>{let h='';s.forEach(m=>{if(m.key==='6057961002')return;h+=`<div class="list-item"><span>🔐 ${m.val().name}</span><button class="btn-sm btn-delete" onclick="if(confirm('حذف؟'))db.ref('managers/${m.key}').remove()">🗑️</button></div>`;});setHTML('mgrList',h||'<p>لا يوجد</p>';});}
+function addManager(){const u=$('mgrUsername').value.trim(),p=$('mgrPassword').value.trim(),n=$('mgrName').value.trim(),ph=$('mgrPhone').value.trim();if(!u||!p||!n)return;db.ref('managers').push({username:u,password:p,name:n,phone:ph,role:'manager'});$('mgrUsername').value='';$('mgrPassword').value='';$('mgrName').value='';$('mgrPhone').value='';}
+function loadRequestsTab(){setHTML('mainContent',`<h3>📩 طلبات تغيير الدور</h3><div id="reqList"></div>`);db.ref('roleRequests').on('value',s=>{let h='';s.forEach(r=>{if(r.val().status==='pending')h+=`<div class="list-item"><span>👤 ${r.val().employeeName} | ${ROLE_MAP[r.val().currentRole]?.label||r.val().currentRole} → ${ROLE_MAP[r.val().requestedRole]?.label||r.val().requestedRole}</span><div><button class="btn-sm btn-success" onclick="approveReq('${r.key}')">✅</button><button class="btn-sm btn-delete" onclick="rejectReq('${r.key}')">❌</button></div></div>`;});setHTML('reqList',h||'<p>لا طلبات</p>';});}
+function approveReq(id){db.ref('roleRequests/'+id).once('value',s=>{if(!s.exists())return;db.ref('roleRequests/'+id).update({status:'approved'});});}
+function rejectReq(id){db.ref('roleRequests/'+id).update({status:'rejected'});}
+function loadShiftsTab(){setHTML('mainContent',`<h3>📊 جميع الورديات</h3><div id="allShifts"></div><hr><h3>💰 إجمالي الأجور المستحقة</h3><div id="totalSalaries" style="font-size:20px;font-weight:bold;color:var(--purple);"></div>`);db.ref('shifts').once('value',s=>{let h='',total=0;s.forEach(sh=>{const d=sh.val();const badge=d.status==='active'?'<span class="shift-badge shift-active">نشطة</span>':'<span class="shift-badge shift-completed">مكتملة</span>';const earn=d.totalEarnings||0;if(d.status==='completed')total+=earn;h+=`<div class="list-item"><span>👤 ${d.employeeName} | ${d.startDate||''} - ${d.endDate||'...'} | ⏱️ ${d.totalHours||0} س | 💰 ${formatMoney(earn)} ل.س</span>${badge}</div>`;});setHTML('allShifts',h||'<p>لا ورديات</p>';$('totalSalaries').textContent=formatMoney(total)+' ل.س';});}
 
 // ==================== واجهة الموظف ====================
 function renderEmployeeView(){
     const role=currentUser.currentRole;
     db.ref('shifts').orderByChild('employeeId').equalTo(currentUser.id).limitToLast(1).on('value',snap=>{
-        activeShiftId=null;
-        snap.forEach(s=>{if(s.val().status==='active')activeShiftId=s.key;});
-        
+        activeShiftId=null; snap.forEach(s=>{if(s.val().status==='active')activeShiftId=s.key;});
         let roleHTML='';
         if(role==='accountant') roleHTML=renderAccountant();
         else if(role==='barista') roleHTML=renderBarista();
         else if(role==='waiter') roleHTML=renderWaiter();
         setHTML('mainContent',roleHTML);
-        
-        let shiftBtn=activeShiftId
-            ?`<button class="btn-primary" style="background:var(--red)" onclick="endMyShift()">🚪 إنهاء الوردية</button>`
-            :`<button class="btn-primary" onclick="startMyShift()">▶️ بدء وردية</button>`;
+        let shiftBtn=activeShiftId?`<button class="btn-primary" style="background:var(--red)" onclick="endMyShift()">🚪 إنهاء الوردية</button>`:`<button class="btn-primary" onclick="startMyShift()">▶️ بدء وردية</button>`;
         setHTML('shiftSection',`<div class="content-card"><h3>⏱️ ورديتي</h3>${shiftBtn}</div>`);
         setHTML('roleRequestSection',`<div class="content-card"><button class="btn-primary" style="background:var(--orange)" onclick="requestRoleChange()">🔄 طلب تغيير الدور</button></div>`);
     });
 }
-
-function startMyShift(){
-    const rate=ROLE_RATES[currentUser.currentRole]||5000;
-    db.ref('shifts').push({
-        employeeId:currentUser.id,employeeName:currentUser.name,
-        role:currentUser.currentRole,start:Date.now(),
-        startDate:new Date().toLocaleString('ar-SY'),status:'active',
-        hourlyRate:rate,totalHours:0,totalEarnings:0
-    });
-}
-
-function endMyShift(){
-    if(!activeShiftId)return;
-    if(!confirm('إنهاء الوردية؟'))return;
-    db.ref('shifts/'+activeShiftId).once('value',s=>{
-        if(!s.exists())return;
-        const sh=s.val();const end=Date.now();
-        const hours=((end-sh.start)/3600000).toFixed(2);
-        const earnings=hours*sh.hourlyRate;
-        db.ref('shifts/'+activeShiftId).update({
-            end,endDate:new Date().toLocaleString('ar-SY'),status:'completed',
-            totalHours:parseFloat(hours),totalEarnings:Math.round(earnings)
-        });
-    });
-}
-
-function requestRoleChange(){
-    const opts=Object.entries(ROLE_MAP).filter(([k])=>k!==currentUser.currentRole&&['barista','waiter','accountant'].includes(k)).map(([k,v])=>`${k} (${v.label})`).join(', ');
-    const nr=prompt(`دورك الحالي: ${ROLE_MAP[currentUser.currentRole]?.label}\nاختر:\n${opts}\nاكتب بالإنجليزي:`);
-    if(!nr||!['barista','waiter','accountant'].includes(nr)){alert('دور غير صالح');return;}
-    db.ref('roleRequests').push({employeeId:currentUser.id,employeeName:currentUser.name,currentRole:currentUser.currentRole,requestedRole:nr,status:'pending',date:Date.now()});
-    alert('✅ تم إرسال الطلب');
-}
+function startMyShift(){const rate=ROLE_RATES[currentUser.currentRole]||5000;db.ref('shifts').push({employeeId:currentUser.id,employeeName:currentUser.name,role:currentUser.currentRole,start:Date.now(),startDate:new Date().toLocaleString('ar-SY'),status:'active',hourlyRate:rate,totalHours:0,totalEarnings:0});}
+function endMyShift(){if(!activeShiftId)return;if(!confirm('إنهاء الوردية؟'))return;db.ref('shifts/'+activeShiftId).once('value',s=>{if(!s.exists())return;const sh=s.val();const end=Date.now();const hours=((end-sh.start)/3600000).toFixed(2);const earnings=hours*sh.hourlyRate;db.ref('shifts/'+activeShiftId).update({end,endDate:new Date().toLocaleString('ar-SY'),status:'completed',totalHours:parseFloat(hours),totalEarnings:Math.round(earnings)});});}
+function requestRoleChange(){const opts=Object.entries(ROLE_MAP).filter(([k])=>k!==currentUser.currentRole&&['barista','waiter','accountant'].includes(k)).map(([k,v])=>`${k} (${v.label})`).join(', ');const nr=prompt(`دورك الحالي: ${ROLE_MAP[currentUser.currentRole]?.label}\nاختر:\n${opts}\nاكتب بالإنجليزي:`);if(!nr||!['barista','waiter','accountant'].includes(nr)){alert('دور غير صالح');return;}db.ref('roleRequests').push({employeeId:currentUser.id,employeeName:currentUser.name,currentRole:currentUser.currentRole,requestedRole:nr,status:'pending',date:Date.now()});alert('✅ تم إرسال الطلب');}
 
 // === محاسب ===
-function renderAccountant(){
-    setTimeout(()=>accTab('orders'),50);
-    return `<div class="tabs"><button class="tab-btn active" onclick="accTab('orders')">📋 طلبات الجرسونات</button><button class="tab-btn" onclick="accTab('purchases')">📦 فواتير شراء</button></div><div id="accContent"></div>`;
-}
-function accTab(tab){
-    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));event.target.classList.add('active');
-    const c=$('accContent');
-    if(tab==='orders'){c.innerHTML=`<h3>📋 طلبات الجرسونات</h3><div id="wOrders"></div>`;loadAccOrders();}
-    else{c.innerHTML=`<h3>📦 فاتورة شراء</h3><select id="supSel"><option value="">اختر المورد</option></select><input id="invItem" placeholder="الصنف"><input id="invQty" placeholder="الكمية"><input id="invPrice" placeholder="سعر الشراء"><button class="btn-primary" style="background:var(--orange)" onclick="addInvItem()">➕ إضافة</button><div id="invItems"></div><button class="btn-primary" style="background:var(--green)" onclick="saveInv()">💾 حفظ</button><hr><h3>📋 فواتير اليوم</h3><div id="invList"></div>`;loadSupForInv();loadInvs();}
-}
+function renderAccountant(){setTimeout(()=>accTab('orders'),50);return`<div class="tabs"><button class="tab-btn active" onclick="accTab('orders')">📋 طلبات الجرسونات</button><button class="tab-btn" onclick="accTab('purchases')">📦 فواتير شراء</button></div><div id="accContent"></div>`;}
+function accTab(tab){document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));event.target.classList.add('active');const c=$('accContent');if(tab==='orders'){c.innerHTML=`<h3>📋 طلبات الجرسونات</h3><div id="wOrders"></div>`;loadAccOrders();}else{c.innerHTML=`<h3>📦 فاتورة شراء</h3><select id="supSel"><option value="">اختر المورد</option></select><input id="invItem" placeholder="الصنف"><input id="invQty" placeholder="الكمية"><input id="invPrice" placeholder="سعر الشراء"><button class="btn-primary" style="background:var(--orange)" onclick="addInvItem()">➕ إضافة</button><div id="invItems"></div><button class="btn-primary" style="background:var(--green)" onclick="saveInv()">💾 حفظ</button><hr><h3>📋 فواتير اليوم</h3><div id="invList"></div>`;loadSupForInv();loadInvs();}}
 function loadAccOrders(){db.ref('waiterCarts').on('value',s=>{let h='';s.forEach(cart=>{const c=cart.val();if(c.status==='submitted'&&c.coldItems&&c.coldItems.length>0)h+=`<div class="list-item"><span>🛒 ${c.waiterName} | سلة ${c.cartNumber} | 💰 ${formatMoney(c.coldTotal)} ل.س</span><button class="btn-sm btn-success" onclick="confirmAccPay('${cart.key}')">✅ استلام</button></div>`;});setHTML('wOrders',h||'<p>لا طلبات</p>';});}
 function confirmAccPay(id){if(confirm('تأكيد؟'))db.ref('waiterCarts/'+id).update({status:'paid',accountantId:currentUser.id,paidAt:Date.now()});}
 function loadSupForInv(){db.ref('suppliers').on('value',s=>{let h='<option value="">اختر</option>';s.forEach(x=>h+=`<option value="${x.key}">${x.val().name}</option>`);const el=$('supSel');if(el)el.innerHTML=h;});}
@@ -487,18 +394,13 @@ function saveInv(){const sup=$('supSel').value;if(!sup||invoiceItems.length===0)
 function loadInvs(){db.ref('purchaseInvoices').on('value',s=>{let h='';s.forEach(inv=>h+=`<div class="list-item"><span>📦 ${inv.val().dateStr} | 💰 ${formatMoney(inv.val().total)} ل.س</span><button class="btn-sm btn-delete" onclick="if(confirm('حذف؟'))db.ref('purchaseInvoices/${inv.key}').remove()">🗑️</button></div>`);setHTML('invList',h||'<p>لا فواتير</p>';});}
 
 // === باريستا ===
-function renderBarista(){setTimeout(()=>loadBaristaOrders(),100);return `<h3>☕ المشروبات الساخنة</h3><div id="hotNew"></div><h4>⏳ جاري التجهيز</h4><div id="hotPrep"></div><h4>✅ جاهزة</h4><div id="hotReady"></div>`;}
-function loadBaristaOrders(){db.ref('waiterCarts').on('value',s=>{let nw='',pr='',rd='';s.forEach(cart=>{const c=cart.val();if(c.hotItems&&c.hotItems.length){const card=`<div class="list-item"><span>🛒 ${c.waiterName} | سلة ${c.cartNumber} | 🔥 ${c.hotItems.map(i=>i.name).join(', ')}</span>${c.hotStatus==='submitted'||!c.hotStatus?`<button class="btn-sm btn-success" onclick="startPrep('${cart.key}')">▶️ بدء</button>`:''}${c.hotStatus==='preparing'?`<button class="btn-sm btn-success" onclick="markReady('${cart.key}')">✅ جاهز</button>`:''}${c.hotStatus==='ready'?'<span class="shift-badge shift-active">✅ جاهز</span>':''}</div>`;if(c.hotStatus==='submitted'||!c.hotStatus)nw+=card;else if(c.hotStatus==='preparing')pr+=card;else if(c.hotStatus==='ready')rd+=card;}});setHTML('hotNew',nw||'<p>لا جديد</p>');setHTML('hotPrep',pr||'<p>-</p>');setHTML('hotReady',rd||'<p>-</p>';});}
+function renderBarista(){setTimeout(()=>loadBaristaOrders(),100);return`<h3>☕ المشروبات الساخنة</h3><div id="hotNew"></div><h4>⏳ جاري التجهيز</h4><div id="hotPrep"></div><h4>✅ جاهزة</h4><div id="hotReady"></div>`;}
+function loadBaristaOrders(){db.ref('waiterCarts').on('value',s=>{let nw='',pr='',rd='';s.forEach(cart=>{const c=cart.val();if(c.hotItems&&c.hotItems.length){const card=`<div class="list-item"><span>🛒 ${c.waiterName} | سلة ${c.cartNumber} | 🔥 ${c.hotItems.map(i=>i.name).join(', ')}</span>${c.hotStatus==='submitted'||!c.hotStatus?`<button class="btn-sm btn-success" onclick="startPrep('${cart.key}')">▶️ بدء</button>`:''}${c.hotStatus==='preparing'?`<button class="btn-sm btn-success" onclick="markReady('${cart.key}')">✅ جاهز</button>`:''}${c.hotStatus==='ready'?'<span class="shift-badge shift-active">✅ جاهز</span>':''}</div>`;if(c.hotStatus==='submitted'||!c.hotStatus)nw+=card;else if(c.hotStatus==='preparing')pr+=card;else if(c.hotStatus==='ready')rd+=card;}});setHTML('hotNew',nw||'<p>لا جديد</p>';setHTML('hotPrep',pr||'<p>-</p>';setHTML('hotReady',rd||'<p>-</p>';});}
 function startPrep(id){db.ref('waiterCarts/'+id).update({hotStatus:'preparing',baristaId:currentUser.id,baristaName:currentUser.name});}
 function markReady(id){db.ref('waiterCarts/'+id).update({hotStatus:'ready'});}
 
 // === جرسون ===
-function renderWaiter(){
-    db.ref('categories').once('value',s=>{allCategories={};s.forEach(c=>allCategories[c.key]={id:c.key,...c.val()};});
-    db.ref('products').once('value',s=>{allProducts={};s.forEach(p=>allProducts[p.key]={id:p.key,...p.val()};});
-    setTimeout(()=>loadMyCarts(),100);
-    return `<div><h3>🛒 سلاتي</h3><div id="myCarts"></div><button class="btn-primary" onclick="newCart()">➕ سلة جديدة</button></div><div id="cartDetail" class="hidden content-card"></div><div id="prodSection" class="hidden content-card"><h3>📂 الأقسام</h3><div id="wCats"></div><div id="wProdsSec" class="hidden"><button class="btn-primary" style="background:var(--orange)" onclick="showWCats()">⬅ رجوع</button><h3>📦 المنتجات</h3><div id="wProds"></div></div></div>`;
-}
+function renderWaiter(){db.ref('categories').once('value',s=>{allCategories={};s.forEach(c=>allCategories[c.key]={id:c.key,...c.val()};});db.ref('products').once('value',s=>{allProducts={};s.forEach(p=>allProducts[p.key]={id:p.key,...p.val()};});setTimeout(()=>loadMyCarts(),100);return`<div><h3>🛒 سلاتي</h3><div id="myCarts"></div><button class="btn-primary" onclick="newCart()">➕ سلة جديدة</button></div><div id="cartDetail" class="hidden content-card"></div><div id="prodSection" class="hidden content-card"><h3>📂 الأقسام</h3><div id="wCats"></div><div id="wProdsSec" class="hidden"><button class="btn-primary" style="background:var(--orange)" onclick="showWCats()">⬅ رجوع</button><h3>📦 المنتجات</h3><div id="wProds"></div></div></div>`;}
 function newCart(){db.ref('waiterCarts').push({waiterId:currentUser.id,waiterName:currentUser.name,cartNumber:Date.now().toString().slice(-4),items:[],hotItems:[],coldItems:[],hotTotal:0,coldTotal:0,status:'active',createdAt:Date.now()});}
 function loadMyCarts(){db.ref('waiterCarts').orderByChild('waiterId').equalTo(currentUser.id).on('value',s=>{let h='';s.forEach(cart=>{const c=cart.val();if(c.status!=='paid'&&c.status!=='cancelled')h+=`<div class="list-item"><span>🛒 سلة #${c.cartNumber} | 🔥${c.hotItems?.length||0} 🧊${c.coldItems?.length||0} | 💰 ${formatMoney((c.hotTotal||0)+(c.coldTotal||0))} ل.س</span><div><button class="btn-sm btn-edit" onclick="openCart('${cart.key}')">📂 فتح</button><button class="btn-sm btn-delete" onclick="if(confirm('حذف؟'))db.ref('waiterCarts/${cart.key}').update({status:'cancelled'})">🗑️</button></div></div>`;});setHTML('myCarts',h||'<p>لا سلات نشطة</p>';});}
 function openCart(id){currentCartId=id;show('cartDetail');show('prodSection');db.ref('waiterCarts/'+id).once('value',s=>{const c=s.val();setHTML('cartDetail',`<h3>🛒 سلة #${c.cartNumber}</h3><p>🔥 <b>مشروبات ساخنة:</b> ${c.hotItems?.map(i=>`${i.name}×${i.qty}`).join(', ')||'لا يوجد'} | 💰 ${formatMoney(c.hotTotal)} ل.س ${c.hotStatus==='ready'?'<span class="shift-badge shift-active">✅ جاهز</span>':c.hotStatus==='preparing'?'<span class="shift-badge shift-active">⏳ جاري التجهيز</span>':`<button class="btn-sm btn-warning" onclick="sendHot('${id}')">☕ أرسل للباريستا</button>`}</p><p>🧊 <b>باقي المنتجات:</b> ${c.coldItems?.map(i=>`${i.name}×${i.qty}`).join(', ')||'لا يوجد'} | 💰 ${formatMoney(c.coldTotal)} ل.س ${c.coldStatus==='submitted'?'<span class="shift-badge shift-active">📤 مرسل للمحاسب</span>':`<button class="btn-sm btn-success" onclick="sendCold('${id}')">💵 أرسل للمحاسب</button>`}</p>`;});showWCats();}
@@ -508,7 +410,7 @@ function addToCart(pid,name,price,catId){if(!currentCartId)return;db.ref('waiter
 function sendHot(id){if(confirm('إرسال للباريستا؟'))db.ref('waiterCarts/'+id).update({hotStatus:'submitted'});}
 function sendCold(id){if(confirm('إرسال للمحاسب؟'))db.ref('waiterCarts/'+id).update({coldStatus:'submitted',status:'submitted'});}
 
-// ==================== بدء التشغيل (تم إصلاحه - استدعاء الدالة) ====================
+// ==================== بدء التشغيل (تم استدعاء الدالة) ====================
 window.onload=function(){
     setupInitialData();
     loadRoleRates();

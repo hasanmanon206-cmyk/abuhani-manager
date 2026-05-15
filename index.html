@@ -58,7 +58,7 @@
         <p style="color:#555;margin-bottom:20px">لوحة تحكم الإدارة</p>
         <input type="text" id="loginUsername" placeholder="👤 اسم المستخدم" autocomplete="username">
         <input type="password" id="loginPassword" placeholder="🔒 كلمة المرور" autocomplete="current-password">
-        <select id="loginRole" style="display:none;">
+        <select id="loginRole" class="hidden">
             <option value="">اختر دورك</option>
             <option value="barista">☕ باريستا</option>
             <option value="waiter">🛒 جرسون</option>
@@ -102,21 +102,18 @@ function formatMoney(n){return (n||0).toLocaleString('ar-SY')}
 // ==================== تحميل الأجور ====================
 function loadRoleRates(){
     db.ref('rolePricing').once('value').then(snap=>{
-        if(snap.exists()){
-            snap.forEach(r=>{ ROLE_RATES[r.key]=r.val().hourlyRate; });
-        }
-    });
+        if(snap.exists()){ snap.forEach(r=>{ ROLE_RATES[r.key]=r.val().hourlyRate; }); }
+    }).catch(()=>{});
 }
-loadRoleRates();
-db.ref('rolePricing').on('value',snap=>{
-    snap.forEach(r=>{ ROLE_RATES[r.key]=r.val().hourlyRate; });
-});
+db.ref('rolePricing').on('value',snap=>{ snap.forEach(r=>{ ROLE_RATES[r.key]=r.val().hourlyRate; }); });
 
-// ==================== الإعداد الأولي ====================
+// ==================== الإعداد الأولي (تم الإصلاح) ====================
 function setupInitialData(){
     const msg=$('loginMessage');
     msg.className='message message-info';
     msg.textContent='⏳ جاري التحقق من الإعدادات...';
+    
+    // التأكد من وجود حساب المدير العام
     db.ref('managers/6057961002').once('value').then(snap=>{
         if(!snap.exists()||!snap.val().username){
             msg.textContent='⚙️ جاري إنشاء حساب المدير العام...';
@@ -124,7 +121,9 @@ function setupInitialData(){
                 name:"أبو هاني",phone:"0932293515",role:"owner",username:"admin",password:"admin321"
             });
         }
+        return Promise.resolve();
     }).then(()=>{
+        // التأكد من وجود rolePricing
         return db.ref('rolePricing').once('value');
     }).then(snap2=>{
         if(!snap2.exists()){
@@ -132,6 +131,7 @@ function setupInitialData(){
                 barista:{hourlyRate:5000},waiter:{hourlyRate:4000},accountant:{hourlyRate:6000}
             });
         }
+        return Promise.resolve();
     }).then(()=>{
         msg.className='message message-success';
         msg.textContent='✅ المنصة جاهزة للعمل';
@@ -141,7 +141,7 @@ function setupInitialData(){
     });
 }
 
-// ==================== تسجيل الدخول ====================
+// ==================== تسجيل الدخول (تم إصلاح الوعود) ====================
 function handleLogin(){
     const u=$('loginUsername').value.trim();
     const p=$('loginPassword').value.trim();
@@ -159,8 +159,10 @@ function handleLogin(){
     msg.className='message message-info';
     msg.textContent='⏳ جاري التحقق...';
     
+    let found=false;
+    
+    // التحقق من المدراء
     db.ref('managers').once('value').then(snap=>{
-        let found=false;
         snap.forEach(m=>{
             const d=m.val();
             if(d.username===u && d.password===p){
@@ -170,9 +172,13 @@ function handleLogin(){
         });
         if(found){
             showDashboard();
-            return Promise.resolve(true);
+            return Promise.resolve();
         }
-        return db.ref('employees').once('value').then(snap2=>{
+        // إذا لم يوجد مدير، نتحقق من الموظفين
+        return db.ref('employees').once('value');
+    }).then(snap2=>{
+        if(found) return; // وجدناه كمدير، لا داعي للمتابعة
+        if(snap2){
             snap2.forEach(e=>{
                 const d=e.val();
                 if(d.username===u && d.password===p){
@@ -180,16 +186,16 @@ function handleLogin(){
                     found=true;
                 }
             });
-            if(found){
-                showRoleSelection();
-            } else {
-                msg.className='message message-error';
-                msg.textContent='❌ بيانات الدخول غير صحيحة';
-            }
-        });
+        }
+        if(found){
+            showRoleSelection();
+        } else {
+            msg.className='message message-error';
+            msg.textContent='❌ بيانات الدخول غير صحيحة';
+        }
     }).catch(err=>{
         msg.className='message message-error';
-        msg.textContent='❌ خطأ في الاتصال';
+        msg.textContent='❌ خطأ في الاتصال: '+err.message;
     }).finally(()=>{
         btn.disabled=false;
         btn.textContent='🚀 دخول';
@@ -321,7 +327,7 @@ function savePricing(){
     });
 }
 
-// === تبويب الموظفين ===
+// === باقي التبويبات ===
 function loadEmployeesTab(){
     setHTML('mainContent',`<h3>➕ إضافة موظف</h3>
         <input id="empUsername" placeholder="اسم المستخدم"><input id="empPassword" placeholder="كلمة المرور"><input id="empName" placeholder="الاسم الكامل"><input id="empPhone" placeholder="الهاتف">
@@ -364,7 +370,6 @@ function editEmp(id){
     });
 }
 
-// === باقي التبويبات (مضمونة) ===
 function loadSuppliersTab(){
     setHTML('mainContent',`<h3>➕ إضافة مورد</h3><input id="supName" placeholder="اسم المورد"><input id="supPhone" placeholder="الهاتف"><button class="btn-primary" onclick="addSupplier()">➕ إضافة</button><hr><h3>📋 الموردين</h3><div id="supList"></div>`);
     db.ref('suppliers').on('value',s=>{let h='';s.forEach(x=>h+=`<div class="list-item"><span>🚚 ${x.val().name}</span><button class="btn-sm btn-delete" onclick="if(confirm('حذف؟'))db.ref('suppliers/${x.key}').remove()">🗑️</button></div>`);setHTML('supList',h||'<p>لا يوجد</p>');});
@@ -433,15 +438,10 @@ function renderEmployeeView(){
 function startMyShift(){
     const rate=ROLE_RATES[currentUser.currentRole]||5000;
     db.ref('shifts').push({
-        employeeId:currentUser.id,
-        employeeName:currentUser.name,
-        role:currentUser.currentRole,
-        start:Date.now(),
-        startDate:new Date().toLocaleString('ar-SY'),
-        status:'active',
-        hourlyRate:rate,
-        totalHours:0,
-        totalEarnings:0
+        employeeId:currentUser.id,employeeName:currentUser.name,
+        role:currentUser.currentRole,start:Date.now(),
+        startDate:new Date().toLocaleString('ar-SY'),status:'active',
+        hourlyRate:rate,totalHours:0,totalEarnings:0
     });
 }
 
@@ -450,8 +450,7 @@ function endMyShift(){
     if(!confirm('إنهاء الوردية؟'))return;
     db.ref('shifts/'+activeShiftId).once('value',s=>{
         if(!s.exists())return;
-        const sh=s.val();
-        const end=Date.now();
+        const sh=s.val();const end=Date.now();
         const hours=((end-sh.start)/3600000).toFixed(2);
         const earnings=hours*sh.hourlyRate;
         db.ref('shifts/'+activeShiftId).update({
@@ -462,234 +461,58 @@ function endMyShift(){
 }
 
 function requestRoleChange(){
-    const opts=Object.entries(ROLE_MAP)
-        .filter(([k])=>k!==currentUser.currentRole&&['barista','waiter','accountant'].includes(k))
-        .map(([k,v])=>`${k} (${v.label})`).join(', ');
+    const opts=Object.entries(ROLE_MAP).filter(([k])=>k!==currentUser.currentRole&&['barista','waiter','accountant'].includes(k)).map(([k,v])=>`${k} (${v.label})`).join(', ');
     const nr=prompt(`دورك الحالي: ${ROLE_MAP[currentUser.currentRole]?.label}\nاختر:\n${opts}\nاكتب بالإنجليزي:`);
     if(!nr||!['barista','waiter','accountant'].includes(nr)){alert('دور غير صالح');return;}
-    db.ref('roleRequests').push({
-        employeeId:currentUser.id,employeeName:currentUser.name,
-        currentRole:currentUser.currentRole,requestedRole:nr,
-        status:'pending',date:Date.now()
-    });
+    db.ref('roleRequests').push({employeeId:currentUser.id,employeeName:currentUser.name,currentRole:currentUser.currentRole,requestedRole:nr,status:'pending',date:Date.now()});
     alert('✅ تم إرسال الطلب');
 }
 
 // === محاسب ===
 function renderAccountant(){
     setTimeout(()=>accTab('orders'),50);
-    return `<div class="tabs">
-        <button class="tab-btn active" onclick="accTab('orders')">📋 طلبات الجرسونات</button>
-        <button class="tab-btn" onclick="accTab('purchases')">📦 فواتير شراء</button>
-    </div><div id="accContent"></div>`;
+    return `<div class="tabs"><button class="tab-btn active" onclick="accTab('orders')">📋 طلبات الجرسونات</button><button class="tab-btn" onclick="accTab('purchases')">📦 فواتير شراء</button></div><div id="accContent"></div>`;
 }
-
 function accTab(tab){
-    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-    event.target.classList.add('active');
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));event.target.classList.add('active');
     const c=$('accContent');
-    if(tab==='orders'){
-        c.innerHTML=`<h3>📋 طلبات الجرسونات</h3><div id="wOrders"></div>`;
-        loadAccOrders();
-    } else {
-        c.innerHTML=`<h3>📦 فاتورة شراء</h3>
-            <select id="supSel"><option value="">اختر المورد</option></select>
-            <input id="invItem" placeholder="الصنف"><input id="invQty" placeholder="الكمية"><input id="invPrice" placeholder="سعر الشراء">
-            <button class="btn-primary" style="background:var(--orange)" onclick="addInvItem()">➕ إضافة</button>
-            <div id="invItems"></div>
-            <button class="btn-primary" style="background:var(--green)" onclick="saveInv()">💾 حفظ</button>
-            <hr><h3>📋 فواتير اليوم</h3><div id="invList"></div>`;
-        loadSupForInv();
-        loadInvs();
-    }
+    if(tab==='orders'){c.innerHTML=`<h3>📋 طلبات الجرسونات</h3><div id="wOrders"></div>`;loadAccOrders();}
+    else{c.innerHTML=`<h3>📦 فاتورة شراء</h3><select id="supSel"><option value="">اختر المورد</option></select><input id="invItem" placeholder="الصنف"><input id="invQty" placeholder="الكمية"><input id="invPrice" placeholder="سعر الشراء"><button class="btn-primary" style="background:var(--orange)" onclick="addInvItem()">➕ إضافة</button><div id="invItems"></div><button class="btn-primary" style="background:var(--green)" onclick="saveInv()">💾 حفظ</button><hr><h3>📋 فواتير اليوم</h3><div id="invList"></div>`;loadSupForInv();loadInvs();}
 }
-
-function loadAccOrders(){
-    db.ref('waiterCarts').on('value',s=>{
-        let h='';
-        s.forEach(cart=>{
-            const c=cart.val();
-            if(c.status==='submitted'&&c.coldItems&&c.coldItems.length>0){
-                h+=`<div class="list-item"><span>🛒 ${c.waiterName} | سلة ${c.cartNumber} | 💰 ${formatMoney(c.coldTotal)} ل.س</span>
-                <button class="btn-sm btn-success" onclick="confirmAccPay('${cart.key}')">✅ استلام</button></div>`;
-            }
-        });
-        setHTML('wOrders',h||'<p>لا طلبات</p>');
-    });
-}
-
-function confirmAccPay(id){
-    if(confirm('تأكيد استلام الرصيد؟')){
-        db.ref('waiterCarts/'+id).update({status:'paid',accountantId:currentUser.id,paidAt:Date.now()});
-    }
-}
-
-function loadSupForInv(){
-    db.ref('suppliers').on('value',s=>{
-        let h='<option value="">اختر</option>';
-        s.forEach(x=>h+=`<option value="${x.key}">${x.val().name}</option>`);
-        const el=$('supSel'); if(el)el.innerHTML=h;
-    });
-}
-
-function addInvItem(){
-    const item=$('invItem').value.trim();
-    const qty=parseInt($('invQty').value);
-    const price=parseInt($('invPrice').value);
-    if(!item||!qty||!price)return;
-    invoiceItems.push({item,qty,price,total:qty*price});
-    $('invItem').value='';$('invQty').value='';$('invPrice').value='';
-    setHTML('invItems',invoiceItems.map((i,idx)=>`<div>📦 ${i.item} × ${i.qty} = ${formatMoney(i.total)} ل.س <button class="btn-sm btn-delete" onclick="invoiceItems.splice(${idx},1);this.parentElement.remove()">❌</button></div>`).join(''));
-}
-
-function saveInv(){
-    const sup=$('supSel').value;
-    if(!sup||invoiceItems.length===0){alert('اختر مورد وأضف أصناف');return;}
-    const total=invoiceItems.reduce((s,i)=>s+i.total,0);
-    db.ref('purchaseInvoices').push({
-        supplierId:sup,items:[...invoiceItems],total,
-        accountantId:currentUser.id,accountantName:currentUser.name,
-        date:Date.now(),dateStr:new Date().toLocaleString('ar-SY')
-    });
-    invoiceItems=[];
-    setHTML('invItems','');
-    alert('✅ تم الحفظ');
-    accTab('purchases');
-}
-
-function loadInvs(){
-    db.ref('purchaseInvoices').on('value',s=>{
-        let h='';
-        s.forEach(inv=>h+=`<div class="list-item"><span>📦 ${inv.val().dateStr} | 💰 ${formatMoney(inv.val().total)} ل.س</span>
-        <button class="btn-sm btn-delete" onclick="if(confirm('حذف؟'))db.ref('purchaseInvoices/${inv.key}').remove()">🗑️</button></div>`);
-        setHTML('invList',h||'<p>لا فواتير</p>');
-    });
-}
+function loadAccOrders(){db.ref('waiterCarts').on('value',s=>{let h='';s.forEach(cart=>{const c=cart.val();if(c.status==='submitted'&&c.coldItems&&c.coldItems.length>0)h+=`<div class="list-item"><span>🛒 ${c.waiterName} | سلة ${c.cartNumber} | 💰 ${formatMoney(c.coldTotal)} ل.س</span><button class="btn-sm btn-success" onclick="confirmAccPay('${cart.key}')">✅ استلام</button></div>`;});setHTML('wOrders',h||'<p>لا طلبات</p>';});}
+function confirmAccPay(id){if(confirm('تأكيد؟'))db.ref('waiterCarts/'+id).update({status:'paid',accountantId:currentUser.id,paidAt:Date.now()});}
+function loadSupForInv(){db.ref('suppliers').on('value',s=>{let h='<option value="">اختر</option>';s.forEach(x=>h+=`<option value="${x.key}">${x.val().name}</option>`);const el=$('supSel');if(el)el.innerHTML=h;});}
+function addInvItem(){const item=$('invItem').value.trim(),qty=parseInt($('invQty').value),price=parseInt($('invPrice').value);if(!item||!qty||!price)return;invoiceItems.push({item,qty,price,total:qty*price});$('invItem').value='';$('invQty').value='';$('invPrice').value='';setHTML('invItems',invoiceItems.map((i,idx)=>`<div>📦 ${i.item} × ${i.qty} = ${formatMoney(i.total)} ل.س <button class="btn-sm btn-delete" onclick="invoiceItems.splice(${idx},1);this.parentElement.remove()">❌</button></div>`).join(''));}
+function saveInv(){const sup=$('supSel').value;if(!sup||invoiceItems.length===0){alert('اختر مورد وأضف أصناف');return;}const total=invoiceItems.reduce((s,i)=>s+i.total,0);db.ref('purchaseInvoices').push({supplierId:sup,items:[...invoiceItems],total,accountantId:currentUser.id,accountantName:currentUser.name,date:Date.now(),dateStr:new Date().toLocaleString('ar-SY')});invoiceItems=[];setHTML('invItems','');alert('✅ تم الحفظ');accTab('purchases');}
+function loadInvs(){db.ref('purchaseInvoices').on('value',s=>{let h='';s.forEach(inv=>h+=`<div class="list-item"><span>📦 ${inv.val().dateStr} | 💰 ${formatMoney(inv.val().total)} ل.س</span><button class="btn-sm btn-delete" onclick="if(confirm('حذف؟'))db.ref('purchaseInvoices/${inv.key}').remove()">🗑️</button></div>`);setHTML('invList',h||'<p>لا فواتير</p>';});}
 
 // === باريستا ===
-function renderBarista(){
-    setTimeout(()=>loadBaristaOrders(),100);
-    return `<h3>☕ المشروبات الساخنة</h3><div id="hotNew"></div><h4>⏳ جاري التجهيز</h4><div id="hotPrep"></div><h4>✅ جاهزة</h4><div id="hotReady"></div>`;
-}
-
-function loadBaristaOrders(){
-    db.ref('waiterCarts').on('value',s=>{
-        let nw='',pr='',rd='';
-        s.forEach(cart=>{
-            const c=cart.val();
-            if(c.hotItems&&c.hotItems.length){
-                const card=`<div class="list-item"><span>🛒 ${c.waiterName} | سلة ${c.cartNumber} | 🔥 ${c.hotItems.map(i=>i.name).join(', ')}</span>
-                ${c.hotStatus==='submitted'||!c.hotStatus?`<button class="btn-sm btn-success" onclick="startPrep('${cart.key}')">▶️ بدء</button>`:''}
-                ${c.hotStatus==='preparing'?`<button class="btn-sm btn-success" onclick="markReady('${cart.key}')">✅ جاهز</button>`:''}
-                ${c.hotStatus==='ready'?'<span class="shift-badge shift-active">✅ جاهز</span>':''}</div>`;
-                if(c.hotStatus==='submitted'||!c.hotStatus)nw+=card;
-                else if(c.hotStatus==='preparing')pr+=card;
-                else if(c.hotStatus==='ready')rd+=card;
-            }
-        });
-        setHTML('hotNew',nw||'<p>لا جديد</p>');
-        setHTML('hotPrep',pr||'<p>-</p>');
-        setHTML('hotReady',rd||'<p>-</p>');
-    });
-}
-
-function startPrep(id){ db.ref('waiterCarts/'+id).update({hotStatus:'preparing',baristaId:currentUser.id,baristaName:currentUser.name}); }
-function markReady(id){ db.ref('waiterCarts/'+id).update({hotStatus:'ready'}); }
+function renderBarista(){setTimeout(()=>loadBaristaOrders(),100);return `<h3>☕ المشروبات الساخنة</h3><div id="hotNew"></div><h4>⏳ جاري التجهيز</h4><div id="hotPrep"></div><h4>✅ جاهزة</h4><div id="hotReady"></div>`;}
+function loadBaristaOrders(){db.ref('waiterCarts').on('value',s=>{let nw='',pr='',rd='';s.forEach(cart=>{const c=cart.val();if(c.hotItems&&c.hotItems.length){const card=`<div class="list-item"><span>🛒 ${c.waiterName} | سلة ${c.cartNumber} | 🔥 ${c.hotItems.map(i=>i.name).join(', ')}</span>${c.hotStatus==='submitted'||!c.hotStatus?`<button class="btn-sm btn-success" onclick="startPrep('${cart.key}')">▶️ بدء</button>`:''}${c.hotStatus==='preparing'?`<button class="btn-sm btn-success" onclick="markReady('${cart.key}')">✅ جاهز</button>`:''}${c.hotStatus==='ready'?'<span class="shift-badge shift-active">✅ جاهز</span>':''}</div>`;if(c.hotStatus==='submitted'||!c.hotStatus)nw+=card;else if(c.hotStatus==='preparing')pr+=card;else if(c.hotStatus==='ready')rd+=card;}});setHTML('hotNew',nw||'<p>لا جديد</p>');setHTML('hotPrep',pr||'<p>-</p>');setHTML('hotReady',rd||'<p>-</p>';});}
+function startPrep(id){db.ref('waiterCarts/'+id).update({hotStatus:'preparing',baristaId:currentUser.id,baristaName:currentUser.name});}
+function markReady(id){db.ref('waiterCarts/'+id).update({hotStatus:'ready'});}
 
 // === جرسون ===
 function renderWaiter(){
     db.ref('categories').once('value',s=>{allCategories={};s.forEach(c=>allCategories[c.key]={id:c.key,...c.val()};});
     db.ref('products').once('value',s=>{allProducts={};s.forEach(p=>allProducts[p.key]={id:p.key,...p.val()};});
     setTimeout(()=>loadMyCarts(),100);
-    return `<div><h3>🛒 سلاتي</h3><div id="myCarts"></div><button class="btn-primary" onclick="newCart()">➕ سلة جديدة</button></div>
-    <div id="cartDetail" class="hidden content-card"></div>
-    <div id="prodSection" class="hidden content-card">
-        <h3>📂 الأقسام</h3><div id="wCats"></div>
-        <div id="wProdsSec" class="hidden">
-            <button class="btn-primary" style="background:var(--orange)" onclick="showWCats()">⬅ رجوع</button>
-            <h3>📦 المنتجات</h3><div id="wProds"></div>
-        </div>
-    </div>`;
+    return `<div><h3>🛒 سلاتي</h3><div id="myCarts"></div><button class="btn-primary" onclick="newCart()">➕ سلة جديدة</button></div><div id="cartDetail" class="hidden content-card"></div><div id="prodSection" class="hidden content-card"><h3>📂 الأقسام</h3><div id="wCats"></div><div id="wProdsSec" class="hidden"><button class="btn-primary" style="background:var(--orange)" onclick="showWCats()">⬅ رجوع</button><h3>📦 المنتجات</h3><div id="wProds"></div></div></div>`;
 }
+function newCart(){db.ref('waiterCarts').push({waiterId:currentUser.id,waiterName:currentUser.name,cartNumber:Date.now().toString().slice(-4),items:[],hotItems:[],coldItems:[],hotTotal:0,coldTotal:0,status:'active',createdAt:Date.now()});}
+function loadMyCarts(){db.ref('waiterCarts').orderByChild('waiterId').equalTo(currentUser.id).on('value',s=>{let h='';s.forEach(cart=>{const c=cart.val();if(c.status!=='paid'&&c.status!=='cancelled')h+=`<div class="list-item"><span>🛒 سلة #${c.cartNumber} | 🔥${c.hotItems?.length||0} 🧊${c.coldItems?.length||0} | 💰 ${formatMoney((c.hotTotal||0)+(c.coldTotal||0))} ل.س</span><div><button class="btn-sm btn-edit" onclick="openCart('${cart.key}')">📂 فتح</button><button class="btn-sm btn-delete" onclick="if(confirm('حذف؟'))db.ref('waiterCarts/${cart.key}').update({status:'cancelled'})">🗑️</button></div></div>`;});setHTML('myCarts',h||'<p>لا سلات نشطة</p>';});}
+function openCart(id){currentCartId=id;show('cartDetail');show('prodSection');db.ref('waiterCarts/'+id).once('value',s=>{const c=s.val();setHTML('cartDetail',`<h3>🛒 سلة #${c.cartNumber}</h3><p>🔥 <b>مشروبات ساخنة:</b> ${c.hotItems?.map(i=>`${i.name}×${i.qty}`).join(', ')||'لا يوجد'} | 💰 ${formatMoney(c.hotTotal)} ل.س ${c.hotStatus==='ready'?'<span class="shift-badge shift-active">✅ جاهز</span>':c.hotStatus==='preparing'?'<span class="shift-badge shift-active">⏳ جاري التجهيز</span>':`<button class="btn-sm btn-warning" onclick="sendHot('${id}')">☕ أرسل للباريستا</button>`}</p><p>🧊 <b>باقي المنتجات:</b> ${c.coldItems?.map(i=>`${i.name}×${i.qty}`).join(', ')||'لا يوجد'} | 💰 ${formatMoney(c.coldTotal)} ل.س ${c.coldStatus==='submitted'?'<span class="shift-badge shift-active">📤 مرسل للمحاسب</span>':`<button class="btn-sm btn-success" onclick="sendCold('${id}')">💵 أرسل للمحاسب</button>`}</p>`;});showWCats();}
+function showWCats(){hide('wProdsSec');show('wCats');let h='';Object.values(allCategories).forEach(c=>h+=`<div class="list-item" onclick="showWProds('${c.id}','${c.name}')" style="cursor:pointer;">📁 ${c.name} ➤</div>`);setHTML('wCats',h);}
+function showWProds(catId,catName){hide('wCats');show('wProdsSec');const prods=Object.values(allProducts).filter(p=>String(p.categoryId)===String(catId));let h='';prods.forEach(p=>h+=`<div class="list-item"><span>${p.name} | 💰 ${p.price} ل.س | 📦 ${p.stock}</span><button class="btn-sm btn-success" onclick="addToCart('${p.id}','${p.name}',${p.price},'${p.categoryId}')">➕</button></div>`);setHTML('wProds',h||'<p>لا منتجات</p>');}
+function addToCart(pid,name,price,catId){if(!currentCartId)return;db.ref('waiterCarts/'+currentCartId).once('value',s=>{const c=s.val();const items=c.items||[];const ex=items.find(i=>i.id===pid);if(ex){ex.qty++;ex.total=ex.qty*price;}else{items.push({id:pid,name,price,qty:1,total:price});}const hot=items.filter(i=>allProducts[i.id]?.categoryId==='cat1');const cold=items.filter(i=>allProducts[i.id]?.categoryId!=='cat1');db.ref('waiterCarts/'+currentCartId).update({items,hotItems:hot,coldItems:cold,hotTotal:hot.reduce((s,i)=>s+i.total,0),coldTotal:cold.reduce((s,i)=>s+i.total,0)});openCart(currentCartId);});}
+function sendHot(id){if(confirm('إرسال للباريستا؟'))db.ref('waiterCarts/'+id).update({hotStatus:'submitted'});}
+function sendCold(id){if(confirm('إرسال للمحاسب؟'))db.ref('waiterCarts/'+id).update({coldStatus:'submitted',status:'submitted'});}
 
-function newCart(){ db.ref('waiterCarts').push({waiterId:currentUser.id,waiterName:currentUser.name,cartNumber:Date.now().toString().slice(-4),items:[],hotItems:[],coldItems:[],hotTotal:0,coldTotal:0,status:'active',createdAt:Date.now()}); }
-
-function loadMyCarts(){
-    db.ref('waiterCarts').orderByChild('waiterId').equalTo(currentUser.id).on('value',s=>{
-        let h='';
-        s.forEach(cart=>{
-            const c=cart.val();
-            if(c.status!=='paid'&&c.status!=='cancelled'){
-                h+=`<div class="list-item"><span>🛒 سلة #${c.cartNumber} | 🔥${c.hotItems?.length||0} 🧊${c.coldItems?.length||0} | 💰 ${formatMoney((c.hotTotal||0)+(c.coldTotal||0))} ل.س</span>
-                <div><button class="btn-sm btn-edit" onclick="openCart('${cart.key}')">📂 فتح</button>
-                <button class="btn-sm btn-delete" onclick="if(confirm('حذف؟'))db.ref('waiterCarts/${cart.key}').update({status:'cancelled'})">🗑️</button></div></div>`;
-            }
-        });
-        setHTML('myCarts',h||'<p>لا سلات نشطة</p>');
-    });
-}
-
-function openCart(id){
-    currentCartId=id;
-    show('cartDetail');
-    show('prodSection');
-    db.ref('waiterCarts/'+id).once('value',s=>{
-        const c=s.val();
-        setHTML('cartDetail',`<h3>🛒 سلة #${c.cartNumber}</h3>
-        <p>🔥 <b>مشروبات ساخنة:</b> ${c.hotItems?.map(i=>`${i.name}×${i.qty}`).join(', ')||'لا يوجد'} | 💰 ${formatMoney(c.hotTotal)} ل.س
-        ${c.hotStatus==='ready'?'<span class="shift-badge shift-active">✅ جاهز</span>':c.hotStatus==='preparing'?'<span class="shift-badge shift-active">⏳ جاري التجهيز</span>':`<button class="btn-sm btn-warning" onclick="sendHot('${id}')">☕ أرسل للباريستا</button>`}</p>
-        <p>🧊 <b>باقي المنتجات:</b> ${c.coldItems?.map(i=>`${i.name}×${i.qty}`).join(', ')||'لا يوجد'} | 💰 ${formatMoney(c.coldTotal)} ل.س
-        ${c.coldStatus==='submitted'?'<span class="shift-badge shift-active">📤 مرسل للمحاسب</span>':`<button class="btn-sm btn-success" onclick="sendCold('${id}')">💵 أرسل للمحاسب</button>`}</p>`);
-    });
-    showWCats();
-}
-
-function showWCats(){
-    hide('wProdsSec');
-    show('wCats');
-    let h='';
-    Object.values(allCategories).forEach(c=>{
-        h+=`<div class="list-item" onclick="showWProds('${c.id}','${c.name}')" style="cursor:pointer;">📁 ${c.name} ➤</div>`;
-    });
-    setHTML('wCats',h);
-}
-
-function showWProds(catId,catName){
-    hide('wCats');
-    show('wProdsSec');
-    const prods=Object.values(allProducts).filter(p=>String(p.categoryId)===String(catId));
-    let h='';
-    prods.forEach(p=>{
-        h+=`<div class="list-item"><span>${p.name} | 💰 ${p.price} ل.س | 📦 ${p.stock}</span>
-        <button class="btn-sm btn-success" onclick="addToCart('${p.id}','${p.name}',${p.price},'${p.categoryId}')">➕</button></div>`;
-    });
-    setHTML('wProds',h||'<p>لا منتجات</p>');
-}
-
-function addToCart(pid,name,price,catId){
-    if(!currentCartId)return;
-    db.ref('waiterCarts/'+currentCartId).once('value',s=>{
-        const c=s.val();
-        const items=c.items||[];
-        const ex=items.find(i=>i.id===pid);
-        if(ex){ex.qty++;ex.total=ex.qty*price;}
-        else{items.push({id:pid,name,price,qty:1,total:price});}
-        const hot=items.filter(i=>allProducts[i.id]?.categoryId==='cat1');
-        const cold=items.filter(i=>allProducts[i.id]?.categoryId!=='cat1');
-        db.ref('waiterCarts/'+currentCartId).update({
-            items,hotItems:hot,coldItems:cold,
-            hotTotal:hot.reduce((s,i)=>s+i.total,0),
-            coldTotal:cold.reduce((s,i)=>s+i.total,0)
-        });
-        openCart(currentCartId);
-    });
-}
-
-function sendHot(id){ if(confirm('إرسال للباريستا؟'))db.ref('waiterCarts/'+id).update({hotStatus:'submitted'}); }
-function sendCold(id){ if(confirm('إرسال للمحاسب؟'))db.ref('waiterCarts/'+id).update({coldStatus:'submitted',status:'submitted'}); }
-
-// ==================== بدء التشغيل ====================
-window.onload=function(){ setupInitialData(); };
+// ==================== بدء التشغيل (تم إصلاحه - استدعاء الدالة) ====================
+window.onload=function(){
+    setupInitialData();
+    loadRoleRates();
+};
 </script>
 </body>
 </html>

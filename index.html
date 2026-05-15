@@ -1,420 +1,883 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>أبو هاني - الإدارة</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        :root{--bg-start:#ff9a9e;--bg-mid1:#fad0c4;--bg-mid2:#a18cd1;--bg-mid3:#fbc2eb;--bg-end:#8fd3f4;--card-bg:rgba(255,255,255,0.85);--blur:blur(10px);--radius:20px;--radius-sm:12px;--shadow:0 8px 20px rgba(0,0,0,0.1);--blue:#1a73e8;--red:#ff4757;--green:#2ed573;--orange:#ffa502;--purple:#6c5ce7}
-        *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:'Segoe UI',Tahoma,sans-serif;background:linear-gradient(135deg,var(--bg-start) 0%,var(--bg-mid1) 25%,var(--bg-mid2) 50%,var(--bg-mid3) 75%,var(--bg-end) 100%);background-size:400% 400%;animation:gradientBG 15s ease infinite;min-height:100vh;padding:20px 10px;display:flex;flex-direction:column;min-height:100vh}
-        @keyframes gradientBG{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-        .container{max-width:550px;margin:0 auto;flex:1}
-        .login-box{background:var(--card-bg);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-radius:var(--radius);padding:30px 20px;box-shadow:var(--shadow);text-align:center;margin-top:50px}
-        .login-box h2{font-size:28px;margin-bottom:20px;background:linear-gradient(to right,#ff6b6b,#feca57,#48dbfb,#ff9ff3);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-        .login-box input,.login-box select{width:100%;padding:12px 15px;margin:10px 0;border:2px solid #e0e0e0;border-radius:var(--radius-sm);font-size:16px;outline:none;transition:0.3s}
-        .login-box input:focus,.login-box select:focus{border-color:#ff6b6b;box-shadow:0 0 10px rgba(255,107,107,0.3)}
-        .btn-login{background:linear-gradient(45deg,#ff6b6b,#feca57,#48dbfb);border:none;color:white;font-weight:bold;font-size:18px;padding:12px;width:100%;border-radius:var(--radius-sm);cursor:pointer;margin-top:15px;transition:0.3s;background-size:200% 200%;animation:btnGlow 2s ease infinite}
-        @keyframes btnGlow{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-        .btn-login:hover{transform:scale(1.02)}.btn-login:active{transform:scale(0.98)}
-        .dashboard{display:none}
-        .header{background:var(--card-bg);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-radius:var(--radius);padding:15px 20px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;box-shadow:var(--shadow)}
-        .header .user-info h3{margin:0;color:#333;font-size:18px}.header .user-info span{font-size:13px;color:#666}
-        .btn-logout{background:var(--red);border:none;color:white;padding:8px 15px;border-radius:10px;cursor:pointer;font-weight:bold;font-size:13px}
-        .stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:15px;margin-bottom:25px}
-        .stat-card{padding:20px;border-radius:var(--radius);text-align:center;color:white;box-shadow:0 5px 15px rgba(0,0,0,0.2);transition:0.3s}
-        .stat-card:hover{transform:translateY(-3px)}
-        .stat-card:nth-child(1){background:linear-gradient(135deg,#ff6b6b,#ee5a24)}.stat-card:nth-child(2){background:linear-gradient(135deg,#feca57,#ff9f43)}
-        .stat-card:nth-child(3){background:linear-gradient(135deg,#48dbfb,#0abde3)}.stat-card:nth-child(4){background:linear-gradient(135deg,#ff9ff3,#f368e0)}
-        .stat-card .num{font-size:32px;font-weight:bold}.stat-card .label{font-size:14px;opacity:0.9}
-        .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
-        .tab-btn{padding:8px 15px;border-radius:20px;border:none;cursor:pointer;font-weight:bold;font-size:13px;background:rgba(255,255,255,0.7);backdrop-filter:blur(5px);transition:0.3s}
-        .tab-btn.active{background:linear-gradient(45deg,#ff6b6b,#feca57);color:white}
-        .content-card{background:var(--card-bg);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-radius:var(--radius);padding:20px;margin-bottom:20px;box-shadow:var(--shadow)}
-        .content-card h3{margin-bottom:15px;font-size:20px;background:linear-gradient(45deg,#ff6b6b,#48dbfb);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-        .content-card h4{margin:15px 0 10px;color:#555;font-size:16px}
-        .list-item{background:rgba(255,255,255,0.9);border-radius:var(--radius-sm);padding:12px 15px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,0.05);transition:0.2s}
-        .list-item:hover{background:#fff;box-shadow:0 4px 12px rgba(0,0,0,0.1)}
-        .btn-sm{padding:5px 12px;border:none;border-radius:8px;font-size:12px;font-weight:bold;cursor:pointer;margin:0 2px;transition:0.2s}
-        .btn-sm:hover{opacity:0.85;transform:scale(1.05)}.btn-sm:active{transform:scale(0.95)}
-        .btn-edit{background:#1e90ff;color:white}.btn-delete{background:var(--red);color:white}.btn-success{background:var(--green);color:white}.btn-warning{background:var(--orange);color:white}
-        .btn-primary{background:linear-gradient(45deg,var(--purple),#a29bfe);color:white;border:none;border-radius:var(--radius-sm);padding:10px 20px;font-weight:bold;cursor:pointer;width:100%;margin-top:10px;transition:0.3s}
-        .btn-primary:hover{opacity:0.9;transform:translateY(-1px)}.btn-primary:active{transform:scale(0.98)}
-        input,select,textarea{width:100%;padding:10px 12px;margin:8px 0;border:2px solid #e0e0e0;border-radius:10px;font-size:14px;outline:none;transition:0.3s;font-family:inherit}
-        input:focus,select:focus,textarea:focus{border-color:#ff6b6b;box-shadow:0 0 8px rgba(255,107,107,0.2)}
-        .shift-badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:bold}
-        .shift-active{background:var(--green);color:white}.shift-completed{background:var(--orange);color:white}
-        .hidden{display:none!important}
-        .message{padding:10px;border-radius:10px;margin-top:10px;text-align:center;font-weight:bold}
-        .message-success{background:#d4edda;color:#155724}.message-error{background:#f8d7da;color:#721c24}.message-info{background:#d1ecf1;color:#0c5460}
-        /* تذييل المطور */
-        .footer{text-align:center;padding:15px 10px;color:rgba(255,255,255,0.8);font-size:12px;margin-top:20px;background:rgba(0,0,0,0.1);border-radius:15px;backdrop-filter:blur(5px)}
-        .footer strong{color:white;font-size:13px}
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>أبو هاني | الإدارة</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<style>
+:root{
+--brown:#4e342e;
+--beige:#f5e6ca;
+--gold:#d4a017;
+--green:#16a34a;
+--red:#dc2626;
+--blue:#2563eb;
+--glass:rgba(255,255,255,.18);
+--radius:18px;
+}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+font-family:Tahoma,sans-serif;
+background:linear-gradient(-45deg,#ff006e,#8338ec,#3a86ff,#06d6a0,#ffbe0b,#fb5607);
+background-size:400% 400%;
+animation:rainbowBG 15s ease infinite;
+min-height:100vh;
+padding:15px;
+color:#fff;
+overflow-x:hidden;
+}
+
+@keyframes rainbowBG{
+0%{background-position:0% 50%;}
+50%{background-position:100% 50%;}
+100%{background-position:0% 50%;}
+}
+
+.container{
+max-width:1200px;
+margin:auto;
+}
+
+.glass{
+background:var(--glass);
+backdrop-filter:blur(10px);
+border:1px solid rgba(255,255,255,.2);
+border-radius:var(--radius);
+padding:20px;
+margin-bottom:20px;
+box-shadow:0 8px 30px rgba(0,0,0,.2);
+}
+
+h1,h2,h3{
+margin-bottom:15px;
+}
+
+input,select,textarea{
+width:100%;
+padding:12px;
+border:none;
+border-radius:12px;
+margin:8px 0;
+font-size:15px;
+}
+
+button{
+border:none;
+padding:12px 18px;
+border-radius:12px;
+cursor:pointer;
+font-weight:bold;
+transition:.2s;
+}
+
+button:hover{
+transform:translateY(-2px);
+}
+
+.btn-primary{
+background:var(--gold);
+color:#fff;
+}
+
+.btn-danger{
+background:var(--red);
+color:#fff;
+}
+
+.btn-success{
+background:var(--green);
+color:#fff;
+}
+
+.btn-blue{
+background:var(--blue);
+color:#fff;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:15px;
+}
+
+.card{
+background:rgba(255,255,255,.12);
+padding:15px;
+border-radius:15px;
+}
+
+.hidden{
+display:none;
+}
+
+.item{
+background:rgba(255,255,255,.12);
+padding:12px;
+border-radius:12px;
+margin-bottom:10px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:10px;
+flex-wrap:wrap;
+}
+
+.tabs{
+display:flex;
+flex-wrap:wrap;
+gap:10px;
+margin-bottom:20px;
+}
+
+.tab{
+background:#fff;
+color:#333;
+}
+
+.active-tab{
+background:var(--gold);
+color:#fff;
+}
+
+.footer{
+text-align:center;
+margin-top:30px;
+opacity:.8;
+font-size:14px;
+}
+</style>
 </head>
 <body>
-<div class="container" id="appContainer">
-    <!-- شاشة الدخول -->
-    <div id="loginScreen" class="login-box">
-        <h2>🏢 أبو هاني</h2>
-        <p style="color:#555;margin-bottom:20px">لوحة تحكم الإدارة</p>
-        <input type="text" id="loginUsername" placeholder="👤 اسم المستخدم" autocomplete="username">
-        <input type="password" id="loginPassword" placeholder="🔒 كلمة المرور" autocomplete="current-password">
-        <select id="loginRole" class="hidden">
-            <option value="">اختر دورك</option>
-            <option value="barista">☕ باريستا</option>
-            <option value="waiter">🛒 جرسون</option>
-            <option value="accountant">💰 محاسب</option>
-        </select>
-        <button class="btn-login" id="btnLogin" onclick="handleLogin()">🚀 دخول</button>
-        <button class="btn-login hidden" id="btnConfirmRole" onclick="confirmRole()">🎯 تأكيد الدور والدخول</button>
-        <div id="loginMessage"></div>
-        <div class="footer">
-            <strong>© عالم الإلكترونيات</strong> | تم التطوير بواسطة <strong>أبو هاني</strong>
-        </div>
-    </div>
 
-    <!-- داشبورد -->
-    <div id="dashboardScreen" class="dashboard">
-        <div class="header">
-            <div class="user-info"><h3 id="displayName"></h3><span id="displayRole"></span></div>
-            <button class="btn-logout" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> خروج</button>
-        </div>
-        <div id="statsContainer" class="stats-grid hidden"></div>
-        <div id="tabsContainer" class="tabs"></div>
-        <div id="mainContent" class="content-card"></div>
-        <div id="shiftSection"></div>
-        <div id="roleRequestSection"></div>
-        <div class="footer">
-            <strong>© عالم الإلكترونيات</strong> | تم التطوير بواسطة <strong>أبو هاني</strong> | جميع الأنظمة (ويندوز، لينكس، أندرويد)
-        </div>
-    </div>
+<div class="container">
+
+<div id="loginScreen" class="glass">
+<h1>☕ نظام أبو هاني</h1>
+
+<input type="text" id="username" placeholder="اسم المستخدم">
+<input type="password" id="password" placeholder="كلمة المرور">
+
+<select id="roleSelect" class="hidden">
+<option value="">اختر الدور</option>
+<option value="barista">☕ باريستا</option>
+<option value="waiter">🛒 جرسون</option>
+<option value="accountant">💰 محاسب</option>
+</select>
+
+<button class="btn-primary" onclick="login()">🚀 دخول</button>
+<button class="btn-success hidden" id="confirmRoleBtn" onclick="confirmRole()">✅ تأكيد الدور</button>
+
+<p id="loginMsg"></p>
+</div>
+
+<div id="dashboard" class="hidden">
+
+<div class="glass">
+<div style="display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap">
+<div>
+<h2 id="welcomeName"></h2>
+<p id="welcomeRole"></p>
+</div>
+<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+<div class="card" style="padding:10px 15px;min-width:120px;text-align:center">
+🕒 <span id="liveClock">00:00:00</span>
+</div>
+<div class="card" style="padding:10px 15px;min-width:180px;text-align:center">
+⏱️ مدة الوردية: <span id="shiftDuration">0 دقيقة</span>
+</div>
+<button class="btn-danger" onclick="logout()">🚪 تسجيل خروج وإنهاء الوردية</button>
+</div>
+</div>
+</div>
+
+<div id="stats" class="grid"></div>
+
+<div class="tabs" id="tabs"></div>
+
+<div class="glass" id="content"></div>
+
+</div>
+
+<div class="footer">
+© عالم الإلكترونيات | تم تطوير وإنشاء هذا التطبيق بواسطة أبو هاني ☕
+</div>
+
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
 <script>
-// ==================== التهيئة ====================
-const FIREBASE_URL="https://abuhaniapp-default-rtdb.asia-southeast1.firebasedatabase.app/";
-firebase.initializeApp({databaseURL:FIREBASE_URL});
+
+const firebaseConfig={
+databaseURL:"https://abuhaniapp-default-rtdb.asia-southeast1.firebasedatabase.app/"
+};
+
+firebase.initializeApp(firebaseConfig);
+
 const db=firebase.database();
-let currentUser=null,allCategories={},allProducts={},currentCartId=null,invoiceItems=[],activeShiftId=null;
-const ROLE_MAP={owner:{label:'مدير عام',icon:'👑'},barista:{label:'باريستا',icon:'☕'},waiter:{label:'جرسون',icon:'🛒'},accountant:{label:'محاسب',icon:'💰'},manager:{label:'مدير',icon:'🔐'}};
-const ROLE_RATES={barista:5000,waiter:4000,accountant:6000};
-function $(id){return document.getElementById(id)}
-function show(el){if(typeof el==='string')el=$(el);el.classList.remove('hidden')}
-function hide(el){if(typeof el==='string')el=$(el);el.classList.add('hidden')}
-function setHTML(id,html){const el=$(id);if(el)el.innerHTML=html}
-function formatMoney(n){return (n||0).toLocaleString('ar-SY')}
 
-// ==================== تحميل الأجور ====================
-function loadRoleRates(){
-    db.ref('rolePricing').once('value').then(snap=>{
-        if(snap.exists()){ snap.forEach(r=>{ ROLE_RATES[r.key]=r.val().hourlyRate; }); }
-    }).catch(()=>{});
-}
-db.ref('rolePricing').on('value',snap=>{ snap.forEach(r=>{ ROLE_RATES[r.key]=r.val().hourlyRate; }); });
+let currentUser=null;
+let shiftStartTime=null;
+let shiftTimer=null;
 
-// ==================== الإعداد الأولي ====================
-function setupInitialData(){
-    const msg=$('loginMessage');
-    if(!msg) return;
-    msg.className='message message-info';
-    msg.textContent='⏳ جاري التحقق من الإعدادات...';
-    
-    db.ref('managers/6057961002').once('value').then(snap=>{
-        if(!snap.exists()||!snap.val().username){
-            msg.textContent='⚙️ جاري إنشاء حساب المدير العام...';
-            return db.ref('managers/6057961002').set({
-                name:"أبو هاني",phone:"0932293515",role:"owner",username:"admin",password:"admin321"
-            });
-        }
-        return Promise.resolve();
-    }).then(()=>{
-        return db.ref('rolePricing').once('value');
-    }).then(snap2=>{
-        if(!snap2.exists()){
-            return db.ref('rolePricing').set({
-                barista:{hourlyRate:5000},waiter:{hourlyRate:4000},accountant:{hourlyRate:6000}
-            });
-        }
-        return Promise.resolve();
-    }).then(()=>{
-        msg.className='message message-success';
-        msg.textContent='✅ المنصة جاهزة للعمل';
-    }).catch(err=>{
-        msg.className='message message-error';
-        msg.textContent='❌ خطأ: '+err.message;
-    });
+let ROLE_RATES={
+barista:5000,
+waiter:4000,
+accountant:6000
+};
+
+const ROLE_MAP={
+owner:{label:'مدير عام',icon:'👑'},
+barista:{label:'باريستا',icon:'☕'},
+waiter:{label:'جرسون',icon:'🛒'},
+accountant:{label:'محاسب',icon:'💰'}
+};
+
+function $(id){
+return document.getElementById(id);
 }
 
-// ==================== تسجيل الدخول ====================
-function handleLogin(){
-    const u=$('loginUsername').value.trim();
-    const p=$('loginPassword').value.trim();
-    const msg=$('loginMessage');
-    const btn=$('btnLogin');
-    
-    if(!u||!p){
-        msg.className='message message-error';
-        msg.textContent='⚠️ أدخل اسم المستخدم وكلمة المرور';
-        return;
-    }
-    
-    btn.disabled=true;
-    btn.textContent='⏳ جاري الدخول...';
-    msg.className='message message-info';
-    msg.textContent='⏳ جاري التحقق...';
-    
-    let found=false;
-    
-    db.ref('managers').once('value').then(snap=>{
-        snap.forEach(m=>{
-            const d=m.val();
-            if(d.username===u && d.password===p){
-                currentUser={id:m.key,...d,type:'manager',currentRole:'owner'};
-                found=true;
-            }
-        });
-        if(found){
-            showDashboard();
-            return Promise.resolve();
-        }
-        return db.ref('employees').once('value');
-    }).then(snap2=>{
-        if(found) return;
-        if(snap2){
-            snap2.forEach(e=>{
-                const d=e.val();
-                if(d.username===u && d.password===p){
-                    currentUser={id:e.key,...d,type:'employee'};
-                    found=true;
-                }
-            });
-        }
-        if(found){
-            showRoleSelection();
-        } else {
-            msg.className='message message-error';
-            msg.textContent='❌ بيانات الدخول غير صحيحة';
-        }
-    }).catch(err=>{
-        msg.className='message message-error';
-        msg.textContent='❌ خطأ: '+err.message;
-    }).finally(()=>{
-        btn.disabled=false;
-        btn.textContent='🚀 دخول';
-    });
+function initSystem(){
+
+const adminRef=db.ref('managers/6057961002');
+
+adminRef.once('value').then(snapshot=>{
+
+if(!snapshot.exists()){
+
+adminRef.set({
+name:'أبو هاني',
+phone:'0932293515',
+role:'owner',
+username:'admin',
+password:'admin321'
+});
+
 }
 
-function showRoleSelection(){
-    hide('loginUsername');
-    hide('loginPassword');
-    hide('btnLogin');
-    show('loginRole');
-    show('btnConfirmRole');
-    
-    $('loginMessage').className='message message-info';
-    $('loginMessage').textContent='👋 مرحباً '+currentUser.name+'! اختر دورك لهذه الوردية:';
+});
+
+const pricingRef=db.ref('rolePricing');
+
+pricingRef.once('value').then(snapshot=>{
+
+if(!snapshot.exists()){
+
+pricingRef.set({
+barista:{hourlyRate:5000},
+waiter:{hourlyRate:4000},
+accountant:{hourlyRate:6000}
+});
+
+}else{
+
+const data=snapshot.val();
+
+ROLE_RATES={
+barista:data.barista?.hourlyRate||5000,
+waiter:data.waiter?.hourlyRate||4000,
+accountant:data.accountant?.hourlyRate||6000
+};
+
+}
+
+});
+
+}
+
+initSystem();
+
+function login(){
+
+const username=$('username').value.trim();
+const password=$('password').value.trim();
+
+if(!username||!password){
+$('loginMsg').innerText='⚠️ أدخل بيانات الدخول';
+return;
+}
+
+// مدير
+if(username==='admin'&&password==='admin321'){
+
+currentUser={
+name:'أبو هاني',
+role:'owner'
+};
+
+openDashboard();
+return;
+}
+
+// موظفين
+
+db.ref('employees').once('value').then(snapshot=>{
+
+let found=null;
+
+snapshot.forEach(item=>{
+
+const data=item.val();
+
+if(data.username===username&&data.password===password){
+found={id:item.key,...data};
+}
+
+});
+
+if(found){
+
+currentUser=found;
+
+$('roleSelect').classList.remove('hidden');
+$('confirmRoleBtn').classList.remove('hidden');
+
+$('loginMsg').innerText='✅ اختر دورك';
+
+}else{
+$('loginMsg').innerText='❌ بيانات غير صحيحة';
+}
+
+});
+
 }
 
 function confirmRole(){
-    const role=$('loginRole').value;
-    if(!role){ alert('اختر دوراً'); return; }
-    currentUser.currentRole=role;
-    currentUser.hourlyRate=ROLE_RATES[role]||5000;
-    
-    hide('loginScreen');
-    show('dashboardScreen');
-    
-    const ri=ROLE_MAP[role]||ROLE_MAP['waiter'];
-    $('displayName').textContent=ri.icon+' '+currentUser.name;
-    $('displayRole').textContent=ri.label+' | 💰 '+formatMoney(currentUser.hourlyRate)+' ل.س/ساعة';
-    
-    hide('statsContainer');
-    setHTML('tabsContainer','');
-    setHTML('shiftSection','');
-    setHTML('roleRequestSection','');
-    renderEmployeeView();
+
+const role=$('roleSelect').value;
+
+if(!role){
+alert('اختر الدور');
+return;
 }
 
-function showDashboard(){
-    hide('loginScreen');
-    show('dashboardScreen');
-    const ri=ROLE_MAP['owner'];
-    $('displayName').textContent=ri.icon+' '+currentUser.name;
-    $('displayRole').textContent=ri.label;
-    show('statsContainer');
-    renderManagerView();
+currentUser.role=role;
+
+openDashboard();
+
 }
 
-function doLogout(){ location.reload(); }
+function openDashboard(){
 
-// ==================== مدير عام ====================
-function renderManagerView(){
-    updateStats();
-    setHTML('statsContainer',`
-        <div class="stat-card"><div class="num" id="statEmp">0</div><div class="label">👥 موظفين</div></div>
-        <div class="stat-card"><div class="num" id="statSup">0</div><div class="label">🚚 موردين</div></div>
-        <div class="stat-card"><div class="num" id="statCust">0</div><div class="label">👤 عملاء</div></div>
-        <div class="stat-card"><div class="num" id="statProd">0</div><div class="label">📦 منتجات</div></div>`);
-    setHTML('tabsContainer',`
-        <button class="tab-btn active" onclick="switchMgrTab('employees',event)">👥 موظفين</button>
-        <button class="tab-btn" onclick="switchMgrTab('suppliers',event)">🚚 موردين</button>
-        <button class="tab-btn" onclick="switchMgrTab('customers',event)">👤 عملاء</button>
-        <button class="tab-btn" onclick="switchMgrTab('products',event)">📦 منتجات</button>
-        <button class="tab-btn" onclick="switchMgrTab('categories',event)">📂 أقسام</button>
-        <button class="tab-btn" onclick="switchMgrTab('managers',event)">🔐 مدراء</button>
-        <button class="tab-btn" onclick="switchMgrTab('pricing',event)">💵 تسعير الأدوار</button>
-        <button class="tab-btn" onclick="switchMgrTab('requests',event)">📩 طلبات</button>
-        <button class="tab-btn" onclick="switchMgrTab('shifts',event)">📊 ورديات</button>`);
-    switchMgrTab('employees',{target:document.querySelector('.tab-btn')});
+$('loginScreen').classList.add('hidden');
+$('dashboard').classList.remove('hidden');
+
+$('welcomeName').innerText=currentUser.name;
+
+$('welcomeRole').innerText=
+ROLE_MAP[currentUser.role]?.label||'مدير';
+
+startShift();
+startClock();
+
+if(currentUser.role==='owner'){
+renderOwner();
+}else{
+renderEmployee();
 }
 
-function updateStats(){
-    db.ref('employees').once('value',s=>{ const el=$('statEmp'); if(el)el.textContent=s.numChildren(); });
-    db.ref('suppliers').once('value',s=>{ const el=$('statSup'); if(el)el.textContent=s.numChildren(); });
-    db.ref('customers').once('value',s=>{ const el=$('statCust'); if(el)el.textContent=s.numChildren(); });
-    db.ref('products').once('value',s=>{ const el=$('statProd'); if(el)el.textContent=s.numChildren(); });
 }
 
-// ==================== switchMgrTab مع تمرير event ====================
-function switchMgrTab(tab,evt){
-    if(evt&&evt.target){
-        document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-        evt.target.classList.add('active');
-    }
-    setHTML('mainContent','');
-    if(tab==='employees') loadEmployeesTab();
-    else if(tab==='suppliers') loadSuppliersTab();
-    else if(tab==='customers') loadCustomersTab();
-    else if(tab==='products') loadProductsTab();
-    else if(tab==='categories') loadCategoriesTab();
-    else if(tab==='managers') loadManagersTab();
-    else if(tab==='pricing') loadPricingTab();
-    else if(tab==='requests') loadRequestsTab();
-    else if(tab==='shifts') loadShiftsTab();
-}
-
-// === تبويب تسعير الأدوار ===
-function loadPricingTab(){
-    db.ref('rolePricing').once('value',snap=>{
-        const p=snap.exists()?snap.val():{};
-        setHTML('mainContent',`
-            <h3>💵 تسعير الأدوار (أجرة الساعة)</h3>
-            <label>☕ باريستا:</label>
-            <input id="priceBarista" type="number" value="${p.barista?.hourlyRate||5000}">
-            <label>🛒 جرسون:</label>
-            <input id="priceWaiter" type="number" value="${p.waiter?.hourlyRate||4000}">
-            <label>💰 محاسب:</label>
-            <input id="priceAccountant" type="number" value="${p.accountant?.hourlyRate||6000}">
-            <button class="btn-primary" onclick="savePricing()">💾 حفظ التسعير</button>
-            <p style="color:#888;margin-top:10px;font-size:12px;">الأجور ستُستخدم تلقائياً عند بدء الموظف لورديته</p>`);
-    });
-}
-
-function savePricing(){
-    const barista=parseInt($('priceBarista').value)||5000;
-    const waiter=parseInt($('priceWaiter').value)||4000;
-    const accountant=parseInt($('priceAccountant').value)||6000;
-    db.ref('rolePricing').set({
-        barista:{hourlyRate:barista},waiter:{hourlyRate:waiter},accountant:{hourlyRate:accountant}
-    }).then(()=>{
-        alert('✅ تم حفظ التسعير بنجاح');
-        ROLE_RATES.barista=barista; ROLE_RATES.waiter=waiter; ROLE_RATES.accountant=accountant;
-        loadPricingTab();
-    });
-}
-
-// === تبويب الموظفين ===
-function loadEmployeesTab(){
-    setHTML('mainContent',`<h3>➕ إضافة موظف</h3>
-        <input id="empUsername" placeholder="اسم المستخدم"><input id="empPassword" placeholder="كلمة المرور"><input id="empName" placeholder="الاسم الكامل"><input id="empPhone" placeholder="الهاتف">
-        <p style="font-size:12px;color:#888;">⚠️ الموظف سيختار دوره بنفسه عند تسجيل الدخول</p>
-        <button class="btn-primary" onclick="addEmployee()">➕ إضافة موظف</button>
-        <hr><h3>📋 الموظفين</h3><div id="empList"></div>`);
-    loadEmployeesList();
-}
-function addEmployee(){
-    const u=$('empUsername').value.trim(),p=$('empPassword').value.trim(),n=$('empName').value.trim(),ph=$('empPhone').value.trim();
-    if(!u||!p||!n){alert('اسم المستخدم وكلمة المرور والاسم مطلوبة');return;}
-    db.ref('employees').push({username:u,password:p,name:n,phone:ph,status:'active'});
-    alert('✅ تمت الإضافة'); loadEmployeesTab();
-}
-function loadEmployeesList(){
-    db.ref('employees').on('value',s=>{let h='';s.forEach(e=>{const d=e.val();h+=`<div class="list-item"><span>👤 ${d.name} (${d.username}) | 📞 ${d.phone||'-'}</span><div><button class="btn-sm btn-edit" onclick="editEmp('${e.key}')">✏️</button><button class="btn-sm btn-delete" onclick="if(confirm('حذف؟'))db.ref('employees/${e.key}').remove()">🗑️</button></div></div>`;});setHTML('empList',h||'<p style="color:#888;">لا يوجد موظفين</p>';});}
-function editEmp(id){db.ref('employees/'+id).once('value',s=>{if(!s.exists())return;const d=s.val();const u=prompt('اسم المستخدم',d.username);if(u===null)return;const p=prompt('كلمة المرور',d.password);if(p===null)return;const n=prompt('الاسم',d.name);if(n===null)return;const ph=prompt('الهاتف',d.phone||'');db.ref('employees/'+id).update({username:u,password:p,name:n,phone:ph||''});});}
-
-// === باقي التبويبات (نفس الكود السابق مع setHTML الآمن) ===
-function loadSuppliersTab(){setHTML('mainContent',`<h3>➕ إضافة مورد</h3><input id="supName" placeholder="اسم المورد"><input id="supPhone" placeholder="الهاتف"><button class="btn-primary" onclick="addSupplier()">➕ إضافة</button><hr><h3>📋 الموردين</h3><div id="supList"></div>`);db.ref('suppliers').on('value',s=>{let h='';s.forEach(x=>h+=`<div class="list-item"><span>🚚 ${x.val().name}</span><button class="btn-sm btn-delete" onclick="if(confirm('حذف؟'))db.ref('suppliers/${x.key}').remove()">🗑️</button></div>`);setHTML('supList',h||'<p>لا يوجد</p>';});}
-function addSupplier(){const n=$('supName').value.trim();if(!n)return;db.ref('suppliers').push({name:n,phone:$('supPhone').value.trim(),balance:0});$('supName').value='';$('supPhone').value='';}
-function loadCustomersTab(){setHTML('mainContent',`<h3>➕ إضافة عميل</h3><input id="custName" placeholder="اسم العميل"><input id="custPhone" placeholder="الهاتف"><button class="btn-primary" onclick="addCustomer()">➕ إضافة</button><hr><h3>📋 العملاء</h3><div id="custList"></div>`);db.ref('customers').on('value',s=>{let h='';s.forEach(x=>h+=`<div class="list-item"><span>👤 ${x.val().name}</span><button class="btn-sm btn-delete" onclick="if(confirm('حذف؟'))db.ref('customers/${x.key}').remove()">🗑️</button></div>`);setHTML('custList',h||'<p>لا يوجد</p>';});}
-function addCustomer(){const n=$('custName').value.trim();if(!n)return;db.ref('customers').push({name:n,phone:$('custPhone').value.trim(),totalPurchases:0,debt:0});$('custName').value='';$('custPhone').value='';}
-function loadProductsTab(){setHTML('mainContent',`<h3>➕ إضافة منتج</h3><input id="prodName" placeholder="الاسم"><input id="prodPrice" placeholder="السعر"><input id="prodStock" placeholder="المخزون"><select id="prodCat"><option value="">اختر القسم</option></select><button class="btn-primary" onclick="addProduct()">➕ إضافة</button><hr><h3>📋 المنتجات</h3><div id="prodList"></div>`);loadCatSelect();loadProductsList();}
-function loadCatSelect(){db.ref('categories').on('value',s=>{let h='<option value="">اختر القسم</option>';s.forEach(c=>{allCategories[c.key]={id:c.key,...c.val()};h+=`<option value="${c.key}">${c.val().name}</option>`;});const el=$('prodCat');if(el)el.innerHTML=h;});}
-function addProduct(){const n=$('prodName').value.trim(),pr=parseInt($('prodPrice').value),st=parseInt($('prodStock').value),cat=$('prodCat').value;if(!n||!pr||!st||!cat){alert('املأ الحقول');return;}db.ref('products').push({name:n,price:pr,stock:st,categoryId:cat});$('prodName').value='';$('prodPrice').value='';$('prodStock').value='';}
-function loadProductsList(){db.ref('products').on('value',s=>{allProducts={};let h='';s.forEach(p=>{allProducts[p.key]={id:p.key,...p.val()};h+=`<div class="list-item"><span>📦 ${p.val().name} | 💰 ${p.val().price} ل.س</span><button class="btn-sm btn-delete" onclick="if(confirm('حذف؟'))db.ref('products/${p.key}').remove()">🗑️</button></div>`;});setHTML('prodList',h||'<p>لا يوجد</p>';});}
-function loadCategoriesTab(){setHTML('mainContent',`<h3>➕ إضافة قسم</h3><input id="catName" placeholder="اسم القسم"><button class="btn-primary" onclick="addCategory()">➕ إضافة</button><hr><h3>📋 الأقسام</h3><div id="catList"></div>`);db.ref('categories').on('value',s=>{allCategories={};let h='';s.forEach(c=>{allCategories[c.key]={id:c.key,...c.val()};h+=`<div class="list-item"><span>📂 ${c.val().name}</span><button class="btn-sm btn-delete" onclick="if(confirm('حذف؟'))db.ref('categories/${c.key}').remove()">🗑️</button></div>`;});setHTML('catList',h||'<p>لا يوجد</p>';});}
-function addCategory(){const n=$('catName').value.trim();if(!n)return;db.ref('categories').push({name:n});$('catName').value='';}
-function loadManagersTab(){setHTML('mainContent',`<h3>➕ إضافة مدير</h3><input id="mgrUsername" placeholder="اسم المستخدم"><input id="mgrPassword" placeholder="كلمة المرور"><input id="mgrName" placeholder="الاسم"><input id="mgrPhone" placeholder="الهاتف"><button class="btn-primary" onclick="addManager()">➕ إضافة</button><hr><h3>📋 المدراء</h3><div id="mgrList"></div>`);db.ref('managers').on('value',s=>{let h='';s.forEach(m=>{if(m.key==='6057961002')return;h+=`<div class="list-item"><span>🔐 ${m.val().name}</span><button class="btn-sm btn-delete" onclick="if(confirm('حذف؟'))db.ref('managers/${m.key}').remove()">🗑️</button></div>`;});setHTML('mgrList',h||'<p>لا يوجد</p>';});}
-function addManager(){const u=$('mgrUsername').value.trim(),p=$('mgrPassword').value.trim(),n=$('mgrName').value.trim(),ph=$('mgrPhone').value.trim();if(!u||!p||!n)return;db.ref('managers').push({username:u,password:p,name:n,phone:ph,role:'manager'});$('mgrUsername').value='';$('mgrPassword').value='';$('mgrName').value='';$('mgrPhone').value='';}
-function loadRequestsTab(){setHTML('mainContent',`<h3>📩 طلبات تغيير الدور</h3><div id="reqList"></div>`);db.ref('roleRequests').on('value',s=>{let h='';s.forEach(r=>{if(r.val().status==='pending')h+=`<div class="list-item"><span>👤 ${r.val().employeeName} | ${ROLE_MAP[r.val().currentRole]?.label||r.val().currentRole} → ${ROLE_MAP[r.val().requestedRole]?.label||r.val().requestedRole}</span><div><button class="btn-sm btn-success" onclick="approveReq('${r.key}')">✅</button><button class="btn-sm btn-delete" onclick="rejectReq('${r.key}')">❌</button></div></div>`;});setHTML('reqList',h||'<p>لا طلبات</p>';});}
-function approveReq(id){db.ref('roleRequests/'+id).once('value',s=>{if(!s.exists())return;db.ref('roleRequests/'+id).update({status:'approved'});});}
-function rejectReq(id){db.ref('roleRequests/'+id).update({status:'rejected'});}
-function loadShiftsTab(){setHTML('mainContent',`<h3>📊 جميع الورديات</h3><div id="allShifts"></div><hr><h3>💰 إجمالي الأجور المستحقة</h3><div id="totalSalaries" style="font-size:20px;font-weight:bold;color:var(--purple);"></div>`);db.ref('shifts').once('value',s=>{let h='',total=0;s.forEach(sh=>{const d=sh.val();const badge=d.status==='active'?'<span class="shift-badge shift-active">نشطة</span>':'<span class="shift-badge shift-completed">مكتملة</span>';const earn=d.totalEarnings||0;if(d.status==='completed')total+=earn;h+=`<div class="list-item"><span>👤 ${d.employeeName} | ${d.startDate||''} - ${d.endDate||'...'} | ⏱️ ${d.totalHours||0} س | 💰 ${formatMoney(earn)} ل.س</span>${badge}</div>`;});setHTML('allShifts',h||'<p>لا ورديات</p>';$('totalSalaries').textContent=formatMoney(total)+' ل.س';});}
-
-// ==================== واجهة الموظف ====================
-function renderEmployeeView(){
-    const role=currentUser.currentRole;
-    db.ref('shifts').orderByChild('employeeId').equalTo(currentUser.id).limitToLast(1).on('value',snap=>{
-        activeShiftId=null; snap.forEach(s=>{if(s.val().status==='active')activeShiftId=s.key;});
-        let roleHTML='';
-        if(role==='accountant') roleHTML=renderAccountant();
-        else if(role==='barista') roleHTML=renderBarista();
-        else if(role==='waiter') roleHTML=renderWaiter();
-        setHTML('mainContent',roleHTML);
-        let shiftBtn=activeShiftId?`<button class="btn-primary" style="background:var(--red)" onclick="endMyShift()">🚪 إنهاء الوردية</button>`:`<button class="btn-primary" onclick="startMyShift()">▶️ بدء وردية</button>`;
-        setHTML('shiftSection',`<div class="content-card"><h3>⏱️ ورديتي</h3>${shiftBtn}</div>`);
-        setHTML('roleRequestSection',`<div class="content-card"><button class="btn-primary" style="background:var(--orange)" onclick="requestRoleChange()">🔄 طلب تغيير الدور</button></div>`);
-    });
-}
-function startMyShift(){const rate=ROLE_RATES[currentUser.currentRole]||5000;db.ref('shifts').push({employeeId:currentUser.id,employeeName:currentUser.name,role:currentUser.currentRole,start:Date.now(),startDate:new Date().toLocaleString('ar-SY'),status:'active',hourlyRate:rate,totalHours:0,totalEarnings:0});}
-function endMyShift(){if(!activeShiftId)return;if(!confirm('إنهاء الوردية؟'))return;db.ref('shifts/'+activeShiftId).once('value',s=>{if(!s.exists())return;const sh=s.val();const end=Date.now();const hours=((end-sh.start)/3600000).toFixed(2);const earnings=hours*sh.hourlyRate;db.ref('shifts/'+activeShiftId).update({end,endDate:new Date().toLocaleString('ar-SY'),status:'completed',totalHours:parseFloat(hours),totalEarnings:Math.round(earnings)});});}
-function requestRoleChange(){const opts=Object.entries(ROLE_MAP).filter(([k])=>k!==currentUser.currentRole&&['barista','waiter','accountant'].includes(k)).map(([k,v])=>`${k} (${v.label})`).join(', ');const nr=prompt(`دورك الحالي: ${ROLE_MAP[currentUser.currentRole]?.label}\nاختر:\n${opts}\nاكتب بالإنجليزي:`);if(!nr||!['barista','waiter','accountant'].includes(nr)){alert('دور غير صالح');return;}db.ref('roleRequests').push({employeeId:currentUser.id,employeeName:currentUser.name,currentRole:currentUser.currentRole,requestedRole:nr,status:'pending',date:Date.now()});alert('✅ تم إرسال الطلب');}
-
-// === محاسب ===
-function renderAccountant(){setTimeout(()=>accTab('orders'),50);return`<div class="tabs"><button class="tab-btn active" onclick="accTab('orders')">📋 طلبات الجرسونات</button><button class="tab-btn" onclick="accTab('purchases')">📦 فواتير شراء</button></div><div id="accContent"></div>`;}
-function accTab(tab){document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));event.target.classList.add('active');const c=$('accContent');if(tab==='orders'){c.innerHTML=`<h3>📋 طلبات الجرسونات</h3><div id="wOrders"></div>`;loadAccOrders();}else{c.innerHTML=`<h3>📦 فاتورة شراء</h3><select id="supSel"><option value="">اختر المورد</option></select><input id="invItem" placeholder="الصنف"><input id="invQty" placeholder="الكمية"><input id="invPrice" placeholder="سعر الشراء"><button class="btn-primary" style="background:var(--orange)" onclick="addInvItem()">➕ إضافة</button><div id="invItems"></div><button class="btn-primary" style="background:var(--green)" onclick="saveInv()">💾 حفظ</button><hr><h3>📋 فواتير اليوم</h3><div id="invList"></div>`;loadSupForInv();loadInvs();}}
-function loadAccOrders(){db.ref('waiterCarts').on('value',s=>{let h='';s.forEach(cart=>{const c=cart.val();if(c.status==='submitted'&&c.coldItems&&c.coldItems.length>0)h+=`<div class="list-item"><span>🛒 ${c.waiterName} | سلة ${c.cartNumber} | 💰 ${formatMoney(c.coldTotal)} ل.س</span><button class="btn-sm btn-success" onclick="confirmAccPay('${cart.key}')">✅ استلام</button></div>`;});setHTML('wOrders',h||'<p>لا طلبات</p>';});}
-function confirmAccPay(id){if(confirm('تأكيد؟'))db.ref('waiterCarts/'+id).update({status:'paid',accountantId:currentUser.id,paidAt:Date.now()});}
-function loadSupForInv(){db.ref('suppliers').on('value',s=>{let h='<option value="">اختر</option>';s.forEach(x=>h+=`<option value="${x.key}">${x.val().name}</option>`);const el=$('supSel');if(el)el.innerHTML=h;});}
-function addInvItem(){const item=$('invItem').value.trim(),qty=parseInt($('invQty').value),price=parseInt($('invPrice').value);if(!item||!qty||!price)return;invoiceItems.push({item,qty,price,total:qty*price});$('invItem').value='';$('invQty').value='';$('invPrice').value='';setHTML('invItems',invoiceItems.map((i,idx)=>`<div>📦 ${i.item} × ${i.qty} = ${formatMoney(i.total)} ل.س <button class="btn-sm btn-delete" onclick="invoiceItems.splice(${idx},1);this.parentElement.remove()">❌</button></div>`).join(''));}
-function saveInv(){const sup=$('supSel').value;if(!sup||invoiceItems.length===0){alert('اختر مورد وأضف أصناف');return;}const total=invoiceItems.reduce((s,i)=>s+i.total,0);db.ref('purchaseInvoices').push({supplierId:sup,items:[...invoiceItems],total,accountantId:currentUser.id,accountantName:currentUser.name,date:Date.now(),dateStr:new Date().toLocaleString('ar-SY')});invoiceItems=[];setHTML('invItems','');alert('✅ تم الحفظ');accTab('purchases');}
-function loadInvs(){db.ref('purchaseInvoices').on('value',s=>{let h='';s.forEach(inv=>h+=`<div class="list-item"><span>📦 ${inv.val().dateStr} | 💰 ${formatMoney(inv.val().total)} ل.س</span><button class="btn-sm btn-delete" onclick="if(confirm('حذف؟'))db.ref('purchaseInvoices/${inv.key}').remove()">🗑️</button></div>`);setHTML('invList',h||'<p>لا فواتير</p>';});}
-
-// === باريستا ===
-function renderBarista(){setTimeout(()=>loadBaristaOrders(),100);return`<h3>☕ المشروبات الساخنة</h3><div id="hotNew"></div><h4>⏳ جاري التجهيز</h4><div id="hotPrep"></div><h4>✅ جاهزة</h4><div id="hotReady"></div>`;}
-function loadBaristaOrders(){db.ref('waiterCarts').on('value',s=>{let nw='',pr='',rd='';s.forEach(cart=>{const c=cart.val();if(c.hotItems&&c.hotItems.length){const card=`<div class="list-item"><span>🛒 ${c.waiterName} | سلة ${c.cartNumber} | 🔥 ${c.hotItems.map(i=>i.name).join(', ')}</span>${c.hotStatus==='submitted'||!c.hotStatus?`<button class="btn-sm btn-success" onclick="startPrep('${cart.key}')">▶️ بدء</button>`:''}${c.hotStatus==='preparing'?`<button class="btn-sm btn-success" onclick="markReady('${cart.key}')">✅ جاهز</button>`:''}${c.hotStatus==='ready'?'<span class="shift-badge shift-active">✅ جاهز</span>':''}</div>`;if(c.hotStatus==='submitted'||!c.hotStatus)nw+=card;else if(c.hotStatus==='preparing')pr+=card;else if(c.hotStatus==='ready')rd+=card;}});setHTML('hotNew',nw||'<p>لا جديد</p>';setHTML('hotPrep',pr||'<p>-</p>';setHTML('hotReady',rd||'<p>-</p>';});}
-function startPrep(id){db.ref('waiterCarts/'+id).update({hotStatus:'preparing',baristaId:currentUser.id,baristaName:currentUser.name});}
-function markReady(id){db.ref('waiterCarts/'+id).update({hotStatus:'ready'});}
-
-// === جرسون ===
-function renderWaiter(){db.ref('categories').once('value',s=>{allCategories={};s.forEach(c=>allCategories[c.key]={id:c.key,...c.val()};});db.ref('products').once('value',s=>{allProducts={};s.forEach(p=>allProducts[p.key]={id:p.key,...p.val()};});setTimeout(()=>loadMyCarts(),100);return`<div><h3>🛒 سلاتي</h3><div id="myCarts"></div><button class="btn-primary" onclick="newCart()">➕ سلة جديدة</button></div><div id="cartDetail" class="hidden content-card"></div><div id="prodSection" class="hidden content-card"><h3>📂 الأقسام</h3><div id="wCats"></div><div id="wProdsSec" class="hidden"><button class="btn-primary" style="background:var(--orange)" onclick="showWCats()">⬅ رجوع</button><h3>📦 المنتجات</h3><div id="wProds"></div></div></div>`;}
-function newCart(){db.ref('waiterCarts').push({waiterId:currentUser.id,waiterName:currentUser.name,cartNumber:Date.now().toString().slice(-4),items:[],hotItems:[],coldItems:[],hotTotal:0,coldTotal:0,status:'active',createdAt:Date.now()});}
-function loadMyCarts(){db.ref('waiterCarts').orderByChild('waiterId').equalTo(currentUser.id).on('value',s=>{let h='';s.forEach(cart=>{const c=cart.val();if(c.status!=='paid'&&c.status!=='cancelled')h+=`<div class="list-item"><span>🛒 سلة #${c.cartNumber} | 🔥${c.hotItems?.length||0} 🧊${c.coldItems?.length||0} | 💰 ${formatMoney((c.hotTotal||0)+(c.coldTotal||0))} ل.س</span><div><button class="btn-sm btn-edit" onclick="openCart('${cart.key}')">📂 فتح</button><button class="btn-sm btn-delete" onclick="if(confirm('حذف؟'))db.ref('waiterCarts/${cart.key}').update({status:'cancelled'})">🗑️</button></div></div>`;});setHTML('myCarts',h||'<p>لا سلات نشطة</p>';});}
-function openCart(id){currentCartId=id;show('cartDetail');show('prodSection');db.ref('waiterCarts/'+id).once('value',s=>{const c=s.val();setHTML('cartDetail',`<h3>🛒 سلة #${c.cartNumber}</h3><p>🔥 <b>مشروبات ساخنة:</b> ${c.hotItems?.map(i=>`${i.name}×${i.qty}`).join(', ')||'لا يوجد'} | 💰 ${formatMoney(c.hotTotal)} ل.س ${c.hotStatus==='ready'?'<span class="shift-badge shift-active">✅ جاهز</span>':c.hotStatus==='preparing'?'<span class="shift-badge shift-active">⏳ جاري التجهيز</span>':`<button class="btn-sm btn-warning" onclick="sendHot('${id}')">☕ أرسل للباريستا</button>`}</p><p>🧊 <b>باقي المنتجات:</b> ${c.coldItems?.map(i=>`${i.name}×${i.qty}`).join(', ')||'لا يوجد'} | 💰 ${formatMoney(c.coldTotal)} ل.س ${c.coldStatus==='submitted'?'<span class="shift-badge shift-active">📤 مرسل للمحاسب</span>':`<button class="btn-sm btn-success" onclick="sendCold('${id}')">💵 أرسل للمحاسب</button>`}</p>`;});showWCats();}
-function showWCats(){hide('wProdsSec');show('wCats');let h='';Object.values(allCategories).forEach(c=>h+=`<div class="list-item" onclick="showWProds('${c.id}','${c.name}')" style="cursor:pointer;">📁 ${c.name} ➤</div>`);setHTML('wCats',h);}
-function showWProds(catId,catName){hide('wCats');show('wProdsSec');const prods=Object.values(allProducts).filter(p=>String(p.categoryId)===String(catId));let h='';prods.forEach(p=>h+=`<div class="list-item"><span>${p.name} | 💰 ${p.price} ل.س | 📦 ${p.stock}</span><button class="btn-sm btn-success" onclick="addToCart('${p.id}','${p.name}',${p.price},'${p.categoryId}')">➕</button></div>`);setHTML('wProds',h||'<p>لا منتجات</p>');}
-function addToCart(pid,name,price,catId){if(!currentCartId)return;db.ref('waiterCarts/'+currentCartId).once('value',s=>{const c=s.val();const items=c.items||[];const ex=items.find(i=>i.id===pid);if(ex){ex.qty++;ex.total=ex.qty*price;}else{items.push({id:pid,name,price,qty:1,total:price});}const hot=items.filter(i=>allProducts[i.id]?.categoryId==='cat1');const cold=items.filter(i=>allProducts[i.id]?.categoryId!=='cat1');db.ref('waiterCarts/'+currentCartId).update({items,hotItems:hot,coldItems:cold,hotTotal:hot.reduce((s,i)=>s+i.total,0),coldTotal:cold.reduce((s,i)=>s+i.total,0)});openCart(currentCartId);});}
-function sendHot(id){if(confirm('إرسال للباريستا؟'))db.ref('waiterCarts/'+id).update({hotStatus:'submitted'});}
-function sendCold(id){if(confirm('إرسال للمحاسب؟'))db.ref('waiterCarts/'+id).update({coldStatus:'submitted',status:'submitted'});}
-
-// ==================== بدء التشغيل (تم استدعاء الدالة) ====================
-window.onload=function(){
-    setupInitialData();
-    loadRoleRates();
+function logout(){
+if(currentUser && currentUser.role!=='owner'){
+const endTime=Date.now();
+const hours=((endTime-shiftStartTime)/1000/60/60).toFixed(2);
+const salary=Math.round(hours*(ROLE_RATES[currentUser.role]||0));
+const shiftData={
+employee:currentUser.name,
+role:currentUser.role,
+start:shiftStartTime,
+end:endTime,
+hours:hours,
+salary:salary
 };
+
+db.ref('shifts').push(shiftData).then(()=>{
+alert(`✅ انتهت الوردية
+⏱️ عدد الساعات: ${hours}
+💰 الأجر: ${salary} ل.س`);
+location.reload();
+});
+}else{
+location.reload();
+}
+}
+
+function startClock(){
+function updateClock(){
+const now=new Date();
+$('liveClock').innerText=now.toLocaleTimeString('ar-EG');
+}
+updateClock();
+setInterval(updateClock,1000);
+}
+
+function startShift(){
+shiftStartTime=Date.now();
+if(shiftTimer) clearInterval(shiftTimer);
+shiftTimer=setInterval(()=>{
+const diff=Date.now()-shiftStartTime;
+const mins=Math.floor(diff/1000/60);
+const hrs=Math.floor(mins/60);
+$('shiftDuration').innerText=`${hrs} ساعة و ${mins%60} دقيقة`;
+},1000);
+}
+
+function renderOwner(){
+
+loadStats();
+
+$('tabs').innerHTML=`
+<button class="tab active-tab" onclick="employeesTab()">👥 الموظفين</button>
+<button class="tab" onclick="productsTab()">📦 المنتجات</button>
+<button class="tab" onclick="categoriesTab()">📂 الأقسام</button>
+<button class="tab" onclick="suppliersTab()">🚚 الموردين</button>
+<button class="tab" onclick="ordersTab()">🧾 الطلبات</button>
+<button class="tab" onclick="pricingTab()">💰 الأجور</button>
+`;
+
+employeesTab();
+
+}
+
+function renderEmployee(){
+
+$('stats').innerHTML='';
+$('tabs').innerHTML='';
+
+if(currentUser.role==='barista'){
+baristaTab();
+}
+
+if(currentUser.role==='waiter'){
+waiterTab();
+}
+
+if(currentUser.role==='accountant'){
+accountantTab();
+}
+
+}
+
+function loadStats(){
+
+Promise.all([
+db.ref('employees').once('value'),
+db.ref('products').once('value'),
+db.ref('orders').once('value'),
+db.ref('suppliers').once('value')
+]).then(res=>{
+
+$('stats').innerHTML=`
+<div class="card"><h2>${res[0].numChildren()}</h2><p>👥 موظفين</p></div>
+<div class="card"><h2>${res[1].numChildren()}</h2><p>📦 منتجات</p></div>
+<div class="card"><h2>${res[2].numChildren()}</h2><p>🧾 طلبات</p></div>
+<div class="card"><h2>${res[3].numChildren()}</h2><p>🚚 موردين</p></div>
+`;
+
+});
+
+}
+
+function employeesTab(){
+
+$('content').innerHTML=`
+<h2>👥 الموظفين</h2>
+
+<input id="empName" placeholder="اسم الموظف">
+<input id="empUser" placeholder="اسم المستخدم">
+<input id="empPass" placeholder="كلمة المرور">
+<input id="empPhone" placeholder="الهاتف">
+
+<button class="btn-primary" onclick="addEmployee()">➕ إضافة موظف</button>
+
+<hr style="margin:20px 0">
+
+<div id="employeesList"></div>
+`;
+
+loadEmployees();
+
+}
+
+function addEmployee(){
+
+const data={
+name:$('empName').value,
+username:$('empUser').value,
+password:$('empPass').value,
+phone:$('empPhone').value
+};
+
+if(!data.name||!data.username||!data.password){
+alert('املأ الحقول');
+return;
+}
+
+
+db.ref('employees').push(data).then(()=>{
+alert('✅ تمت الإضافة');
+employeesTab();
+});
+
+}
+
+function loadEmployees(){
+
+const list=$('employeesList');
+
+
+db.ref('employees').on('value',snapshot=>{
+
+let html='';
+
+snapshot.forEach(item=>{
+
+const data=item.val();
+
+html+=`
+<div class="item">
+<div>
+<b>${data.name}</b><br>
+${data.username}
+</div>
+<button class="btn-danger" onclick="deleteEmployee('${item.key}')">🗑️ حذف</button>
+</div>
+`;
+
+});
+
+list.innerHTML=html||'<p>لا يوجد موظفين</p>';
+
+});
+
+}
+
+function deleteEmployee(id){
+
+if(confirm('حذف الموظف؟')){
+db.ref('employees/'+id).remove();
+}
+
+}
+
+function productsTab(){
+
+$('content').innerHTML=`
+<h2>📦 المنتجات</h2>
+
+<input id="prodName" placeholder="اسم المنتج">
+<input id="prodPrice" type="number" placeholder="السعر">
+
+<button class="btn-primary" onclick="addProduct()">➕ إضافة منتج</button>
+
+<hr style="margin:20px 0">
+
+<div id="productsList"></div>
+`;
+
+loadProducts();
+
+}
+
+function addProduct(){
+
+const name=$('prodName').value;
+const price=$('prodPrice').value;
+
+if(!name||!price){
+alert('أدخل البيانات');
+return;
+}
+
+
+db.ref('products').push({
+name,
+price,
+createdAt:Date.now()
+});
+
+$('prodName').value='';
+$('prodPrice').value='';
+
+}
+
+function loadProducts(){
+
+const list=$('productsList');
+
+
+db.ref('products').on('value',snapshot=>{
+
+let html='';
+
+snapshot.forEach(item=>{
+
+const data=item.val();
+
+html+=`
+<div class="item">
+<div>
+<b>${data.name}</b><br>
+💰 ${data.price} ل.س
+</div>
+<button class="btn-danger" onclick="deleteProduct('${item.key}')">🗑️ حذف</button>
+</div>
+`;
+
+});
+
+list.innerHTML=html||'<p>لا يوجد منتجات</p>';
+
+});
+
+}
+
+function deleteProduct(id){
+
+if(confirm('حذف المنتج؟')){
+db.ref('products/'+id).remove();
+}
+
+}
+
+function pricingTab(){
+$('content').innerHTML=`
+<h2>💰 تسعير الأدوار</h2>
+<label>☕ أجر الباريستا / ساعة</label>
+<input type="number" id="baristaRate" value="${ROLE_RATES.barista}">
+<label>🛒 أجر الجرسون / ساعة</label>
+<input type="number" id="waiterRate" value="${ROLE_RATES.waiter}">
+<label>💰 أجر المحاسب / ساعة</label>
+<input type="number" id="accountantRate" value="${ROLE_RATES.accountant}">
+<button class="btn-success" onclick="saveRolePricing()">💾 حفظ التسعير</button>
+`;
+}
+
+function saveRolePricing(){
+ROLE_RATES={
+barista:parseInt($('baristaRate').value)||5000,
+waiter:parseInt($('waiterRate').value)||4000,
+accountant:parseInt($('accountantRate').value)||6000
+};
+
+db.ref('rolePricing').set({
+barista:{hourlyRate:ROLE_RATES.barista},
+waiter:{hourlyRate:ROLE_RATES.waiter},
+accountant:{hourlyRate:ROLE_RATES.accountant}
+}).then(()=>{
+alert('✅ تم حفظ أجور الأدوار');
+});
+}
+
+function categoriesTab(){
+
+$('content').innerHTML=`
+<h2>📂 الأقسام</h2>
+
+<input id="catName" placeholder="اسم القسم">
+
+<button class="btn-primary" onclick="addCategory()">➕ إضافة قسم</button>
+
+<hr style="margin:20px 0">
+
+<div id="catList"></div>
+`;
+
+loadCategories();
+
+}
+
+function addCategory(){
+
+const name=$('catName').value;
+
+if(!name)return;
+
+
+db.ref('categories').push({name});
+
+$('catName').value='';
+
+}
+
+function loadCategories(){
+
+
+db.ref('categories').on('value',snapshot=>{
+
+let html='';
+
+snapshot.forEach(item=>{
+
+html+=`
+<div class="item">
+<div>${item.val().name}</div>
+<button class="btn-danger" onclick="deleteCategory('${item.key}')">🗑️</button>
+</div>
+`;
+
+});
+
+$('catList').innerHTML=html||'<p>لا يوجد أقسام</p>';
+
+});
+
+}
+
+function deleteCategory(id){
+
+if(confirm('حذف القسم؟')){
+db.ref('categories/'+id).remove();
+}
+
+}
+
+function suppliersTab(){
+
+$('content').innerHTML=`
+<h2>🚚 الموردين</h2>
+
+<input id="supName" placeholder="اسم المورد">
+<input id="supPhone" placeholder="الهاتف">
+
+<button class="btn-primary" onclick="addSupplier()">➕ إضافة</button>
+
+<hr style="margin:20px 0">
+
+<div id="suppliersList"></div>
+`;
+
+loadSuppliers();
+
+}
+
+function addSupplier(){
+
+const name=$('supName').value;
+const phone=$('supPhone').value;
+
+if(!name)return;
+
+
+db.ref('suppliers').push({
+name,
+phone
+});
+
+$('supName').value='';
+$('supPhone').value='';
+
+}
+
+function loadSuppliers(){
+
+
+db.ref('suppliers').on('value',snapshot=>{
+
+let html='';
+
+snapshot.forEach(item=>{
+
+const data=item.val();
+
+html+=`
+<div class="item">
+<div>
+<b>${data.name}</b><br>
+📞 ${data.phone||'-'}
+</div>
+<button class="btn-danger" onclick="deleteSupplier('${item.key}')">🗑️</button>
+</div>
+`;
+
+});
+
+$('suppliersList').innerHTML=html||'<p>لا يوجد موردين</p>';
+
+});
+
+}
+
+function deleteSupplier(id){
+
+if(confirm('حذف المورد؟')){
+db.ref('suppliers/'+id).remove();
+}
+
+}
+
+function ordersTab(){
+
+$('content').innerHTML=`
+<h2>🧾 الطلبات</h2>
+<div id="ordersList"></div>
+`;
+
+
+db.ref('orders').on('value',snapshot=>{
+
+let html='';
+
+snapshot.forEach(item=>{
+
+const data=item.val();
+
+html+=`
+<div class="item">
+<div>
+<b>${data.customerName||'زبون'}</b><br>
+الحالة: ${data.status||'new'}
+</div>
+</div>
+`;
+
+});
+
+$('ordersList').innerHTML=html||'<p>لا يوجد طلبات</p>';
+
+});
+
+}
+
+function baristaTab(){
+
+$('content').innerHTML=`
+<h2>☕ شاشة الباريستا</h2>
+<p>طلبات المشروبات الساخنة ستظهر هنا</p>
+`;
+
+}
+
+function waiterTab(){
+
+$('content').innerHTML=`
+<h2>🛒 شاشة الجرسون</h2>
+<p>إدارة السلات والطلبات</p>
+`;
+
+}
+
+function accountantTab(){
+
+$('content').innerHTML=`
+<h2>💰 شاشة المحاسب</h2>
+<p>الفواتير والدفعات</p>
+`;
+
+}
+
 </script>
+
 </body>
 </html>

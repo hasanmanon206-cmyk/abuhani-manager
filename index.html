@@ -2,268 +2,203 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام إدارة البلة الذكي - أبو هاني</title>
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>لوحة التحكم - أبو هاني</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-database-compat.js"></script>
-
     <style>
-        /* 1. المحرك البصري: قوس قزح الزجاجي */
-        :root {
-            --glass: rgba(255, 255, 255, 0.88);
-            --accent: #6c5ce7;
-            --rainbow: linear-gradient(135deg, #ff9a9e, #fad0c4, #a18cd1, #fbc2eb, #8fd3f4);
-        }
-
-        body {
-            margin: 0; font-family: 'Segoe UI', Tahoma;
-            background: var(--rainbow); background-size: 400% 400%;
-            animation: rainbowBG 15s ease infinite;
-            height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden;
-        }
-
-        @keyframes rainbowBG { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-
-        .main-app {
-            background: var(--glass); backdrop-filter: blur(20px);
-            border-radius: 30px; width: 95%; max-width: 500px; height: 95vh;
-            display: flex; flex-direction: column; padding: 20px; box-sizing: border-box;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.4);
-            position: relative;
-        }
-
-        /* 2. الهيدر وساعة الدوام */
-        .app-header { text-align: center; margin-bottom: 15px; }
-        .work-clock {
-            background: #2d3436; color: #fdcb6e; padding: 12px; border-radius: 15px;
-            font-family: monospace; font-size: 1.8rem; border: 2px solid #fdcb6e;
-            box-shadow: inset 0 0 10px rgba(253,203,110,0.2); margin: 10px 0;
-        }
-
-        /* 3. البطاقات المربعة (المعدلة حسب صورتك 102107) */
-        .stats-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px;
-        }
-        .stat-card {
-            aspect-ratio: 1/1; border-radius: 20px; color: white;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            font-weight: bold; cursor: pointer; transition: 0.3s;
-            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
-        }
-        .stat-card i { font-size: 2.2rem; margin-bottom: 8px; }
-        .stat-card span { font-size: 1.5rem; }
-        .stat-card:active { transform: scale(0.95); }
-
-        .c-emp { background: linear-gradient(45deg, #ff4757, #ff6b81); }
-        .c-sup { background: linear-gradient(45deg, #ffa502, #ff7f50); }
-        .c-cus { background: linear-gradient(45deg, #2ed573, #7bed9f); }
-        .c-prd { background: linear-gradient(45deg, #1e90ff, #70a1ff); }
-
-        /* 4. شريط التبويبات المتطور */
-        .tabs-nav {
-            display: flex; overflow-x: auto; gap: 8px; padding-bottom: 10px;
-            scrollbar-width: none; border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
-        .tabs-nav::-webkit-scrollbar { display: none; }
-        .tab-item {
-            padding: 8px 18px; background: rgba(0,0,0,0.05); border-radius: 20px;
-            white-space: nowrap; cursor: pointer; font-size: 0.9rem; font-weight: bold;
-        }
-        .tab-item.active { background: var(--accent); color: white; }
-
-        /* 5. منطقة المحتوى */
-        .content-area { flex-grow: 1; overflow-y: auto; padding-top: 10px; }
-        .data-item {
-            background: white; padding: 15px; border-radius: 15px; margin-bottom: 10px;
-            display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02); animation: fadeIn 0.4s;
-        }
-        @keyframes fadeIn { from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)} }
-
-        /* 6. زر الإضافة العائم */
-        .fab {
-            position: absolute; bottom: 25px; left: 25px; width: 60px; height: 60px;
-            background: var(--accent); color: white; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem; box-shadow: 0 10px 20px rgba(108,92,231,0.3);
-            cursor: pointer; z-index: 100;
-        }
-
-        /* 7. شاشة الدخول */
-        #login-page {
-            position: absolute; inset: 0; background: var(--rainbow);
-            z-index: 1000; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; padding: 40px;
-        }
-        .login-card {
-            background: white; padding: 30px; border-radius: 25px; width: 100%;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1); text-align: center;
-        }
-        input {
-            width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px;
-            border: 1px solid #eee; background: #f9f9f9; box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
+        body { background: #0a0a1a; color: white; padding: 20px; }
+        .dashboard-container { max-width: 1200px; margin: auto; }
+        .header { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 20px; padding: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .role-badge { background: #f39c12; padding: 5px 15px; border-radius: 30px; font-size: 0.9rem; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab-btn { background: #2c2c3a; border: none; padding: 10px 20px; border-radius: 30px; color: white; cursor: pointer; }
+        .tab-btn.active { background: #e67e22; }
+        .panel { display: none; background: rgba(255,255,255,0.05); border-radius: 24px; padding: 20px; }
+        .panel.active-panel { display: block; }
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; margin-top: 15px; }
+        .product-card { background: #1e1e2e; border-radius: 16px; padding: 12px; text-align: center; }
+        .order-card { background: #1a1a2a; border-radius: 16px; padding: 15px; margin-bottom: 15px; border-right: 5px solid #f39c12; }
+        button, .btn-small { background: #27ae60; border: none; padding: 8px 16px; border-radius: 30px; color: white; cursor: pointer; margin-top: 8px; }
+        .btn-danger { background: #c0392b; }
+        .btn-warning { background: #f39c12; }
+        input, select { width: 100%; padding: 10px; margin: 8px 0; border-radius: 12px; border: none; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; }
     </style>
 </head>
 <body>
-
-<div id="login-page">
-    <div class="login-card">
-        <i class="fas fa-shield-alt fa-3x" style="color:var(--accent)"></i>
-        <h2>إدارة البلة</h2>
-        <div id="db-check" style="font-size:0.8rem; margin-bottom:10px; color:red;">جاري فحص الاتصال...</div>
-        <input type="text" id="user" placeholder="اسم المستخدم">
-        <input type="password" id="pass" placeholder="كلمة المرور">
-        <button onclick="auth()" style="width:100%; padding:15px; border-radius:12px; border:none; background:var(--accent); color:white; font-weight:bold; cursor:pointer;">دخول آمن</button>
-    </div>
-</div>
-
-<div class="main-app" id="app" style="display:none;">
-    <div class="app-header">
-        <div class="work-clock" id="clock">00:00:00</div>
+<div class="dashboard-container">
+    <div class="header">
+        <div><i class="fas fa-chalkboard-user"></i> <strong>نظام أبو هاني الإداري</strong></div>
+        <div class="role-badge" id="roleBadge">مدير</div>
+        <button id="logoutBtn" class="btn-small btn-danger" style="background:#555"><i class="fas fa-sign-out-alt"></i> خروج</button>
     </div>
 
-    <div class="stats-grid">
-        <div class="stat-card c-emp" onclick="setTab('employees')"><i class="fas fa-id-badge"></i><span id="n-emp">0</span>موظفين</div>
-        <div class="stat-card c-sup" onclick="setTab('suppliers')"><i class="fas fa-truck-loading"></i><span id="n-sup">0</span>موردين</div>
-        <div class="stat-card c-cus" onclick="setTab('customers')"><i class="fas fa-user-friends"></i><span id="n-cus">0</span>عملاء</div>
-        <div class="stat-card c-prd" onclick="setTab('products')"><i class="fas fa-box"></i><span id="n-prd">0</span>منتجات</div>
-    </div>
+    <div class="tabs" id="tabsContainer"></div>
 
-    <div class="tabs-nav">
-        <div class="tab-item active" onclick="setTab('employees', this)">الموظفين</div>
-        <div class="tab-item" onclick="setTab('suppliers', this)">الموردين</div>
-        <div class="tab-item" onclick="setTab('customers', this)">العملاء</div>
-        <div class="tab-item" onclick="setTab('products', this)">المنتجات</div>
-        <div class="tab-item" onclick="setTab('categories', this)">الأقسام</div>
-        <div class="tab-item" onclick="setTab('orders', this)">الطلبات</div>
-        <div class="tab-item" onclick="setTab('shifts', this)">الورديات</div>
-        <div class="tab-item" onclick="setTab('managers', this)">المدراء</div>
-    </div>
-
-    <div class="content-area" id="list-container">
+    <!-- لوحة المدير -->
+    <div id="managerPanel" class="panel">
+        <h3><i class="fas fa-crown"></i> إدارة المنتجات</h3>
+        <div class="flex-between" style="gap:10px; flex-wrap:wrap">
+            <input type="text" id="prodName" placeholder="اسم المنتج" style="flex:2">
+            <input type="number" id="prodPrice" placeholder="السعر" style="flex:1">
+            <button id="addProductBtn"><i class="fas fa-plus"></i> إضافة</button>
         </div>
+        <div id="productsList" class="products-grid">جاري التحميل...</div>
+        <hr style="margin: 20px 0">
+        <h3><i class="fas fa-qrcode"></i> تحديث باركود شام كاش</h3>
+        <input type="text" id="barcodeUrl" placeholder="رابط صورة الباركود الجديد">
+        <button id="updateBarcodeBtn">تحديث باركود الدفع</button>
+    </div>
 
-    <div class="fab" onclick="showAddForm()"><i class="fas fa-plus"></i></div>
+    <!-- لوحة المحاسب -->
+    <div id="accountantPanel" class="panel">
+        <h3><i class="fas fa-chart-line"></i> التقارير المالية والطلبات</h3>
+        <div id="financeStats" class="product-card" style="text-align:center; margin-bottom:20px;">جاري حساب الإجمالي...</div>
+        <div id="allOrdersList"></div>
+    </div>
+
+    <!-- لوحة الباريستا -->
+    <div id="baristaPanel" class="panel">
+        <h3><i class="fas fa-mug-hot"></i> طلبات جاهزة للتحضير</h3>
+        <div id="baristaOrders"></div>
+    </div>
 </div>
 
-<script>
-    // 1. التكوين
-    const firebaseConfig = { databaseURL: "https://abuhaniapp-default-rtdb.asia-southeast1.firebasedatabase.app/" };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    // 2. فحص الاتصال
-    db.ref(".info/connected").on("value", s => {
-        const check = document.getElementById('db-check');
-        if(s.val()) { check.innerText = "● متصل بالقاعدة"; check.style.color = "green"; }
-        else { check.innerText = "○ لا يوجد اتصال"; check.style.color = "red"; }
+<script type="module">
+    // استيراد Firebase (يفترض وجود firebase-config.js)
+    import { db } from './firebase-config.js';
+    import { ref, onValue, push, set, update, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    
+    // محاكاة تسجيل الدخول (سؤال: من أنت؟)
+    let currentRole = localStorage.getItem('userRole') || 'manager'; // تجريبياً: مدير
+    document.getElementById('roleBadge').innerText = currentRole === 'manager' ? 'مدير' : (currentRole === 'accountant' ? 'محاسب' : 'باريستا');
+    
+    // إظهار التبويبات حسب الدور
+    const tabsContainer = document.getElementById('tabsContainer');
+    const panels = {
+        manager: document.getElementById('managerPanel'),
+        accountant: document.getElementById('accountantPanel'),
+        barista: document.getElementById('baristaPanel')
+    };
+    
+    if(currentRole === 'manager') {
+        tabsContainer.innerHTML = `<button class="tab-btn active" data-panel="manager">📦 المنتجات</button><button class="tab-btn" data-panel="accountant">💰 المالية</button><button class="tab-btn" data-panel="barista">☕ الطلبات</button>`;
+        showPanel('manager');
+    } else if(currentRole === 'accountant') {
+        tabsContainer.innerHTML = `<button class="tab-btn active" data-panel="accountant">📊 المالية والتقارير</button>`;
+        showPanel('accountant');
+    } else if(currentRole === 'barista') {
+        tabsContainer.innerHTML = `<button class="tab-btn active" data-panel="barista">🍽️ طلبات التحضير</button>`;
+        showPanel('barista');
+    }
+    
+    function showPanel(panelName) {
+        Object.keys(panels).forEach(p => panels[p].classList.remove('active-panel'));
+        panels[panelName].classList.add('active-panel');
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        if(document.querySelector(`.tab-btn[data-panel="${panelName}"]`))
+            document.querySelector(`.tab-btn[data-panel="${panelName}"]`).classList.add('active');
+    }
+    
+    document.getElementById('tabsContainer').addEventListener('click', (e) => {
+        if(e.target.classList.contains('tab-btn')) {
+            const panel = e.target.dataset.panel;
+            if(panel && panels[panel]) showPanel(panel);
+        }
     });
-
-    // 3. ساعة الدوام
-    setInterval(() => {
-        document.getElementById('clock').innerText = new Date().toLocaleTimeString('ar-SY');
-    }, 1000);
-
-    // 4. نظام الدخول
-    function auth() {
-        const u = document.getElementById('user').value;
-        const p = document.getElementById('pass').value;
-        if(u === "admin" && p === "admin123") {
-            document.getElementById('login-page').style.display = 'none';
-            document.getElementById('app').style.display = 'flex';
-            syncStats();
-            setTab('employees');
-        } else {
-            Swal.fire('خطأ!', 'بيانات الدخول غير صحيحة يا أبا هاني', 'error');
-        }
-    }
-
-    // 5. مزامنة العدادات
-    function syncStats() {
-        const nodes = ['employees', 'suppliers', 'customers', 'products'];
-        nodes.forEach(node => {
-            db.ref(node).on('value', s => {
-                document.getElementById('n-' + node.substring(0,3)).innerText = s.numChildren();
-            });
-        });
-    }
-
-    // 6. إدارة التبويبات وعرض البيانات
-    let activeTab = 'employees';
-    function setTab(tab, el) {
-        activeTab = tab;
-        if(el) {
-            document.querySelectorAll('.tab-item').forEach(i => i.classList.remove('active'));
-            el.classList.add('active');
-        }
-        
-        const container = document.getElementById('list-container');
-        container.innerHTML = '<p style="text-align:center">جاري التحميل...</p>';
-
-        db.ref(tab).on('value', snap => {
-            container.innerHTML = "";
-            if(!snap.exists()) { container.innerHTML = "<p style='text-align:center'>لا توجد بيانات في " + tab + "</p>"; return; }
-            
-            snap.forEach(child => {
-                const data = child.val();
-                const div = document.createElement('div');
-                div.className = 'data-item';
-                div.innerHTML = `
-                    <div>
-                        <strong>${data.name || data.username || 'بدون اسم'}</strong><br>
-                        <small style="color:gray">${data.role || data.phone || data.price || ''}</small>
+    
+    // ========== 1. وظائف المدير ==========
+    if(currentRole === 'manager') {
+        const productsRef = ref(db, 'products');
+        onValue(productsRef, (snap) => {
+            if(snap.exists()) {
+                const products = Object.entries(snap.val()).map(([id,val])=>`
+                    <div class="product-card">
+                        <i class="fas fa-cup"></i>
+                        <div><strong>${val.name}</strong></div>
+                        <div>${val.price} ل.س</div>
+                        <button class="delProductBtn" data-id="${id}">🗑️ حذف</button>
                     </div>
-                    <button onclick="deleteItem('${tab}', '${child.key}')" style="border:none; background:none; color:#ff4757"><i class="fas fa-trash"></i></button>
-                `;
-                container.appendChild(div);
-            });
+                `).join('');
+                document.getElementById('productsList').innerHTML = products;
+                document.querySelectorAll('.delProductBtn').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        await set(ref(db, `products/${btn.dataset.id}`), null);
+                        Swal.fire('تم الحذف','','info');
+                    });
+                });
+            } else { document.getElementById('productsList').innerHTML = '<p>لا توجد منتجات</p>'; }
+        });
+        
+        document.getElementById('addProductBtn').addEventListener('click', async () => {
+            const name = document.getElementById('prodName').value;
+            const price = parseInt(document.getElementById('prodPrice').value);
+            if(!name || !price) return Swal.fire('املأ البيانات','','error');
+            await push(ref(db,'products'), { name, price });
+            Swal.fire('تمت الإضافة','','success');
+        });
+        
+        document.getElementById('updateBarcodeBtn').addEventListener('click', async () => {
+            const url = document.getElementById('barcodeUrl').value;
+            if(!url) return;
+            await update(ref(db,'settings'), { paymentBarcode: url });
+            Swal.fire('تم','تم تحديث باركود الدفع','success');
         });
     }
-
-    // 7. إضافة وحذف البيانات (الذكاء الوظيفي)
-    async function showAddForm() {
-        const { value: formValues } = await Swal.fire({
-            title: 'إضافة جديد إلى ' + activeTab,
-            html:
-                '<input id="swal-input1" class="swal2-input" placeholder="الاسم / العنوان">' +
-                '<input id="swal-input2" class="swal2-input" placeholder="التفاصيل / الهاتف">',
-            focusConfirm: false,
-            preConfirm: () => {
-                return [
-                    document.getElementById('swal-input1').value,
-                    document.getElementById('swal-input2').value
-                ]
+    
+    // ========== 2. وظائف المحاسب ==========
+    if(currentRole === 'accountant') {
+        const ordersRef = ref(db, 'orders');
+        onValue(ordersRef, (snap) => {
+            if(snap.exists()) {
+                const orders = Object.entries(snap.val()).map(([id,val])=>`
+                    <div class="order-card">
+                        <div><strong>رقم الطلب:</strong> ${id.slice(-6)}</div>
+                        <div><strong>المصدر:</strong> ${val.source || 'غير محدد'}</div>
+                        <div><strong>الإجمالي:</strong> ${val.total} ل.س</div>
+                        <div><strong>الحالة:</strong> ${val.status}</div>
+                        <div><strong>طريقة الدفع:</strong> ${val.paymentMethod}</div>
+                        <hr>
+                    </div>
+                `).join('');
+                document.getElementById('allOrdersList').innerHTML = orders;
+                let totalSales = Object.values(snap.val()).reduce((a,o)=>a+o.total,0);
+                document.getElementById('financeStats').innerHTML = `<h2>إجمالي المبيعات: ${totalSales} ل.س</h2>`;
+            } else {
+                document.getElementById('allOrdersList').innerHTML = '<p>لا توجد طلبات</p>';
             }
         });
-
-        if (formValues && formValues[0]) {
-            db.ref(activeTab).push({
-                name: formValues[0],
-                phone: formValues[1],
-                timestamp: Date.now()
-            });
-            Swal.fire('تم!', 'تمت الإضافة بنجاح', 'success');
-        }
     }
-
-    function deleteItem(path, key) {
-        Swal.fire({
-            title: 'هل أنت متأكد؟',
-            text: "لا يمكنك التراجع عن الحذف!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            confirmButtonText: 'نعم، احذف'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                db.ref(path).child(key).remove();
+    
+    // ========== 3. وظائف الباريستا ==========
+    if(currentRole === 'barista') {
+        onValue(ref(db,'orders'), (snap) => {
+            if(snap.exists()) {
+                let orders = Object.entries(snap.val()).map(([id,val])=> ({id, ...val})).filter(o => o.status !== 'delivered' && o.status !== 'ready');
+                if(!orders.length) { document.getElementById('baristaOrders').innerHTML = '<p class="order-card">كل الطلبات جاهزة 👍</p>'; return; }
+                document.getElementById('baristaOrders').innerHTML = orders.map(order => `
+                    <div class="order-card" data-id="${order.id}">
+                        <div class="badge">${order.source === 'online' ? '🛒 أونلاين' : order.source === 'in_store' ? '🏪 داخل المحل' : '🚗 درايف ثرو'}</div>
+                        <div><strong>المنتجات:</strong> ${order.items.map(i=>`${i.name} x${i.qty}`).join(' - ')}</div>
+                        <div><strong>ملاحظة:</strong> ${order.note || 'لا يوجد'}</div>
+                        <button class="markReadyBtn" data-id="${order.id}">✅ أصبح جاهزاً</button>
+                    </div>
+                `).join('');
+                document.querySelectorAll('.markReadyBtn').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        await update(ref(db, `orders/${btn.dataset.id}`), { status: 'ready' });
+                        Swal.fire('تم','تم تحضير الطلب','success');
+                    });
+                });
             }
-        })
+        });
     }
+    
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        localStorage.removeItem('userRole');
+        window.location.reload();
+    });
 </script>
 </body>
 </html>

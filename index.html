@@ -130,6 +130,7 @@
         <input type="password" id="password" placeholder="كلمة المرور">
         <button class="btn-login" onclick="handleLogin()">دخول</button>
         <p id="loginError" style="color:#ff4757;margin-top:10px;"></p>
+        <p id="initMessage" style="color:#1a73e8;margin-top:15px;"></p>
     </div>
 
     <!-- واجهة Dashboard -->
@@ -163,6 +164,35 @@
     let allCats={},allProds={};
     let currentCartId=null, invoiceItems=[];
     let activeShiftId=null;
+
+    // ==================== الإعداد الأولي التلقائي ====================
+    function setupInitialData() {
+        const msgEl = document.getElementById('initMessage');
+        msgEl.textContent = '⏳ جاري التحقق من الإعدادات...';
+        
+        db.ref('managers/6057961002').once('value').then(snapshot => {
+            const data = snapshot.val();
+            // إذا لم تكن بيانات المدير موجودة أو تنقصها حقول الدخول، نقوم بإنشائها
+            if (!data || !data.username || !data.password) {
+                msgEl.textContent = '⚙️ الإعدادات غير مكتملة. جاري إنشاء بيانات المدير...';
+                db.ref('managers/6057961002').set({
+                    name: "أبو هاني",
+                    phone: "0932293515",
+                    role: "owner",
+                    username: "admin",
+                    password: "admin123"
+                }).then(() => {
+                    msgEl.textContent = '✅ تم تجهيز المنصة بنجاح. يمكنك الدخول الآن.';
+                }).catch(error => {
+                    msgEl.textContent = '❌ فشل في الإعداد: ' + error.message;
+                });
+            } else {
+                msgEl.textContent = '✅ المنصة جاهزة للدخول.';
+            }
+        }).catch(error => {
+            msgEl.textContent = '❌ خطأ في الاتصال: ' + error.message;
+        });
+    }
 
     // ==================== تسجيل الدخول ====================
     function handleLogin(){
@@ -656,6 +686,11 @@
     function addToCart(pid,name,price,catId){if(!currentCartId)return;db.ref('waiterCarts/'+currentCartId).once('value',s=>{const c=s.val();const items=c.items||[];const ex=items.find(i=>i.id===pid);ex?ex.qty++:items.push({id:pid,name,price,qty:1,total:price});if(ex)ex.total=ex.qty*price;const hot=items.filter(i=>allProds[i.id]?.categoryId==='cat1');const cold=items.filter(i=>allProds[i.id]?.categoryId!=='cat1');db.ref('waiterCarts/'+currentCartId).update({items,hotItems:hot,coldItems:cold,hotTotal:hot.reduce((s,i)=>s+i.total,0),coldTotal:cold.reduce((s,i)=>s+i.total,0)});openCart(currentCartId);});}
     function sendHot(id){if(confirm('إرسال؟'))db.ref('waiterCarts/'+id).update({hotStatus:'submitted'});}
     function sendCold(id){if(confirm('إرسال؟'))db.ref('waiterCarts/'+id).update({coldStatus:'submitted',status:'submitted'});}
+
+    // استدعاء الإعداد الأولي عند تحميل الصفحة
+    window.onload = function() {
+        setupInitialData();
+    };
 </script>
 </body>
 </html>

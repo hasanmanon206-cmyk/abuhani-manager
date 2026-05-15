@@ -6,57 +6,47 @@
 
 <title>إدارة البلة | أبو هاني</title>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
 <style>
-
-:root{
---bg1:#00c6ff;
---bg2:#0072ff;
---bg3:#7f5af0;
---glass:rgba(255,255,255,0.15);
---glass2:rgba(255,255,255,0.10);
---white:#fff;
---shadow:0 8px 25px rgba(0,0,0,.15);
---radius:24px;
-}
 
 *{
 margin:0;
 padding:0;
 box-sizing:border-box;
-font-family:"Segoe UI",sans-serif;
--webkit-tap-highlight-color:transparent;
+font-family:'Segoe UI',Tahoma;
 }
 
 body{
-background:linear-gradient(135deg,var(--bg1),var(--bg2),var(--bg3));
-background-size:400% 400%;
-animation:bgMove 12s ease infinite;
+background:
+linear-gradient(
+135deg,
+#0048ff,
+#008cff,
+#00d4ff
+);
 min-height:100vh;
-color:#fff;
-padding-bottom:100px;
-}
-
-@keyframes bgMove{
-0%{background-position:0% 50%}
-50%{background-position:100% 50%}
-100%{background-position:0% 50%}
-}
-
-.hidden{
-display:none!important;
+overflow-x:hidden;
+color:white;
 }
 
 .topbar{
-padding:18px;
+height:80px;
+background:rgba(255,255,255,0.15);
+backdrop-filter:blur(10px);
 display:flex;
 align-items:center;
 justify-content:space-between;
+padding:0 15px;
+position:sticky;
+top:0;
+z-index:999;
+box-shadow:0 4px 20px rgba(0,0,0,0.2);
 }
 
-.topbar h1{
-font-size:34px;
+.top-title{
+font-size:30px;
 font-weight:bold;
 }
 
@@ -64,170 +54,19 @@ font-weight:bold;
 width:65px;
 height:65px;
 border-radius:50%;
-border:none;
-font-size:30px;
-color:white;
-background:linear-gradient(135deg,#ff00cc,#3333ff);
-box-shadow:var(--shadow);
-}
-
-.glass{
-background:var(--glass);
-backdrop-filter:blur(14px);
-border:1px solid rgba(255,255,255,.15);
-border-radius:30px;
-box-shadow:var(--shadow);
-}
-
-.user-box{
-margin:0 15px 20px;
-padding:18px;
+background:
+linear-gradient(
+135deg,
+#ff00ff,
+#7a00ff
+);
 display:flex;
-justify-content:space-between;
 align-items:center;
-}
-
-.user-info h2{
-font-size:22px;
-margin-bottom:5px;
-}
-
-.live-clock{
-font-size:15px;
-opacity:.9;
-}
-
-.logout-btn{
-background:#ff4757;
-border:none;
-padding:12px 18px;
-border-radius:16px;
-color:white;
-font-weight:bold;
-}
-
-.grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:15px;
-padding:0 15px;
-margin-bottom:25px;
-}
-
-.card-btn{
-background:white;
-color:#222;
-padding:22px 10px;
-border-radius:24px;
-text-align:center;
-font-size:20px;
-font-weight:bold;
-border:none;
-box-shadow:0 6px 15px rgba(0,0,0,.15);
-}
-
-.card-btn i{
-display:block;
-font-size:28px;
-margin-bottom:10px;
-}
-
-.section{
-margin:15px;
-padding:20px;
-}
-
-.section-title{
-font-size:32px;
-margin-bottom:20px;
-font-weight:bold;
-}
-
-.orders-container{
-display:flex;
-flex-direction:column;
-gap:14px;
-}
-
-.order-card{
-background:rgba(255,255,255,.12);
-padding:18px;
-border-radius:22px;
-border:1px solid rgba(255,255,255,.15);
-}
-
-.order-top{
-display:flex;
-justify-content:space-between;
-margin-bottom:12px;
-}
-
-.customer-name{
-font-size:22px;
-font-weight:bold;
-}
-
-.status{
-padding:6px 14px;
-border-radius:30px;
-font-size:14px;
-font-weight:bold;
-}
-
-.status-new{
-background:#ff9800;
-}
-
-.status-processing{
-background:#2196f3;
-}
-
-.status-completed{
-background:#4caf50;
-}
-
-.order-products{
-margin-top:10px;
-line-height:2;
-font-size:16px;
-}
-
-.order-total{
-margin-top:10px;
-font-size:20px;
-font-weight:bold;
-color:#ffe082;
-}
-
-.order-actions{
-display:flex;
-gap:10px;
-margin-top:15px;
-}
-
-.action-btn{
-flex:1;
-padding:12px;
-border:none;
-border-radius:14px;
-font-weight:bold;
-color:white;
-}
-
-.accept{
-background:#2ecc71;
-}
-
-.prepare{
-background:#3498db;
-}
-
-.finish{
-background:#9b59b6;
-}
-
-.reject{
-background:#e74c3c;
+justify-content:center;
+font-size:35px;
+cursor:pointer;
+box-shadow:0 4px 20px rgba(0,0,0,0.3);
+z-index:10000;
 }
 
 .side-menu{
@@ -236,117 +75,211 @@ top:0;
 right:-320px;
 width:300px;
 height:100%;
-background:#ffffff;
-color:#222;
-z-index:9999;
-transition:.3s;
+background:white;
+color:black;
+z-index:99999;
+transition:0.3s;
 padding:20px;
-overflow:auto;
+overflow-y:auto;
 }
 
-.side-menu.active{
-right:0;
-}
-
-.side-menu h3{
+.side-menu h2{
 margin-bottom:20px;
-font-size:25px;
+font-size:40px;
 }
 
-.side-menu button{
-width:100%;
-padding:16px;
-margin-bottom:12px;
-border:none;
-border-radius:16px;
-font-size:18px;
+.menu-item{
+background:#ececf1;
+padding:20px;
+margin-bottom:15px;
+border-radius:20px;
+font-size:24px;
 font-weight:bold;
-background:#f1f3f6;
-}
-
-.overlay{
-position:fixed;
-inset:0;
-background:rgba(0,0,0,.4);
-display:none;
-z-index:999;
-}
-
-.overlay.active{
-display:block;
-}
-
-.footer{
+cursor:pointer;
 text-align:center;
-padding:25px 15px;
-font-size:18px;
-opacity:.95;
-line-height:1.8;
+transition:0.2s;
 }
 
-.login-screen{
+.menu-item:active{
+transform:scale(0.97);
+}
+
+.logout-btn{
+background:#ff3d57;
+color:white;
+}
+
+.content{
+padding:15px;
+}
+
+.user-card{
+background:rgba(255,255,255,0.15);
+backdrop-filter:blur(10px);
+padding:25px;
+border-radius:35px;
+margin-bottom:20px;
+box-shadow:0 5px 20px rgba(0,0,0,0.2);
+}
+
+.user-name{
+font-size:55px;
+font-weight:bold;
+margin-bottom:10px;
+}
+
+.clock{
+font-size:30px;
+opacity:0.9;
+}
+
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:15px;
+}
+
+.card-btn{
+background:#f2f2f2;
+color:#222;
+border-radius:30px;
+padding:35px 15px;
+font-size:28px;
+font-weight:bold;
+text-align:center;
+cursor:pointer;
+box-shadow:0 5px 15px rgba(0,0,0,0.2);
+transition:0.2s;
+}
+
+.card-btn:active{
+transform:scale(0.96);
+}
+
+.section{
+display:none;
+margin-top:25px;
+}
+
+.section-title{
+font-size:45px;
+margin-bottom:20px;
+font-weight:bold;
+}
+
+.order-card{
+background:rgba(255,255,255,0.15);
+padding:20px;
+border-radius:25px;
+margin-bottom:15px;
+backdrop-filter:blur(10px);
+}
+
+.order-card h3{
+font-size:30px;
+margin-bottom:10px;
+}
+
+.order-card p{
+font-size:22px;
+margin-bottom:8px;
+}
+
+.btn{
+border:none;
+padding:14px 18px;
+border-radius:15px;
+font-size:20px;
+font-weight:bold;
+cursor:pointer;
+margin:5px;
+}
+
+.accept-btn{
+background:#00c853;
+color:white;
+}
+
+.reject-btn{
+background:#ff1744;
+color:white;
+}
+
+.prepare-btn{
+background:#ff9800;
+color:white;
+}
+
+.done-btn{
+background:#2979ff;
+color:white;
+}
+
+.login-page{
 padding:20px;
 display:flex;
-align-items:center;
+flex-direction:column;
 justify-content:center;
-min-height:100vh;
+align-items:center;
+height:100vh;
 }
 
 .login-box{
-width:100%;
-max-width:420px;
+background:rgba(255,255,255,0.15);
+backdrop-filter:blur(10px);
 padding:30px;
-text-align:center;
+width:100%;
+max-width:450px;
+border-radius:35px;
 }
 
 .login-box h1{
+text-align:center;
 margin-bottom:25px;
 font-size:40px;
 }
 
-.login-box input{
+.input{
 width:100%;
 padding:18px;
 margin-bottom:15px;
 border:none;
-border-radius:18px;
-font-size:18px;
-outline:none;
+border-radius:15px;
+font-size:22px;
 }
 
 .login-btn{
 width:100%;
 padding:18px;
 border:none;
-border-radius:18px;
-font-size:20px;
+border-radius:15px;
+font-size:25px;
 font-weight:bold;
-background:linear-gradient(135deg,#00dbde,#fc00ff);
+background:#00c853;
 color:white;
+cursor:pointer;
 }
 
-.remember{
-display:flex;
-align-items:center;
-gap:10px;
-margin-bottom:20px;
-font-size:16px;
-}
-
-.empty{
+.notification{
+position:fixed;
+bottom:20px;
+left:20px;
+right:20px;
+background:#00c853;
+padding:18px;
+border-radius:20px;
+font-size:22px;
+display:none;
+z-index:999999;
 text-align:center;
-padding:30px;
-font-size:18px;
-opacity:.9;
 }
 
-.badge{
-background:red;
-color:white;
-padding:3px 9px;
-border-radius:50px;
-font-size:12px;
-margin-right:5px;
+.footer{
+margin-top:40px;
+padding:20px;
+text-align:center;
+font-size:22px;
+opacity:0.9;
 }
 
 </style>
@@ -354,192 +287,398 @@ margin-right:5px;
 
 <body>
 
-<!-- شاشة تسجيل الدخول -->
+<!-- LOGIN -->
 
-<div id="loginScreen" class="login-screen">
+<div id="loginPage" class="login-page">
 
-<div class="login-box glass">
+<div class="login-box">
 
 <h1>☕ إدارة البلة</h1>
 
-<input type="text" id="username" placeholder="اسم المستخدم">
+<input
+id="loginUser"
+class="input"
+placeholder="اسم المستخدم">
 
-<input type="password" id="password" placeholder="كلمة المرور">
+<input
+id="loginPass"
+type="password"
+class="input"
+placeholder="كلمة المرور">
 
-<div class="remember">
-<input type="checkbox" id="rememberMe">
-<label for="rememberMe">تذكر الجلسة</label>
-</div>
+<button
+class="login-btn"
+onclick="login()">
 
-<button class="login-btn" onclick="login()">
 🚀 دخول
+
 </button>
 
 </div>
 
 </div>
 
-<!-- التطبيق -->
+<!-- DASHBOARD -->
 
-<div id="app" class="hidden">
+<div id="dashboardPage" style="display:none;">
 
 <div class="topbar">
 
-<h1>إدارة البلة</h1>
+<div class="top-title">
+إدارة البلة | أبو هاني
+</div>
 
-<button class="menu-btn" onclick="toggleMenu()">
+<div class="menu-btn" onclick="toggleMenu()">
 ☰
-</button>
+</div>
 
 </div>
 
-<div class="user-box glass">
+<!-- SIDE MENU -->
 
-<div class="user-info">
+<div class="side-menu" id="sideMenu">
 
-<h2 id="welcomeName">أهلاً</h2>
+<h2>📋 القائمة</h2>
 
-<div class="live-clock" id="clock">
+<div class="menu-item" onclick="openSection('employeesSection')">
+👥 الموظفين
+</div>
+
+<div class="menu-item" onclick="openSection('productsSection')">
+📦 المنتجات
+</div>
+
+<div class="menu-item" onclick="openSection('suppliersSection')">
+🚚 الموردين
+</div>
+
+<div class="menu-item" onclick="openSection('departmentsSection')">
+📂 الأقسام
+</div>
+
+<div class="menu-item" onclick="openSection('rolesSection')">
+💰 الأدوار والأجور
+</div>
+
+<div class="menu-item" onclick="openSection('ordersSection')">
+🧾 الطلبات
+</div>
+
+<div class="menu-item" onclick="openSection('customersSection')">
+👤 العملاء
+</div>
+
+<div class="menu-item" onclick="openSection('reportsSection')">
+📊 التقارير
+</div>
+
+<div class="menu-item" onclick="openSection('settingsSection')">
+⚙️ الإعدادات
+</div>
+
+<div class="menu-item logout-btn" onclick="logout()">
+🚪 تسجيل خروج
+</div>
+
+</div>
+
+<!-- CONTENT -->
+
+<div class="content">
+
+<div class="user-card">
+
+<div class="user-name" id="userName">
+👋
+</div>
+
+<div class="clock" id="liveClock">
 00:00
 </div>
 
 </div>
 
-<button class="logout-btn" onclick="logout()">
-🚪 خروج
-</button>
-
-</div>
-
 <div class="grid">
 
-<button class="card-btn">
-👥
-الموظفين
-</button>
+<div class="card-btn" onclick="openSection('productsSection')">
+📦 المنتجات
+</div>
 
-<button class="card-btn">
-📦
-المنتجات
-</button>
+<div class="card-btn" onclick="openSection('employeesSection')">
+👥 الموظفين
+</div>
 
-<button class="card-btn">
-🚚
-الموردين
-</button>
+<div class="card-btn" onclick="openSection('departmentsSection')">
+📂 الأقسام
+</div>
 
-<button class="card-btn">
-📂
-الأقسام
-</button>
+<div class="card-btn" onclick="openSection('suppliersSection')">
+🚚 الموردين
+</div>
 
-<button class="card-btn">
-💰
-الأدوار والأجور
-</button>
+<div class="card-btn" onclick="openSection('ordersSection')">
+🧾 الطلبات
+</div>
 
-<button class="card-btn">
-🧾
-الفواتير
-</button>
+<div class="card-btn" onclick="openSection('rolesSection')">
+💰 الأدوار والأجور
+</div>
 
-<button class="card-btn">
-👤
-العملاء
-</button>
+<div class="card-btn" onclick="openSection('reportsSection')">
+📊 التقارير
+</div>
 
-<button class="card-btn">
-⏱️
-الورديات
-</button>
-
-<button class="card-btn">
-⚙️
-الإعدادات
-</button>
-
-<button class="card-btn">
-📊
-التقارير
-</button>
+<div class="card-btn" onclick="openSection('settingsSection')">
+⚙️ الإعدادات
+</div>
 
 </div>
 
-<div class="section glass">
+<!-- ORDERS -->
+
+<div id="ordersSection" class="section">
 
 <div class="section-title">
 🧾 الطلبات
-<span class="badge" id="ordersCount">0</span>
 </div>
 
-<div id="ordersContainer" class="orders-container">
+<div id="ordersContainer"></div>
 
-<div class="empty">
-لا توجد طلبات حالياً
+</div>
+
+<!-- PRODUCTS -->
+
+<div id="productsSection" class="section">
+
+<div class="section-title">
+📦 المنتجات
+</div>
+
+<div id="productsContainer"></div>
+
+</div>
+
+<!-- EMPLOYEES -->
+
+<div id="employeesSection" class="section">
+
+<div class="section-title">
+👥 الموظفين
+</div>
+
+<div id="employeesContainer"></div>
+
+</div>
+
+<!-- REPORTS -->
+
+<div id="reportsSection" class="section">
+
+<div class="section-title">
+📊 التقارير
+</div>
+
+<div class="order-card">
+التقارير اليومية ستظهر هنا
 </div>
 
 </div>
+
+<!-- SETTINGS -->
+
+<div id="settingsSection" class="section">
+
+<div class="section-title">
+⚙️ الإعدادات
+</div>
+
+<div class="order-card">
+إعدادات النظام
+</div>
+
+</div>
+
+<!-- ROLES -->
+
+<div id="rolesSection" class="section">
+
+<div class="section-title">
+💰 الأدوار والأجور
+</div>
+
+<div id="rolesContainer"></div>
+
+</div>
+
+<!-- CUSTOMERS -->
+
+<div id="customersSection" class="section">
+
+<div class="section-title">
+👤 العملاء
+</div>
+
+<div id="customersContainer"></div>
+
+</div>
+
+<!-- SUPPLIERS -->
+
+<div id="suppliersSection" class="section">
+
+<div class="section-title">
+🚚 الموردين
+</div>
+
+<div id="suppliersContainer"></div>
+
+</div>
+
+<!-- DEPARTMENTS -->
+
+<div id="departmentsSection" class="section">
+
+<div class="section-title">
+📂 الأقسام
+</div>
+
+<div id="departmentsContainer"></div>
 
 </div>
 
 <div class="footer">
-© عالم الإلكترونيات | تم تطوير وإنشاء هذا التطبيق بواسطة أبو هاني ☕
+© تم تطوير وإنشاء هذا التطبيق بواسطة أبو هاني ☕
 </div>
 
 </div>
 
-<!-- القائمة -->
-
-<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
-
-<div class="side-menu" id="sideMenu">
-
-<h3>📋 القائمة</h3>
-
-<button>👥 الموظفين</button>
-<button>📦 المنتجات</button>
-<button>🚚 الموردين</button>
-<button>📂 الأقسام</button>
-<button>💰 الأدوار والأجور</button>
-<button>🧾 الفواتير</button>
-<button>📊 التقارير</button>
-<button>⚙️ الإعدادات</button>
-
-<button onclick="logout()" style="background:#ff4757;color:white;">
-🚪 تسجيل خروج
-</button>
-
 </div>
 
-<!-- Firebase -->
-
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+<div class="notification" id="notifyBox"></div>
 
 <script>
 
 const firebaseConfig = {
-databaseURL:"https://abuhaniapp-default-rtdb.asia-southeast1.firebasedatabase.app/"
+databaseURL:
+"https://abuhaniapp-default-rtdb.asia-southeast1.firebasedatabase.app/"
 };
 
 firebase.initializeApp(firebaseConfig);
 
 const db = firebase.database();
 
-function $(id){
-return document.getElementById(id);
+let currentUser = {};
+
+
+
+// ================= LOGIN =================
+
+function login(){
+
+const u =
+document.getElementById("loginUser").value.trim();
+
+const p =
+document.getElementById("loginPass").value.trim();
+
+if(u===""||p===""){
+alert("أدخل البيانات");
+return;
 }
 
-let currentUser = null;
+db.ref("employees").once("value",snap=>{
 
-function toggleMenu(){
+let found=false;
 
-$('sideMenu').classList.toggle('active');
+snap.forEach(emp=>{
 
-$('overlay').classList.toggle('active');
+const e=emp.val();
+
+if(
+e.username===u &&
+e.password===p
+){
+
+found=true;
+
+currentUser={
+id:emp.key,
+name:e.name,
+role:e.role
+};
+
+localStorage.setItem(
+"abuhani_session",
+JSON.stringify(currentUser)
+);
+
+showDashboard();
 
 }
+
+});
+
+if(!found){
+alert("بيانات غير صحيحة");
+}
+
+});
+
+}
+
+
+
+// ================= AUTO LOGIN =================
+
+function autoLogin(){
+
+const s =
+localStorage.getItem("abuhani_session");
+
+if(s){
+
+currentUser = JSON.parse(s);
+
+showDashboard();
+
+}
+
+}
+
+
+
+// ================= SHOW DASHBOARD =================
+
+function showDashboard(){
+
+document.getElementById("loginPage").style.display="none";
+
+document.getElementById("dashboardPage").style.display="block";
+
+document.getElementById("userName").innerHTML=
+"👋 "+currentUser.name;
+
+loadOrders();
+
+loadProducts();
+
+loadEmployees();
+
+loadCustomers();
+
+loadSuppliers();
+
+loadDepartments();
+
+loadRoles();
+
+startClock();
+
+}
+
+
+
+// ================= CLOCK =================
 
 function startClock(){
 
@@ -547,353 +686,134 @@ setInterval(()=>{
 
 const now = new Date();
 
-$('clock').innerText =
-now.toLocaleTimeString('ar-SY');
+document.getElementById("liveClock").innerHTML =
+now.toLocaleTimeString("ar-SA");
 
 },1000);
 
 }
 
-function saveSession(user){
 
-localStorage.setItem(
-"abuhani_session",
-JSON.stringify(user)
-);
 
-}
+// ================= MENU =================
 
-function loadSession(){
+function toggleMenu(){
 
-const session =
-localStorage.getItem("abuhani_session");
+const menu =
+document.getElementById("sideMenu");
 
-if(session){
+if(menu.style.right==="0px"){
 
-currentUser = JSON.parse(session);
+menu.style.right="-320px";
 
-showApp();
+}else{
+
+menu.style.right="0px";
 
 }
 
 }
 
-function clearSession(){
 
-localStorage.removeItem("abuhani_session");
 
-}
+// ================= OPEN SECTION =================
 
-function login(){
+function openSection(id){
 
-const username =
-$('username').value.trim();
-
-const password =
-$('password').value.trim();
-
-if(!username || !password){
-
-alert("أدخل البيانات");
-
-return;
-
-}
-
-db.ref("managers").once("value")
-
-.then(snapshot=>{
-
-let found = false;
-
-snapshot.forEach(item=>{
-
-const data = item.val();
-
-if(
-data.username === username &&
-data.password === password
-){
-
-found = true;
-
-currentUser = {
-id:item.key,
-...data
-};
-
-if($('rememberMe').checked){
-
-saveSession(currentUser);
-
-}
-
-showApp();
-
-}
-
+document.querySelectorAll(".section")
+.forEach(s=>{
+s.style.display="none";
 });
 
-if(!found){
+document.getElementById(id)
+.style.display="block";
 
-db.ref("employees").once("value")
-
-.then(snap=>{
-
-let empFound = false;
-
-snap.forEach(emp=>{
-
-const d = emp.val();
-
-if(
-d.username === username &&
-d.password === password
-){
-
-empFound = true;
-
-currentUser = {
-id:emp.key,
-...d
-};
-
-if($('rememberMe').checked){
-
-saveSession(currentUser);
+document.getElementById("sideMenu")
+.style.right="-320px";
 
 }
 
-startShift();
 
-showApp();
 
-}
-
-});
-
-if(!empFound){
-
-alert("بيانات الدخول غير صحيحة");
-
-}
-
-});
-
-}
-
-});
-
-}
-
-function showApp(){
-
-$('loginScreen').classList.add('hidden');
-
-$('app').classList.remove('hidden');
-
-$('welcomeName').innerText =
-`👋 ${currentUser.name}`;
-
-startClock();
-
-listenOrders();
-
-}
+// ================= LOGOUT =================
 
 function logout(){
 
-if(currentUser){
-
-endShift();
-}
-
-clearSession();
+localStorage.removeItem("abuhani_session");
 
 location.reload();
 
 }
 
-function startShift(){
 
-const startTime = Date.now();
 
-const shift = {
+// ================= NOTIFY =================
 
-employeeId:currentUser.id,
-employeeName:currentUser.name,
-role:currentUser.role || "موظف",
-hourlyRate:currentUser.hourlyRate || 0,
-startTime:startTime,
-status:"active"
+function notify(msg){
 
-};
+const n =
+document.getElementById("notifyBox");
 
-db.ref("activeShifts/"+currentUser.id)
-.set(shift);
+n.innerHTML=msg;
 
-}
+n.style.display="block";
 
-function endShift(){
-
-db.ref("activeShifts/"+currentUser.id)
-.once("value")
-.then(snapshot=>{
-
-if(snapshot.exists()){
-
-const shift = snapshot.val();
-
-const endTime = Date.now();
-
-const hours =
-(endTime - shift.startTime)
-/
-1000
-/
-60
-/
-60;
-
-const salary =
-Math.round(hours * shift.hourlyRate);
-
-const completedShift = {
-
-...shift,
-endTime:endTime,
-workedHours:hours.toFixed(2),
-salary:salary,
-status:"completed"
-
-};
-
-db.ref("completedShifts")
-.push(completedShift);
-
-db.ref("activeShifts/"+currentUser.id)
-.remove();
+setTimeout(()=>{
+n.style.display="none";
+},3000);
 
 }
 
-});
 
-}
 
-function listenOrders(){
+// ================= LOAD ORDERS =================
 
-db.ref("orders")
-.on("value",snapshot=>{
+function loadOrders(){
 
-let html = "";
+db.ref("orders").on("value",snap=>{
 
-let count = 0;
+let html="";
 
-if(snapshot.exists()){
+snap.forEach(orderSnap=>{
 
-const orders = [];
-
-snapshot.forEach(item=>{
-
-orders.unshift({
-id:item.key,
-...item.val()
-});
-
-});
-
-count = orders.length;
-
-orders.forEach(order=>{
-
-let productsHTML = "";
-
-if(order.items){
-
-order.items.forEach(p=>{
-
-productsHTML += `
-<div>
-• ${p.name}
-× ${p.qty}
-= ${(p.total || 0).toLocaleString()} ل.س
-</div>
-`;
-
-});
-
-}
-
-let statusClass = "status-new";
-
-if(order.status === "processing"){
-
-statusClass = "status-processing";
-
-}
-
-if(order.status === "completed"){
-
-statusClass = "status-completed";
-
-}
+const order = orderSnap.val();
 
 html += `
 
 <div class="order-card">
 
-<div class="order-top">
+<h3>
+🧾 ${order.customer?.name || "زبون"}
+</h3>
 
-<div>
-
-<div class="customer-name">
-${order.customer?.name || "زبون"}
-</div>
-
-<div>
+<p>
 📞 ${order.customer?.phone || "-"}
-</div>
+</p>
 
-</div>
+<p>
+💰 ${order.total || 0} ل.س
+</p>
 
-<div class="status ${statusClass}">
+<p>
+📌 الحالة:
 ${order.status || "new"}
-</div>
+</p>
 
-</div>
+<button
+class="btn accept-btn"
+onclick="acceptOrder('${order.orderId}')">
 
-<div class="order-products">
-${productsHTML}
-</div>
-
-<div class="order-total">
-💰 الإجمالي:
-${(order.total || 0).toLocaleString()}
-ل.س
-</div>
-
-<div style="margin-top:10px;">
-🕒 ${order.date || ""}
-</div>
-
-<div class="order-actions">
-
-<button class="action-btn accept"
-onclick="changeOrderStatus('${order.id}','accepted')">
 ✅ قبول
+
 </button>
 
-<button class="action-btn prepare"
-onclick="changeOrderStatus('${order.id}','processing')">
-👨‍🍳 تحضير
-</button>
+<button
+class="btn reject-btn"
+onclick="rejectOrder('${order.orderId}')">
 
-<button class="action-btn finish"
-onclick="changeOrderStatus('${order.id}','completed')">
-📦 إنهاء
-</button>
+❌ رفض
 
-</div>
+</button>
 
 </div>
 
@@ -901,34 +821,388 @@ onclick="changeOrderStatus('${order.id}','completed')">
 
 });
 
-}else{
-
-html = `
-<div class="empty">
-لا توجد طلبات حالياً
-</div>
-`;
-
-}
-
-$('ordersContainer').innerHTML = html;
-
-$('ordersCount').innerText = count;
+document.getElementById("ordersContainer")
+.innerHTML = html;
 
 });
 
 }
 
-function changeOrderStatus(orderId,status){
+
+
+// ================= ACCEPT ORDER =================
+
+function acceptOrder(orderId){
+
+db.ref("orders/"+orderId)
+.once("value",snap=>{
+
+const order = snap.val();
+
+if(!order){
+notify("الطلب غير موجود");
+return;
+}
+
+let hot=false;
+
+if(order.items){
+
+order.items.forEach(item=>{
+
+if(item.type==="hot"){
+hot=true;
+}
+
+});
+
+}
 
 db.ref("orders/"+orderId)
 .update({
-status:status
+
+status:
+hot ?
+"waiting_barista" :
+"completed",
+
+acceptedBy:
+currentUser.name,
+
+acceptedAt:
+Date.now()
+
+});
+
+if(hot){
+
+db.ref("baristaQueue/"+orderId)
+.set({
+
+...order,
+
+status:"waiting_barista",
+
+cashier:
+currentUser.name
+
 });
 
 }
 
-loadSession();
+db.ref(
+"cashierBalance/"+currentUser.id
+).transaction(v=>{
+
+return (v||0)+Number(order.total||0);
+
+});
+
+notify("✅ تم قبول الطلب");
+
+});
+
+}
+
+
+
+// ================= REJECT ORDER =================
+
+function rejectOrder(orderId){
+
+db.ref("orders/"+orderId)
+.update({
+
+status:"rejected",
+
+rejectedBy:
+currentUser.name,
+
+rejectedAt:
+Date.now()
+
+});
+
+notify("❌ تم رفض الطلب");
+
+}
+
+
+
+// ================= PRODUCTS =================
+
+function loadProducts(){
+
+db.ref("products")
+.on("value",snap=>{
+
+let html="";
+
+snap.forEach(p=>{
+
+const product = p.val();
+
+html += `
+
+<div class="order-card">
+
+<h3>
+${product.name || "-"}
+</h3>
+
+<p>
+💰 ${product.price || 0} ل.س
+</p>
+
+<p>
+📦 المخزون:
+${product.stock || 0}
+</p>
+
+</div>
+
+`;
+
+});
+
+document.getElementById("productsContainer")
+.innerHTML=html;
+
+});
+
+}
+
+
+
+// ================= EMPLOYEES =================
+
+function loadEmployees(){
+
+db.ref("employees")
+.on("value",snap=>{
+
+let html="";
+
+snap.forEach(emp=>{
+
+const e=emp.val();
+
+html += `
+
+<div class="order-card">
+
+<h3>
+${e.name || "-"}
+</h3>
+
+<p>
+👔 الدور:
+${e.role || "-"}
+</p>
+
+<p>
+💰 الأجر:
+${e.salary || 0}
+</p>
+
+</div>
+
+`;
+
+});
+
+document.getElementById("employeesContainer")
+.innerHTML=html;
+
+});
+
+}
+
+
+
+// ================= CUSTOMERS =================
+
+function loadCustomers(){
+
+db.ref("customers")
+.on("value",snap=>{
+
+let html="";
+
+snap.forEach(c=>{
+
+const customer=c.val();
+
+html += `
+
+<div class="order-card">
+
+<h3>
+${customer.name || "-"}
+</h3>
+
+<p>
+📞 ${customer.phone || "-"}
+</p>
+
+</div>
+
+`;
+
+});
+
+document.getElementById("customersContainer")
+.innerHTML=html;
+
+});
+
+}
+
+
+
+// ================= SUPPLIERS =================
+
+function loadSuppliers(){
+
+db.ref("suppliers")
+.on("value",snap=>{
+
+let html="";
+
+snap.forEach(s=>{
+
+const sup=s.val();
+
+html += `
+
+<div class="order-card">
+
+<h3>
+${sup.name || "-"}
+</h3>
+
+<p>
+📞 ${sup.phone || "-"}
+</p>
+
+</div>
+
+`;
+
+});
+
+document.getElementById("suppliersContainer")
+.innerHTML=html;
+
+});
+
+}
+
+
+
+// ================= DEPARTMENTS =================
+
+function loadDepartments(){
+
+db.ref("categories")
+.on("value",snap=>{
+
+let html="";
+
+snap.forEach(dep=>{
+
+const d=dep.val();
+
+html += `
+
+<div class="order-card">
+
+<h3>
+📂 ${d.name || "-"}
+</h3>
+
+</div>
+
+`;
+
+});
+
+document.getElementById("departmentsContainer")
+.innerHTML=html;
+
+});
+
+}
+
+
+
+// ================= ROLES =================
+
+function loadRoles(){
+
+db.ref("roles")
+.on("value",snap=>{
+
+let html="";
+
+snap.forEach(r=>{
+
+const role=r.val();
+
+html += `
+
+<div class="order-card">
+
+<h3>
+${role.name || "-"}
+</h3>
+
+<p>
+💰 ${role.salary || 0}
+</p>
+
+</div>
+
+`;
+
+});
+
+document.getElementById("rolesContainer")
+.innerHTML=html;
+
+});
+
+}
+
+
+
+// ================= LIVE NOTIFICATIONS =================
+
+db.ref("notifications")
+.limitToLast(1)
+.on("child_added",snap=>{
+
+const n=snap.val();
+
+if(n?.title){
+
+notify(
+"🔔 "+n.title
+);
+
+}
+
+});
+
+
+
+// ================= START =================
+
+window.onload=()=>{
+
+autoLogin();
+
+};
 
 </script>
 
